@@ -1,0 +1,4 @@
+nbsphinx
+sphinx-automodapi
+sphinx-rtd-theme
+grheat
