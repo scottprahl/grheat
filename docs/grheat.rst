@@ -1,5 +1,5 @@
 API for `grheat` package
 ========================
 
-.. automodapi:: grheat.grheat
+.. automodapi:: grheat.point_source
    :no-inheritance-diagram:
