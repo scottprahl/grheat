@@ -20,11 +20,13 @@ html:
 	open docs/_build/index.html
 
 clean:
+	rm -rf .pytest_cache
 	rm -rf dist
 	rm -rf grheat.egg-info
 	rm -rf grheat/__pycache__
 	rm -rf docs/_build
 	rm -rf docs/api
+	rm -rf test/__pycache__
 	rm -rf .tox
 	rm -rf build
 	rm -rf 

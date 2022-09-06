@@ -22,7 +22,7 @@ A collection of Green's functions for point, line, and planar source.
 Usage
 -----
 
-Example Light paths in a 0.25 pitch GRIN lens from an ancient Melles Griot Catalog::
+DO NOT USE::
 
     import grheat
 
