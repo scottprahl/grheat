@@ -47,7 +47,7 @@ def _instantaneous(x, y, z, t, xp, yp, zp, tp):
         x, y, z: location for desired temperature [meters]
         t: time of desired temperature [seconds]
         xp, yp, zp: location of point source [meters]
-        tp: time of source impulse time [seconds]
+        tp: time of source impulse [seconds]
 
     Returns:
         normalized temperature
@@ -70,7 +70,7 @@ def instantaneous(x, y, z, t, xp, yp, zp, tp):
         x, y, z: location for desired temperature [meters]
         t: time(s) of desired temperature [seconds]
         xp, yp, zp: location of point source [meters]
-        tp: time of source impulse time [seconds]
+        tp: time of source impulse [seconds]
 
     Returns:
         Temperature Increase [°C]
