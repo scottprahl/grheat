@@ -39,13 +39,9 @@ water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 def _instantaneous(x, y, z, t, xp, yp, zp, tp):
     """
-    Calculate temperature for point source for scalar t and tp.
+    Calculate temperature rise due to a 1J instant point source at time t.
 
-    1J of heat deposited at (xp, yp, zp) at time t=tp.
-
-    See Carslaw and Jaeger page 256 - 259
-
-    Get real temperature by multiplying by
+    Carslaw and Jaeger page 256, 10.2(2)
 
     Parameters:
         x, y, z: location for desired temperature [meters]
@@ -55,28 +51,20 @@ def _instantaneous(x, y, z, t, xp, yp, zp, tp):
 
     Returns:
         normalized temperature
-
     """
     if t <= tp:
         return 0
 
     kappa = water_thermal_diffusivity  # m**2/s
     rho_cee = water_heat_capacity      # J/degree/m**3
-    rr = np.sqrt((x - xp)**2 + (y - yp)**2 + (z - zp)**2)
-    tt = kappa * (t - tp)
-    factor = 1 / rho_cee / (8 * np.pi * tt)**1.5
-    return factor * np.exp(-rr**2 / (4 * tt))
+    r = np.sqrt((x - xp)**2 + (y - yp)**2 + (z - zp)**2)
+    factor = rho_cee * 8 * (np.pi * kappa * (t - tp))**1.5
+    return 1 / factor * np.exp(-r**2 / (4 * kappa * (t - tp)))
 
 
 def instantaneous(x, y, z, t, xp, yp, zp, tp):
     """
-    Return normalized temperature for point source.
-
-    1J of heat deposited at (xp, yp, zp) at time t=tp.
-
-    See Carslaw and Jaeger page 256 - 259
-
-    Get real temperature by multiplying by
+    Calculate temperature rise due to a 1J instant point source at time(s) t.
 
     Parameters:
         x, y, z: location for desired temperature [meters]
@@ -88,22 +76,20 @@ def instantaneous(x, y, z, t, xp, yp, zp, tp):
         Temperature Increase [°C]
     """
     if np.isscalar(t):
-        return _instantaneous(x, y, z, t, xp, yp, zp, tp)
+        T = _instantaneous(x, y, z, t, xp, yp, zp, tp)
 
-    T = np.empty_like(t)
-    for i, tt in enumerate(t):
-        T[i] = _instantaneous(x, y, z, tt, xp, yp, zp, tp)
-
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _instantaneous(x, y, z, tt, xp, yp, zp, tp)
     return T
 
 
 def _continuous(x, y, z, t, xp, yp, zp):
     """
-    Temperature for continuous point source as scalar time.
+    Calculate temperature rise of a 1W continuous point source at time t.
 
-    1W of heat deposited at (xp, yp, zp) continuously starting at t=0.
-
-    See Carslaw and Jaeger page 261.
+    Carslaw and Jaeger page 261, 10.4(2)
 
     Parameters:
         x, y, z: location for desired temperature [meters]
@@ -118,18 +104,17 @@ def _continuous(x, y, z, t, xp, yp, zp):
 
     kappa = water_thermal_diffusivity  # m**2 / s
     rho_cee = water_heat_capacity      # J/degree/m**3
-    rr = np.sqrt((x - xp)**2 + (y - yp)**2 + (z - zp)**2)
-    tt = kappa * t
-    factor = 1 / rho_cee / (4 * np.pi * kappa * rr)
-
-    return factor * scipy.special.erfc(rr / np.sqrt(4 * tt))
+    r = np.sqrt((x - xp)**2 + (y - yp)**2 + (z - zp)**2)
+    factor = 1 / rho_cee / (4 * np.pi * kappa * r)
+    T = factor * scipy.special.erfc(r / np.sqrt(4 * kappa * t))
+    return T
 
 
 def continuous(x, y, z, t, xp, yp, zp):
     """
-    Calc temperature for continuous point source.
+    Calculate temperature rise of a 1W continuous point source.
 
-    1W of heat deposited at (xp, yp, zp) continuously starting at t=0.
+    The point source turns on at t=0.
 
     Parameters:
         x, y, z: location for desired temperature [meters]
@@ -140,18 +125,18 @@ def continuous(x, y, z, t, xp, yp, zp):
         Temperature Increase [°C]
     """
     if np.isscalar(t):
-        return _continuous(x, y, z, t, xp, yp, zp)
+        T = _continuous(x, y, z, t, xp, yp, zp)
 
-    T = np.empty_like(t)
-    for i, tt in enumerate(t):
-        T[i] = _continuous(x, y, z, tt, xp, yp, zp)
-
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _continuous(x, y, z, tt, xp, yp, zp)
     return T
 
 
 def _pulsed(x, y, z, t, xp, yp, zp, t_pulse):
     """
-    Calc temperature for pulsed point source.
+    Calculate temperature rise due to a 1J pulsed point source at time(s) t.
 
     1J of heat deposited at (xp, yp, zp) from t=0 to t=t_pulse.
 
@@ -165,20 +150,17 @@ def _pulsed(x, y, z, t, xp, yp, zp, t_pulse):
         Temperature Increase [°C]
     """
     if t <= 0:
-        return 0
+        T = 0
+    else:
+        T = _continuous(x, y, z, t, xp, yp, zp)
+        if t > t_pulse:
+            T -= _continuous(x, y, z, t - t_pulse, xp, yp, zp)
+    return T / t_pulse
 
-    T = _continuous(x, y, z, t, xp, yp, zp)
-
-    if t > t_pulse:
-        T -= _continuous(x, y, z, t - t_pulse, xp, yp, zp)
-
-    return T/t_pulse
 
 def pulsed(x, y, z, t, xp, yp, zp, t_pulse):
     """
-    Calc temperature for 1J pulsed point source.
-
-    1J of heat is deposited at (xp, yp, zp) from t=0 to t=t_pulse.
+    Calculate temperature rise due to a 1J pulsed point source.
 
     Parameters:
         x, y, z: location for desired temperature [meters]
@@ -190,10 +172,9 @@ def pulsed(x, y, z, t, xp, yp, zp, t_pulse):
         Temperature Increase [°C]
     """
     if np.isscalar(t):
-        return _pulsed(x, y, z, t, xp, yp, zp, t_pulse)
-
-    T = np.empty_like(t)
-    for i, tt in enumerate(t):
-        T[i] = _pulsed(x, y, z, tt, xp, yp, zp, t_pulse)
-
+        T = _pulsed(x, y, z, t, xp, yp, zp, t_pulse)
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _pulsed(x, y, z, tt, xp, yp, zp, t_pulse)
     return T
