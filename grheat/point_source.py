@@ -79,13 +79,13 @@ def instantaneous(x, y, z, t, xp, yp, zp, tp):
     Get real temperature by multiplying by
 
     Parameters:
-        x, y, z: location for desired temperature
-        t: time(s) of desired temperature
-        xp, yp, zp: location of point source
-        tp: time of source impulse time
+        x, y, z: location for desired temperature [meters]
+        t: time(s) of desired temperature [seconds]
+        xp, yp, zp: location of point source [meters]
+        tp: time of source impulse time [seconds]
 
     Returns:
-        normalized temperature
+        Temperature Increase [°C]
     """
     if np.isscalar(t):
         return _instantaneous(x, y, z, t, xp, yp, zp, tp)
@@ -99,21 +99,19 @@ def instantaneous(x, y, z, t, xp, yp, zp, tp):
 
 def _continuous(x, y, z, t, xp, yp, zp):
     """
-    Return normalized temperature for continuous point source.
+    Temperature for continuous point source as scalar time.
 
     1W of heat deposited at (xp, yp, zp) continuously starting at t=0.
 
     See Carslaw and Jaeger page 261.
 
-    Point source starts at t=0.
-
     Parameters:
-        x, y, z: location for desired temperature
-        t: time(s) of desired temperature
-        xp, yp, zp: location of point source
+        x, y, z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        xp, yp, zp: location of point source [meters]
 
     Returns:
-        normalized temperature
+        Temperature Increase [°C]
     """
     if t <= 0:
         return 0
@@ -129,21 +127,17 @@ def _continuous(x, y, z, t, xp, yp, zp):
 
 def continuous(x, y, z, t, xp, yp, zp):
     """
-    Return normalized temperature for continuous point source.
-
-    See Carslaw and Jaeger page 256 - 259
+    Calc temperature for continuous point source.
 
     1W of heat deposited at (xp, yp, zp) continuously starting at t=0.
 
-    Get real temperature by multiplying by
-
     Parameters:
-        x, y, z: location for desired temperature
-        t: time(s) of desired temperature
-        xp, yp, zp: location of point source
+        x, y, z: location for desired temperature [meters]
+        t: time(s) of desired temperature [seconds]
+        xp, yp, zp: location of point source [meters]
 
-    Returns
-        Normalized Temperature
+    Returns:
+        Temperature Increase [°C]
     """
     if np.isscalar(t):
         return _continuous(x, y, z, t, xp, yp, zp)
@@ -162,24 +156,23 @@ def _pulsed(x, y, z, t, xp, yp, zp, t_pulse):
     1J of heat deposited at (xp, yp, zp) from t=0 to t=t_pulse.
 
     Parameters:
-        x, y, z: location for desired temperature
-        t: time(s) of desired temperature
-        xp, yp, zp: location of point source
-        t_pulse: duration of pulse
+        x, y, z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        xp, yp, zp: location of point source [meters]
+        t_pulse: duration of pulse [seconds]
 
     Returns:
-        normalized temperature
+        Temperature Increase [°C]
     """
     if t <= 0:
         return 0
 
     T = _continuous(x, y, z, t, xp, yp, zp)
 
-    if t < t_pulse:
-        return T
+    if t > t_pulse:
+        T -= _continuous(x, y, z, t - t_pulse, xp, yp, zp)
 
-    return T - _continuous(x, y, z, t - t_pulse, xp, yp, zp)
-
+    return T/t_pulse
 
 def pulsed(x, y, z, t, xp, yp, zp, t_pulse):
     """
@@ -187,18 +180,14 @@ def pulsed(x, y, z, t, xp, yp, zp, t_pulse):
 
     1J of heat is deposited at (xp, yp, zp) from t=0 to t=t_pulse.
 
-    See Carslaw and Jaeger page 256 - 259
-
-    Get real temperature by multiplying by
-
     Parameters:
-        x, y, z: location for desired temperature
-        t: time(s) of desired temperature
-        xp, yp, zp: location of point source
-        t_pulse: duration of pulse
+        x, y, z: location for desired temperature [meters]
+        t: time(s) of desired temperature [seconds]
+        xp, yp, zp: location of point source [meters]
+        t_pulse: duration of pulse [seconds]
 
     Returns
-        Normalized Temperature
+        Temperature Increase [°C]
     """
     if np.isscalar(t):
         return _pulsed(x, y, z, t, xp, yp, zp, t_pulse)
