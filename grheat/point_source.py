@@ -118,13 +118,13 @@ def _continuous(x, y, z, t, xp, yp, zp):
     if t <= 0:
         return 0
 
-    kappa = water_thermal_diffusivity  # J/degree / gm
+    kappa = water_thermal_diffusivity  # m**2 / s
     rho_cee = water_heat_capacity      # J/degree/m**3
     rr = np.sqrt((x - xp)**2 + (y - yp)**2 + (z - zp)**2)
     tt = kappa * t
     factor = 1 / rho_cee / (4 * np.pi * kappa * rr)
 
-    return factor * scipy.special.erfc(rr / np.sqrt(4 * kappa * tt))
+    return factor * scipy.special.erfc(rr / np.sqrt(4 * tt))
 
 
 def continuous(x, y, z, t, xp, yp, zp):
