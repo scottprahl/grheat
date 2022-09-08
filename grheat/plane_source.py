@@ -3,7 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's function heat transfer solutions for point source in infinite media.
+Green's function heat transfer solutions for xy-plane source in infinite media.
 
 More documentation at <https://grheat.readthedocs.io>
 
@@ -27,137 +27,156 @@ Typical usage::
 import scipy.special
 import numpy as np
 
-__all__ = ('theta_exp',
-           'theta_exp_pulsed',
+__all__ = ('instantaneous',
+           'continuous',
+           'pulsed',
            )
 
 
-water_heat_capacity = 4.184 * 1000          # J/degree / kg
+water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
-def _theta_exp_dimensionless(xi, tau):
+def _instantaneous(z, t, zp, tp):
     """
-    Handy dimensionless temperature*tau for illumination of absorber.
-    
+    Calculate temperature rise due to a 1 J/m² instantaneous xy-plane source at time t.
+
+    The line parallel to the z-axis and passes through zp.
+
+    Carslaw and Jaeger page 259, 10.3(4)
+
     Parameters:
-        xi: dimensionless depth (mu_a*x)
-        tau: dimensionless time (mu_a**2 * kappa * t)
-    
-    Returns: 
-        dimensionless temperature*tau
+        z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
+        tp: time of source impulse [seconds]
+
+    Returns:
+        normalized temperature
     """
-    if tau <= 0:
+    if t <= tp:
         return 0
 
-    xx = xi/2/np.sqrt(tau)
-    if abs(xx) > 20:
-        expxx = 0
+    kappa = water_thermal_diffusivity  # m**2/s
+    rho_cee = water_heat_capacity      # J/degree/m**3
+    r = np.abs(z - zp)
+    factor = rho_cee * 2 * np.sqrt(np.pi * kappa * (t - tp))
+    return 1 / factor * np.exp(-r**2 / (4 * kappa * (t - tp)))
+
+
+def instantaneous(z, t, zp, tp):
+    """
+    Calculate temperature rise due to a 1 J/m² instant xy-plane source
+
+    Parameters:
+        z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
+        tp: time of source impulse [seconds]
+
+    Returns:
+        Temperature Increase [°C]
+    """
+    if np.isscalar(t):
+        T = _instantaneous(z, t, zp, tp)
+
     else:
-        expxx = np.exp(-xx**2)
-
-    print(np.sqrt(tau)-xx, np.sqrt(tau)+xx)
-    T = 2*np.sqrt(tau/np.pi)*np.exp(-xx**2) 
-    T -= xi * scipy.special.erfc(xx)
-    T -= np.exp(-xi) 
-    T += 1/2*expxx*scipy.special.erfcx(np.sqrt(tau)-xx)
-    T += 1/2*expxx*scipy.special.erfcx(np.sqrt(tau)+xx)
-
-#    T += 1/2*np.exp(tau-xi)*scipy.special.erfc(np.sqrt(tau)-xx)
-#    T += 1/2*np.exp(tau+xi)*scipy.special.erfc(np.sqrt(tau)+xx)
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _instantaneous(z, tt, zp, tp)
     return T
 
 
-def _theta_exp_pulsed_dimensionless(xi, tau, tau_pulse):
+def _continuous(z, t, zp):
     """
-    Find Temperature of pulsed illumination of absorber.
-    
+    Calculate temperature rise due to a 1W/m² xy-plane source at single time point.
+
+    Equation obtained by integrating planar Green's function from 0 to t in
+    Mathematica.
+
     Parameters:
-        xi: dimensionless depth (mu_a*x)
-        tau: dimensionless time (mu_a**2 * kappa * t)
-    
-    Returns: 
-        dimensionless temperature
+        z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
+
+    Returns:
+        Temperature Increase [°C]
     """
-    if tau <= 0:
+    if t <= 0:
         return 0
-    
-    T = theta_exp_dimensionless(xi, tau)
-    
-    if tau <= tau_pulse:
-        return T/tau
-    
-    T = T - theta_exp_dimensionless(xi, tau-tau_pulse)
 
-    return T/tau_pulse
+    kappa = water_thermal_diffusivity  # m**2/s
+    rho_cee = water_heat_capacity      # J/degree/m**3
+    alpha = np.sqrt((z - zp)**2 / (4 * kappa * t))
+    T = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
+    return np.sqrt(t / kappa) / rho_cee * T
 
 
-def theta_exp(x, t, mu_a):
+def continuous(z, t, zp):
     """
-    Find dimensionless temperature of illuminated absorber.
-    
+    Calculate temperature rise due to a 1W/m² continuous xy-plane source.
+
+    The xy-plane source turns on at t=0 and passes through zp.
+
     Parameters:
-        x:  depth [m]
-        t:  time of illumination [s]
-        mu_a: absorption coefficient [1/m]
-    
-    Returns: temperature
-    """
-    kappa = water_thermal_diffusivity
-    xi = mu_a * x
-    tau = t * kappa * mu_a**2
-    
-    if np.isscalar(tau):
-        return _theta_exp_dimensionless(xi, tau)/tau
-    
-    T = np.empty_like(tau)
-    for i, tt in enumerate(tau):
-        T[i] = _theta_exp_dimensionless(xi, tt)/tau
-    return T
+        z: location for desired temperature [meters]
+        t: time(s) of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
 
-    
-def _exp_pulsed(x, t, t_pulse, mu_a):
+    Returns:
+        Temperature Increase [°C]
     """
-    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
-    
-    Parameters:
-        x:  depth [m]
-        t:  time of illumination [s]
-        t_pulse: duration of pulse [s]
-        mu_a: absorption coefficient [1/m]
-        kappa: thermal diffusivity [m**2/s]
-    
-    Returns: dimensionless temperature
-    """
-    kappa = water_thermal_diffusivity
-    xi = mu_a * x
-    tau = t * kappa * mu_a**2
-    tau_pulse = t_pulse * kappa * mu_a**2
+    if np.isscalar(t):
+        T = _continuous(z, t, zp)
 
-    if np.scalar(tau):
-        return theta_exp_pulsed_dimensionless(xi, tau, tau_pulse)
-
-    T = np.empty_like(tau)
-    for i, tt in enumerate(tau):
-        T[i] = _theta_exp_dimensionless(xi, tt)/tau_pulse
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _continuous(z, tt, zp)
     return T
 
 
-def exp_pulsed(x, t, t_pulse, mu_a):
+def _pulsed(z, t, zp, t_pulse):
     """
-    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
-    
+    Calculate temperature rise due to a 1 J/m² pulsed xy-plane source at time t.
+
+    1 J/m² of heat deposited in xy-plane passing through (zp) from t=0 to t=t_pulse.
+
     Parameters:
-        x: depth of temperature [m]
-        t: time(s) of temperature [s]
-        t_pulse: duration of pulse [s]
-        mu_a: absorption coefficient [1/m]
-    
-    Returns: 
-        Temperature increase [°C]
+        z: location for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
+        t_pulse: duration of pulse [seconds]
+
+    Returns:
+        Temperature Increase [°C]
     """
-    kappa = water_thermal_diffusivity
-    rho_c = water_thermal_capacity
-    return 1/(kappa*rho_c*mu_a)*theta_exp_pulsed(x, t, t_pulse, mu_a)
+    if t <= 0:
+        T = 0
+    else:
+        T = _continuous(z, t, zp)
+        if t > t_pulse:
+            T -= _continuous(z, t - t_pulse, zp)
+    return T / t_pulse
 
 
+def pulsed(z, t, zp, t_pulse):
+    """
+    Calculate temperature rise due to a 1 J/m² pulsed xy-plane source.
+
+    Parameters:
+        z: location for desired temperature [meters]
+        t: time(s) of desired temperature [seconds]
+        zp: location of xy-plane source [meters]
+        t_pulse: duration of pulse [seconds]
+
+    Returns
+        Temperature Increase [°C]
+    """
+    if np.isscalar(t):
+        T = _pulsed(z, t, zp, t_pulse)
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _pulsed(z, tt, zp, t_pulse)
+    return T
