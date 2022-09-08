@@ -116,9 +116,9 @@ def theta_exp(x, t, mu_a):
     return T
 
     
-def theta_exp_pulsed(x, t, t_pulse, mu_a):
+def _exp_pulsed(x, t, t_pulse, mu_a):
     """
-    Find dimensionless temperature of pulsed illuminated absorber.
+    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
     
     Parameters:
         x:  depth [m]
@@ -143,21 +143,21 @@ def theta_exp_pulsed(x, t, t_pulse, mu_a):
     return T
 
 
-def temperature_exp_pulsed(x, t, t_pulse, E, mu_a):
+def exp_pulsed(x, t, t_pulse, mu_a):
     """
-    Find Temperature of pulsed illuminated absorber.
+    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
     
     Parameters:
-        x:  depth [m]
-        t:  time of illumination [s]
+        x: depth of temperature [m]
+        t: time(s) of temperature [s]
         t_pulse: duration of pulse [s]
-        E: pulse energy [J]
         mu_a: absorption coefficient [1/m]
     
-    Returns: temperature
+    Returns: 
+        Temperature increase [°C]
     """
     kappa = water_thermal_diffusivity
     rho_c = water_thermal_capacity
-    return E/(kappa*rho_c*mu_a)*theta_exp_pulsed(x, t, t_pulse, mu_a)
+    return 1/(kappa*rho_c*mu_a)*theta_exp_pulsed(x, t, t_pulse, mu_a)
 
 
