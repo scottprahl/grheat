@@ -35,6 +35,56 @@ __all__ = ('theta_exp',
 water_heat_capacity = 4.184 * 1000          # J/degree / kg
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
+def _instantaneous(z, t, tp, mua):
+    """
+    Calculate temperature rise due to a 1 J/m² instantaneous irradiance.
+
+    Prahl, "Charts to rapidly estimate temperature following laser irradiation" 1995.
+
+    \frac{1}{2} e^{\text{mua} (\kappa  \text{mua} t-z)} \text{erfc}\left(\frac{2 \kappa  \text{mua} t-z}{2 \sqrt{\kappa  t}}\right)
+
+    Parameters:
+        z: depth for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        tp: time of source impulse [seconds]
+        mua: absorption coefficient [1/m]
+
+    Returns:
+        Temperature Increase [°C]
+    """
+    if t <= tp:
+        return 0
+
+    kappa = water_thermal_diffusivity  # m**2/s
+    rho_cee = water_heat_capacity      # J/degree/m**3
+    tau = mua**2 * kappa * (t-tp)
+    zeta = mua * z
+    factor = 1 / 2 / rho_cee * np.exp(-zeta + tau)
+    T = factor * scipy.special.erfc((-zeta + 2 * tau)/(2 * np.sqrt(tau)))
+    return T
+
+
+def instantaneous(z, t, tp, mua):
+    """
+    Calculate temperature rise due to a 1 J/m² radiant exposure on absorber.
+    
+    Parameters:
+        z: depth for desired temperature [meters]
+        t: time of desired temperature [seconds]
+        tp: time of source impulse [seconds]
+
+    Returns:
+        Temperature Increase [°C]
+    """
+    if np.isscalar(t):
+        T = _instantaneous(z, t, tp, mua)
+
+    else:
+        T = np.empty_like(t)
+        for i, tt in enumerate(t):
+            T[i] = _instantaneous(z, tt, tp, mua)
+    return T
+
 
 def _theta_exp_dimensionless(xi, tau):
     """
