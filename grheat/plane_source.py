@@ -3,7 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's function heat transfer solutions for xy-plane source in infinite media.
+Green's function heat transfer solutions for xy-planar source in infinite media.
 
 More documentation at <https://grheat.readthedocs.io>
 
@@ -39,20 +39,20 @@ water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 def _instantaneous(z, t, zp, tp):
     """
-    Calculate temperature rise due to a 1 J/m² instantaneous xy-plane source at time t.
+    Calculate temperature rise due to a 1 J/m² instantaneous xy-planar source at time t.
 
-    The line parallel to the z-axis and passes through zp.
+    The plane is parallel to the surface and passes through zp.
 
     Carslaw and Jaeger page 259, 10.3(4)
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth of desired temperature [meters]
         t: time of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
         tp: time of source impulse [seconds]
 
     Returns:
-        normalized temperature
+        Temperature increase [°C]
     """
     if t <= tp:
         return 0
@@ -66,16 +66,18 @@ def _instantaneous(z, t, zp, tp):
 
 def instantaneous(z, t, zp, tp):
     """
-    Calculate temperature rise due to a 1 J/m² instant xy-plane source
+    Calculate temperature rise due to a 1 J/m² instant xy-planar source
+
+    The plane is parallel to the surface and passes through zp.
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth for desired temperature [meters]
         t: time of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
         tp: time of source impulse [seconds]
 
     Returns:
-        Temperature Increase [°C]
+        Temperature increase [°C]
     """
     if np.isscalar(t):
         T = _instantaneous(z, t, zp, tp)
@@ -89,18 +91,21 @@ def instantaneous(z, t, zp, tp):
 
 def _continuous(z, t, zp):
     """
-    Calculate temperature rise due to a 1W/m² xy-plane source at single time point.
+    Calculate temperature rise due to a 1 W/m² xy-planar source.
 
+    The xy-planar source is located at a depth zp and is turned on at t=0.
+    It remains on until t=t.
+    
     Equation obtained by integrating planar Green's function from 0 to t in
     Mathematica.
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth for desired temperature [meters]
         t: time of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
 
     Returns:
-        Temperature Increase [°C]
+        Temperature increase [°C]
     """
     if t <= 0:
         return 0
@@ -114,14 +119,14 @@ def _continuous(z, t, zp):
 
 def continuous(z, t, zp):
     """
-    Calculate temperature rise due to a 1W/m² continuous xy-plane source.
+    Calculate temperature rise due to a 1W/m² continuous xy-planar source.
 
-    The xy-plane source turns on at t=0 and passes through zp.
+    The xy-planar source turns on at t=0 and passes through zp.
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth for desired temperature [meters]
         t: time(s) of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
 
     Returns:
         Temperature Increase [°C]
@@ -138,14 +143,14 @@ def continuous(z, t, zp):
 
 def _pulsed(z, t, zp, t_pulse):
     """
-    Calculate temperature rise due to a 1 J/m² pulsed xy-plane source at time t.
+    Calculate temperature rise due to a 1 J/m² pulsed xy-planar source at time t.
 
-    1 J/m² of heat deposited in xy-plane passing through (zp) from t=0 to t=t_pulse.
+    1 J/m² of heat deposited in an xy-plane passing through (zp) from t=0 to t=t_pulse.
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth for desired temperature [meters]
         t: time of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
         t_pulse: duration of pulse [seconds]
 
     Returns:
@@ -162,12 +167,12 @@ def _pulsed(z, t, zp, t_pulse):
 
 def pulsed(z, t, zp, t_pulse):
     """
-    Calculate temperature rise due to a 1 J/m² pulsed xy-plane source.
+    Calculate temperature rise due to a 1 J/m² pulsed xy-planar source.
 
     Parameters:
-        z: location for desired temperature [meters]
+        z: depth for desired temperature [meters]
         t: time(s) of desired temperature [seconds]
-        zp: location of xy-plane source [meters]
+        zp: depth of xy-planar source [meters]
         t_pulse: duration of pulse [seconds]
 
     Returns
