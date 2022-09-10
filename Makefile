@@ -26,7 +26,7 @@ clean:
 	rm -rf grheat/__pycache__
 	rm -rf docs/_build
 	rm -rf docs/api
-	rm -rf test/__pycache__
+	rm -rf tests/__pycache__
 	rm -rf .tox
 	rm -rf build
 	rm -rf 

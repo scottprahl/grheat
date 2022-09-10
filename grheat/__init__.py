@@ -11,4 +11,4 @@ __copyright__ = 'Copyright 2022, Scott Prahl'
 __license__ = 'MIT'
 __url__ = 'https://github.com/scottprahl/grheat.git'
 
-import grheat.point_source
+from .point_source import *
