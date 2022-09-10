@@ -66,10 +66,10 @@ class Absorber:
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
-        self.mu = mua                          # 1/meter
-        self.diffusivity = diffusivity         # m**2/s
-        self.capacity = capacity               # J/degree/kg
-        self.boundary = boundary.lowercase()   # infinite, adiabatic, constant
+        self.mu = mua                      # 1/meter
+        self.diffusivity = diffusivity     # m**2/s
+        self.capacity = capacity           # J/degree/kg
+        self.boundary = boundary.lower()   # infinite, adiabatic, constant
 
     def _instantaneous(self, z, t, tp):
         """
