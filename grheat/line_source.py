@@ -7,175 +7,200 @@ Green's function heat transfer solutions for z-line source in infinite media.
 
 More documentation at <https://grheat.readthedocs.io>
 
-Typical usage::
+    Typical usage::
 
-    import grheat
-    import numpy as np
-    import matplotlib.pyplot as plt
+        import grheat
+        import numpy as np
+        import matplotlib.pyplot as plt
 
-    r = np.array([0, 0, 0])
-    rp = np.array([0, 0, 1])
-    t = np.linspace(0, 2, 100)
-    tp = 0
+        t = np.linspace(0, 500, 100) / 1000   # seconds
+        mua = 0.25 * 1000                     # 1/m
+        x,y,z = 0,0,0                         # meters
+        xp,yp,zp = 0,0,0.001                  # meters
+        t_pulse = 0.100                       # seconds
 
-    T =
-    plt.plot(t, T, color='blue')
-    plt.show()
+        line = grheat.Line()
+        T = line.pulsed(x,y,z,t,xp,yp,t_pulse)
 
+        plt.plot(t * 1000, T, color='blue')
+        plt.xlabel("Time (ms)")
+        plt.ylabel("Temperature Increase (°C)")
+        plt.title("1J pulse lasting %.0f ms" % t_pulse)
+        plt.show()
 """
 
 import scipy.special
 import numpy as np
-
-__all__ = ('instantaneous',
-           'continuous',
-           'pulsed',
-           )
 
 
 water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
-def _instantaneous(x, y, t, xp, yp, tp):
+class Line:
     """
-    Calculate temperature rise due to a 1 J/m instantaneous z-line source at time t.
+    Green's function heat transfer solutions for line source in infinite media.
 
-    The line parallel to the z-axis and passes through xp, yp.
+    Typical usage::
 
-    Carslaw and Jaeger page 258, 10.3(1)
+        import grheat
+        import numpy as np
+        import matplotlib.pyplot as plt
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
-        tp: time of source impulse [seconds]
+        t = np.linspace(0, 500, 100) / 1000   # seconds
+        mua = 0.25 * 1000                     # 1/m
+        x,y,z = 0,0,0                         # meters
+        xp,yp,zp = 0,0,0.001                  # meters
+        t_pulse = 0.100                       # seconds
 
-    Returns:
-        normalized temperature
+        line = grheat.Line()
+        T = line.pulsed(x,y,z,t,xp,yp,t_pulse)
+
+        plt.plot(t * 1000, T, color='blue')
+        plt.xlabel("Time (ms)")
+        plt.ylabel("Temperature Increase (°C)")
+        plt.title("1J pulse lasting %.0f ms" % t_pulse)
+        plt.show()
     """
-    if t <= tp:
-        return 0
 
-    kappa = water_thermal_diffusivity  # m**2/s
-    rho_cee = water_heat_capacity      # J/degree/m**3
-    r = np.sqrt((x - xp)**2 + (y - yp)**2)
-    factor = rho_cee * 4 * np.pi * kappa * (t - tp)
-    return 1 / factor * np.exp(-r**2 / (4 * kappa * (t - tp)))
+    def __init__(self,
+                 diffusivity=water_thermal_diffusivity,
+                 capacity=water_heat_capacity,
+                 boundary='infinite'):
+        self.diffusivity = diffusivity     # m**2/s
+        self.capacity = capacity           # J/degree/kg
+        self.boundary = boundary.lower()   # infinite, adiabatic, constant
 
+    def _instantaneous(self, x, y, t, xp, yp, tp):
+        """
+        Calculate temperature rise due to a 1 J/m instantaneous z-line source at time t.
 
-def instantaneous(x, y, t, xp, yp, tp):
-    """
-    Calculate temperature rise due to a 1 J/m instant z-line source
+        The line parallel to the z-axis and passes through xp, yp.
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
-        tp: time of source impulse [seconds]
+        Carslaw and Jaeger page 258, 10.3(1)
 
-    Returns:
-        Temperature Increase [°C]
-    """
-    if np.isscalar(t):
-        T = _instantaneous(x, y, t, xp, yp, tp)
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
+            tp: time of source impulse [seconds]
 
-    else:
-        T = np.empty_like(t)
-        for i, tt in enumerate(t):
-            T[i] = _instantaneous(x, y, tt, xp, yp, tp)
-    return T
+        Returns:
+            normalized temperature
+        """
+        if t <= tp:
+            return 0
 
+        r = np.sqrt((x - xp)**2 + (y - yp)**2)
+        factor = self.capacity * 4 * np.pi * self.diffusivity * (t - tp)
+        return 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
 
-def _continuous(x, y, t, xp, yp):
-    """
-    Calculate temperature rise due to a 1W/m z-line source at single time point.
+    def instantaneous(self, x, y, t, xp, yp, tp):
+        """
+        Calculate temperature rise due to a 1 J/m instant z-line source
 
-    Carslaw and Jaeger page 261, 10.4(5)
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
+            tp: time of source impulse [seconds]
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
+        Returns:
+            Temperature Increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._instantaneous(x, y, t, xp, yp, tp)
 
-    Returns:
-        Temperature Increase [°C]
-    """
-    if t <= 0:
-        return 0
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._instantaneous(x, y, tt, xp, yp, tp)
+        return T
 
-    kappa = water_thermal_diffusivity  # m**2/s
-    rho_cee = water_heat_capacity      # J/degree/m**3
-    r = np.sqrt((x - xp)**2 + (y - yp)**2)
-    factor = -rho_cee * 4 * np.pi * kappa
-    return 1 / factor * scipy.special.expi(-r**2 / (4 * kappa * t))
+    def _continuous(self, x, y, t, xp, yp):
+        """
+        Calculate temperature rise due to a 1W/m z-line source at single time point.
 
+        Carslaw and Jaeger page 261, 10.4(5)
 
-def continuous(x, y, t, xp, yp):
-    """
-    Calculate temperature rise due to a 1W/m continuous z-line source.
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
 
-    The z-line source turns on at t=0 and passes through (xp, yp).
+        Returns:
+            Temperature Increase [°C]
+        """
+        if t <= 0:
+            return 0
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time(s) of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
+        r = np.sqrt((x - xp)**2 + (y - yp)**2)
+        factor = -self.capacity * 4 * np.pi * self.diffusivity
+        return 1 / factor * scipy.special.expi(-r**2 / (4 * self.diffusivity * t))
 
-    Returns:
-        Temperature Increase [°C]
-    """
-    if np.isscalar(t):
-        T = _continuous(x, y, t, xp, yp)
+    def continuous(self, x, y, t, xp, yp):
+        """
+        Calculate temperature rise due to a 1W/m continuous z-line source.
 
-    else:
-        T = np.empty_like(t)
-        for i, tt in enumerate(t):
-            T[i] = _continuous(x, y, tt, xp, yp)
-    return T
+        The z-line source turns on at t=0 and passes through (xp, yp).
 
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time(s) of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
 
-def _pulsed(x, y, t, xp, yp, t_pulse):
-    """
-    Calculate temperature rise due to a 1 J/m pulsed z-line source at time(s) t.
+        Returns:
+            Temperature Increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._continuous(x, y, t, xp, yp)
 
-    1 J/m of heat deposited along z-line passing through (xp, yp) from t=0 to t=t_pulse.
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._continuous(x, y, tt, xp, yp)
+        return T
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
-        t_pulse: duration of pulse [seconds]
+    def _pulsed(self, x, y, t, xp, yp, t_pulse):
+        """
+        Calculate temperature rise due to a 1 J/m pulsed z-line source at time(s) t.
 
-    Returns:
-        Temperature Increase [°C]
-    """
-    if t <= 0:
-        T = 0
-    else:
-        T = _continuous(x, y, t, xp, yp)
-        if t > t_pulse:
-            T -= _continuous(x, y, t - t_pulse, xp, yp)
-    return T / t_pulse
+        1 J/m of heat deposited along z-line passing through (xp, yp) from t=0 to t=t_pulse.
 
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
+            t_pulse: duration of pulse [seconds]
 
-def pulsed(x, y, t, xp, yp, t_pulse):
-    """
-    Calculate temperature rise due to a 1 J/m pulsed z-line source.
+        Returns:
+            Temperature Increase [°C]
+        """
+        if t <= 0:
+            T = 0
+        else:
+            T = self._continuous(x, y, t, xp, yp)
+            if t > t_pulse:
+                T -= self._continuous(x, y, t - t_pulse, xp, yp)
+        return T / t_pulse
 
-    Parameters:
-        x, y: location for desired temperature [meters]
-        t: time(s) of desired temperature [seconds]
-        xp, yp: location of z-line source [meters]
-        t_pulse: duration of pulse [seconds]
+    def pulsed(self, x, y, t, xp, yp, t_pulse):
+        """
+        Calculate temperature rise due to a 1 J/m pulsed z-line source.
 
-    Returns
-        Temperature Increase [°C]
-    """
-    if np.isscalar(t):
-        T = _pulsed(x, y, t, xp, yp, t_pulse)
-    else:
-        T = np.empty_like(t)
-        for i, tt in enumerate(t):
-            T[i] = _pulsed(x, y, tt, xp, yp, t_pulse)
-    return T
+        Parameters:
+            x, y: location for desired temperature [meters]
+            t: time(s) of desired temperature [seconds]
+            xp, yp: location of z-line source [meters]
+            t_pulse: duration of pulse [seconds]
+
+        Returns
+            Temperature Increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._pulsed(x, y, t, xp, yp, t_pulse)
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._pulsed(x, y, tt, xp, yp, t_pulse)
+        return T

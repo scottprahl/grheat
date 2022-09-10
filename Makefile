@@ -7,12 +7,14 @@ pycheck:
 	-pylint grheat/point_source.py
 	-pylint grheat/line_source.py
 	-pylint grheat/plane_source.py
+	-pylint grheat/absorber.py
 	-pylint grheat/__init__.py
 
 doccheck:
 	-pydocstyle grheat/point_source.py
 	-pydocstyle grheat/line_source.py
 	-pydocstyle grheat/plane_source.py
+	-pydocstyle grheat/absorber.py
 	-pydocstyle grheat/__init__.py
 
 html:
@@ -50,5 +52,6 @@ rcheck:
 
 test:
 	python3 -m pytest tests/test_point.py
+	python3 -m pytest tests/test_line.py
 
 .PHONY: clean check rcheck html

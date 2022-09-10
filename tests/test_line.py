@@ -6,9 +6,9 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=line-too-long
 
+import grheat
 import unittest
 import numpy as np
-import grheat.line_source as line
 
 # the low level tests use functions that should not be exported.  These work
 # but now that the higher level tests pass, these are skipped
@@ -17,16 +17,19 @@ import grheat.line_source as line
 class InstantaneousLine(unittest.TestCase):
 
     def test_01_scalar(self):
+        line = grheat.Line()
         tp = 0
         t = 1
         T = line.instantaneous(0, 0, t, 0, 1, tp)
 
     def test_02_time_array(self):
+        line = grheat.Line()
         tp = 0
         t = np.linspace(0,10)
         T = line.instantaneous(0, 0, t, 0, 1, tp)
 
     def test_03_surface(self):
+        line = grheat.Line()
         tp = 0
         t = 1
         X, Y = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
@@ -36,14 +39,17 @@ class InstantaneousLine(unittest.TestCase):
 class ContinuousLine(unittest.TestCase):
 
     def test_01_scalar(self):
+        line = grheat.Line()
         t = 1
         T = line.continuous(0, 0, t, 0, 1)
 
     def test_02_time_array(self):
+        line = grheat.Line()
         t = np.linspace(0,10)
         T = line.continuous(0, 0, t, 0, 1)
 
     def test_03_surface(self):
+        line = grheat.Line()
         tp = 0
         t = 1
         X, Y = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
@@ -53,18 +59,21 @@ class ContinuousLine(unittest.TestCase):
 class PulsedLine(unittest.TestCase):
 
     def test_01_scalar(self):
+        line = grheat.Line()
         t_pulse = 0.5
         t = 1
         yp = 0.001  # meters
         T = line.pulsed(0, 0, t, 0, yp, t_pulse)
 
     def test_02_time_array(self):
+        line = grheat.Line()
         t_pulse = 0.5
         t = np.linspace(0,10)
         yp = 0.001  # meters
         T = line.pulsed(0, 0, t, 0, yp, t_pulse)
 
     def test_03_surface(self):
+        line = grheat.Line()
         t_pulse = 0.5
         t = 1
         yp = 0.001  # meters
@@ -75,6 +84,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
+        line = grheat.Line()
         t_pulse = 0.00001
         tp = 0
         t = 1
@@ -85,6 +95,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source."""
+        line = grheat.Line()
         t_pulse = 0.00001
         tp = 0
         t = np.linspace(0,10)
@@ -96,6 +107,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_03_instant(self):
         """Short pulse result should be same as instantaneous source."""
+        line = grheat.Line()
         t_pulse = 0.00001
         tp = 0
         t = 1

@@ -12,3 +12,4 @@ __license__ = 'MIT'
 __url__ = 'https://github.com/scottprahl/grheat.git'
 
 from .point_source import *
+from .line_source import *
