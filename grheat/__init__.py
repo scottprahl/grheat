@@ -13,3 +13,5 @@ __url__ = 'https://github.com/scottprahl/grheat.git'
 
 from .point_source import *
 from .line_source import *
+from .plane_source import *
+from .absorber import *

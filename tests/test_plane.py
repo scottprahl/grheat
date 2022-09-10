@@ -8,17 +8,19 @@
 
 import unittest
 import numpy as np
-import grheat.plane_source as plane
+import grheat
 
 class InstantaneousPlane(unittest.TestCase):
 
     def test_01_scalar(self):
+        plane = grheat.Plane()
         tp = 0
         t = 1
         zp = 0.001  # meters
         T = plane.instantaneous(0, t, zp, tp)
 
     def test_02_time_array(self):
+        plane = grheat.Plane()
         tp = 0
         zp = 0.001  # meters
         t = np.linspace(0,10)
@@ -28,11 +30,13 @@ class InstantaneousPlane(unittest.TestCase):
 class ContinuousPlane(unittest.TestCase):
 
     def test_01_scalar(self):
+        plane = grheat.Plane()
         t = 1
         zp = 0.001  # meters
         T = plane.continuous(0, t, zp)
 
     def test_02_time_array(self):
+        plane = grheat.Plane()
         t = np.linspace(0,10)
         zp = 0.001  # meters
         T = plane.continuous(0, t, zp)
@@ -41,12 +45,14 @@ class ContinuousPlane(unittest.TestCase):
 class PulsedPlane(unittest.TestCase):
 
     def test_01_scalar(self):
+        plane = grheat.Plane()
         t_pulse = 0.5
         t = 1
         zp = 0.001  # meters
         T = plane.pulsed(0, t, zp, t_pulse)
 
     def test_02_time_array(self):
+        plane = grheat.Plane()
         t_pulse = 0.5
         t = np.linspace(0,10)
         zp = 0.001  # meters
@@ -56,6 +62,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
+        plane = grheat.Plane()
         t_pulse = 0.00001
         tp = 0
         t = 1
@@ -67,6 +74,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source."""
+        plane = grheat.Plane()
         t_pulse = 0.00001
         tp = 0
         t = np.linspace(0,10)

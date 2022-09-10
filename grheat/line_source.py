@@ -97,7 +97,7 @@ class Line:
 
     def instantaneous(self, x, y, t, xp, yp, tp):
         """
-        Calculate temperature rise due to a 1 J/m instant z-line source
+        Calculate temperature rise due to a 1 J/m instant z-line source.
 
         Parameters:
             x, y: location for desired temperature [meters]
