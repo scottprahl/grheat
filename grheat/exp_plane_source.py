@@ -3,7 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's function heat transfer solutions for point source in infinite media.
+Green's function heat transfer solutions for exponential heating of infinite media.
 
 More documentation at <https://grheat.readthedocs.io>
 
@@ -13,13 +13,18 @@ Typical usage::
     import numpy as np
     import matplotlib.pyplot as plt
 
-    r = np.array([0, 0, 0])
-    rp = np.array([0, 0, 1])
-    t = np.linspace(0, 2, 100)
-    tp = 0
+    t = np.linspace(0, 500, 100) / 1000   # seconds
+    mua = 0.25 * 1000                     # 1/m
+    z = 0                                 # meters
+    t_pulse = 0.100                       # seconds
 
-    T =
-    plt.plot(t, T, color='blue')
+    medium = new Absorber(mua)
+    T = medium.pulsed(z, t, t_pulse)
+
+    plt.plot(t * 1000, T, color='blue')
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Temperature Increase (°C)")
+    plt.title("1J/m² pulse lasting %.0f ms" % t_pulse)
     plt.show()
 
 """
@@ -27,187 +32,184 @@ Typical usage::
 import scipy.special
 import numpy as np
 
-__all__ = ('theta_exp',
-           'theta_exp_pulsed',
-           )
-
-
 water_heat_capacity = 4.184 * 1000          # J/degree / kg
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
-def _instantaneous(z, t, tp, mua):
+
+class Absorber:
     """
-    Calculate temperature rise due to a 1 J/m² instantaneous irradiance.
+    Green's function heat transfer solutions for exponential heating of infinite media.
 
-    Prahl, "Charts to rapidly estimate temperature following laser irradiation" 1995.
+    Typical usage::
 
-    \frac{1}{2} e^{\text{mua} (\kappa  \text{mua} t-z)} \text{erfc}\left(\frac{2 \kappa  \text{mua} t-z}{2 \sqrt{\kappa  t}}\right)
+        import grheat
+        import numpy as np
+        import matplotlib.pyplot as plt
 
-    Parameters:
-        z: depth for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        tp: time of source impulse [seconds]
-        mua: absorption coefficient [1/m]
+        t = np.linspace(0, 500, 100) / 1000   # seconds
+        mua = 0.25 * 1000                     # 1/m
+        z = 0                                 # meters
+        t_pulse = 0.100                       # seconds
 
-    Returns:
-        Temperature Increase [°C]
+        medium = new Absorber(mua)
+        T = medium.pulsed(z, t, t_pulse)
+
+        plt.plot(t * 1000, T, color='blue')
+        plt.xlabel("Time (ms)")
+        plt.ylabel("Temperature Increase (°C)")
+        plt.title("1J/m² pulse lasting %.0f ms" % t_pulse)
+        plt.show()
     """
-    if t <= tp:
-        return 0
 
-    kappa = water_thermal_diffusivity  # m**2/s
-    rho_cee = water_heat_capacity      # J/degree/m**3
-    tau = mua**2 * kappa * (t-tp)
-    zeta = mua * z
-    factor = 1 / 2 / rho_cee * np.exp(-zeta + tau)
-    T = factor * scipy.special.erfc((-zeta + 2 * tau)/(2 * np.sqrt(tau)))
-    return T
+    def __init__(self,
+                 mua,
+                 diffusivity=water_thermal_diffusivity,
+                 capacity=water_heat_capacity,
+                 boundary='infinite'):
+        self.mu = mua                          # 1/meter
+        self.diffusivity = diffusivity         # m**2/s
+        self.capacity = capacity               # J/degree/kg
+        self.boundary = boundary.lowercase()   # infinite, adiabatic, constant
 
+    def _instantaneous(self, z, t, tp):
+        """
+        Calculate temperature rise due to 1 J/m² radiant exposure of absorber.
 
-def instantaneous(z, t, tp, mua):
-    """
-    Calculate temperature rise due to a 1 J/m² radiant exposure on absorber.
-    
-    Parameters:
-        z: depth for desired temperature [meters]
-        t: time of desired temperature [seconds]
-        tp: time of source impulse [seconds]
+        Volumetric heating decreases as mu*exp(-mu*z) [J/m³].
 
-    Returns:
-        Temperature Increase [°C]
-    """
-    if np.isscalar(t):
-        T = _instantaneous(z, t, tp, mua)
+        Equation follows from integration of instantaneous planar source
+        multiplied by exponential over half-space 0<=zp<=Infinity
 
-    else:
-        T = np.empty_like(t)
-        for i, tt in enumerate(t):
-            T[i] = _instantaneous(z, tt, tp, mua)
-    return T
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            tp: time of source impulse [seconds]
 
+        Returns:
+            Temperature increase [°C]
+        """
+        if t <= tp:
+            return 0
 
-def _theta_exp_dimensionless(xi, tau):
-    """
-    Handy dimensionless temperature*tau for illumination of absorber.
-    
-    Parameters:
-        xi: dimensionless depth (mu_a*x)
-        tau: dimensionless time (mu_a**2 * kappa * t)
-    
-    Returns: 
-        dimensionless temperature*tau
-    """
-    if tau <= 0:
-        return 0
+        tau = self.mu**2 * self.diffusivity * (t - tp)
+        zeta = self.mu * z
+        factor = 1 / 2 / self.capacity * np.exp(tau - zeta)
+        T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
+        return T
 
-    xx = xi/2/np.sqrt(tau)
-    if abs(xx) > 20:
-        expxx = 0
-    else:
-        expxx = np.exp(-xx**2)
+    def instantaneous(self, z, t, tp):
+        """
+        Calculate temperature rise due to 1 J/m² radiant exposure on absorber.
 
-    print(np.sqrt(tau)-xx, np.sqrt(tau)+xx)
-    T = 2*np.sqrt(tau/np.pi)*np.exp(-xx**2) 
-    T -= xi * scipy.special.erfc(xx)
-    T -= np.exp(-xi) 
-    T += 1/2*expxx*scipy.special.erfcx(np.sqrt(tau)-xx)
-    T += 1/2*expxx*scipy.special.erfcx(np.sqrt(tau)+xx)
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            tp: time of source impulse [seconds]
 
-#    T += 1/2*np.exp(tau-xi)*scipy.special.erfc(np.sqrt(tau)-xx)
-#    T += 1/2*np.exp(tau+xi)*scipy.special.erfc(np.sqrt(tau)+xx)
-    return T
+        Returns:
+            Temperature Increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._instantaneous(z, t, tp)
 
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._instantaneous(z, tt, tp)
+        return T
 
-def _theta_exp_pulsed_dimensionless(xi, tau, tau_pulse):
-    """
-    Find Temperature of pulsed illumination of absorber.
-    
-    Parameters:
-        xi: dimensionless depth (mu_a*x)
-        tau: dimensionless time (mu_a**2 * kappa * t)
-    
-    Returns: 
-        dimensionless temperature
-    """
-    if tau <= 0:
-        return 0
-    
-    T = theta_exp_dimensionless(xi, tau)
-    
-    if tau <= tau_pulse:
-        return T/tau
-    
-    T = T - theta_exp_dimensionless(xi, tau-tau_pulse)
+    def _continuous(self, z, t):
+        """
+        Calculate temperature rise due to 1 W/m² radiant exposure on absorber.
 
-    return T/tau_pulse
+        Volumetric heating decreases as self.mu*exp(-self.mu*z) [W/m³].
 
+        Prahl, "Charts to rapidly estimate temperature following laser irradiation" 1995.
 
-def theta_exp(x, t, mu_a):
-    """
-    Find dimensionless temperature of illuminated absorber.
-    
-    Parameters:
-        x:  depth [m]
-        t:  time of illumination [s]
-        mu_a: absorption coefficient [1/m]
-    
-    Returns: temperature
-    """
-    kappa = water_thermal_diffusivity
-    xi = mu_a * x
-    tau = t * kappa * mu_a**2
-    
-    if np.isscalar(tau):
-        return _theta_exp_dimensionless(xi, tau)/tau
-    
-    T = np.empty_like(tau)
-    for i, tt in enumerate(tau):
-        T[i] = _theta_exp_dimensionless(xi, tt)/tau
-    return T
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            self.mu: exponential attenuation coefficient [1/meter]
 
-    
-def _exp_pulsed(x, t, t_pulse, mu_a):
-    """
-    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
-    
-    Parameters:
-        x:  depth [m]
-        t:  time of illumination [s]
-        t_pulse: duration of pulse [s]
-        mu_a: absorption coefficient [1/m]
-        kappa: thermal diffusivity [m**2/s]
-    
-    Returns: dimensionless temperature
-    """
-    kappa = water_thermal_diffusivity
-    xi = mu_a * x
-    tau = t * kappa * mu_a**2
-    tau_pulse = t_pulse * kappa * mu_a**2
+        Returns:
+            Temperature increase [°C]
+        """
+        if t <= 0:
+            return 0
 
-    if np.scalar(tau):
-        return theta_exp_pulsed_dimensionless(xi, tau, tau_pulse)
+        tau = self.mu**2 * self.diffusivity * t
+        zeta = self.mu * z
 
-    T = np.empty_like(tau)
-    for i, tt in enumerate(tau):
-        T[i] = _theta_exp_dimensionless(xi, tt)/tau_pulse
-    return T
+        zz = zeta / np.sqrt(4 * tau)
 
+        T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+        T -= zeta * scipy.special.erfc(zz)
+        T -= np.exp(-zeta)
+        T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
+        T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
+        return T / self.capacity
 
-def exp_pulsed(x, t, t_pulse, mu_a):
-    """
-    Calculate temperature increase due to 1 J/m**2 pulsed irradiance on absorber.
-    
-    Parameters:
-        x: depth of temperature [m]
-        t: time(s) of temperature [s]
-        t_pulse: duration of pulse [s]
-        mu_a: absorption coefficient [1/m]
-    
-    Returns: 
-        Temperature increase [°C]
-    """
-    kappa = water_thermal_diffusivity
-    rho_c = water_thermal_capacity
-    return 1/(kappa*rho_c*mu_a)*theta_exp_pulsed(x, t, t_pulse, mu_a)
+    def continuous(self, z, t):
+        """
+        Calculate temperature rise due to 1 J/m² radiant exposure on absorber.
 
+        Volumetric heating decreases as mu*exp(-mu*z) [W/m³].  The
+        heating starts at t=0 and continues to t=t.
 
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time of desired temperature [seconds]
+
+        Returns:
+            Temperature increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._continuous(z, t)
+
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._continuous(z, tt)
+        return T
+
+    def _pulsed(self, z, t, t_pulse):
+        """
+        Calculate temperature rise due to a 1 J/m² pulsed irradiance of absorber.
+
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time of desired temperature [seconds]
+            t_pulse: duration of pulse [seconds]
+
+        Returns:
+            Temperature increase [°C]
+        """
+        if t <= 0:
+            T = 0
+        else:
+            T = self._continuous(z, t)
+            if t > t_pulse:
+                T -= self._continuous(z, t - t_pulse)
+        return T / t_pulse
+
+    def pulsed(self, z, t, t_pulse):
+        """
+        Calculate temperature rise due to a 1 J/m² pulsed radiant exposure.
+
+        Pulse lasts from t=0 to t=t_pulse.
+
+        Parameters:
+            z: depth for desired temperature [meters]
+            t: time(s) of desired temperature [seconds]
+            t_pulse: duration of pulse [seconds]
+
+        Returns
+            Temperature increase [°C]
+        """
+        if np.isscalar(t):
+            T = self._pulsed(z, t, t_pulse)
+        else:
+            T = np.empty_like(t)
+            for i, tt in enumerate(t):
+                T[i] = self._pulsed(z, tt, t_pulse)
+        return T
