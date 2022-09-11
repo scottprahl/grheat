@@ -106,7 +106,20 @@ class Point:
 
         r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
         factor = self.capacity * 8 * (np.pi * self.diffusivity * (t - tp))**1.5
-        return 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+        T = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+
+        if self.boundary != 'infinite':
+            r = np.sqrt((x + self.xp)**2 + (y + self.yp)**2 + (z + self.zp)**2)
+            factor = self.capacity * 8 * (np.pi * self.diffusivity * (t - tp))**1.5
+            T1 = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
+        return T
 
     def instantaneous(self, x, y, z, t, tp):
         """
@@ -156,6 +169,18 @@ class Point:
         r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
         factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
         T = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
+
+        if self.boundary != 'infinite':
+            r = np.sqrt((x + self.xp)**2 + (y + self.yp)**2 + (z + self.zp)**2)
+            factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
+            T1 = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
         return T
 
     def continuous(self, x, y, z, t):
