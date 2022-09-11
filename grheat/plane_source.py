@@ -42,6 +42,8 @@ class Plane:
     """
     Green's function heat transfer solutions for point source in infinite media.
 
+Typical usage::
+
     Typical usage::
 
         import grheat
@@ -65,14 +67,27 @@ class Plane:
     """
 
     def __init__(self,
+                 zp,
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
+        """
+        Initialize Planar object.
+
+        Parameters:
+            zp: depth of xy-planar source                [meters]
+            diffusivity: thermal diffusivity             [m**2/s]
+            capacity: heat capacity                      [J/degree/kg]
+            boundary: 'infinite', 'adiabatic', 'constant'
+        Returns:
+            Planar heat source object
+        """
+        self.zp = zp
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
         self.boundary = boundary.lower()   # infinite, adiabatic, constant
 
-    def _instantaneous(self, z, t, zp, tp):
+    def _instantaneous(self, z, t, tp):
         """
         Calculate temperature rise due to a 1 J/m² instantaneous xy-planar source at time t.
 
@@ -92,11 +107,11 @@ class Plane:
         if t <= tp:
             return 0
 
-        r = np.abs(z - zp)
+        r = np.abs(z - self.zp)
         factor = self.capacity * 2 * np.sqrt(np.pi * self.diffusivity * (t - tp))
         return 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
 
-    def instantaneous(self, z, t, zp, tp):
+    def instantaneous(self, z, t, tp):
         """
         Calculate temperature rise due to a 1 J/m² instant xy-planar source.
 
@@ -112,15 +127,15 @@ class Plane:
             Temperature increase [°C]
         """
         if np.isscalar(t):
-            T = self._instantaneous(z, t, zp, tp)
+            T = self._instantaneous(z, t, tp)
 
         else:
             T = np.empty_like(t)
             for i, tt in enumerate(t):
-                T[i] = self._instantaneous(z, tt, zp, tp)
+                T[i] = self._instantaneous(z, tt, tp)
         return T
 
-    def _continuous(self, z, t, zp):
+    def _continuous(self, z, t):
         """
         Calculate temperature rise due to a 1 W/m² xy-planar source.
 
@@ -141,11 +156,11 @@ class Plane:
         if t <= 0:
             return 0
 
-        alpha = np.sqrt((z - zp)**2 / (4 * self.diffusivity * t))
+        alpha = np.sqrt((z - self.zp)**2 / (4 * self.diffusivity * t))
         T = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
         return np.sqrt(t / self.diffusivity) / self.capacity * T
 
-    def continuous(self, z, t, zp):
+    def continuous(self, z, t):
         """
         Calculate temperature rise due to a 1W/m² continuous xy-planar source.
 
@@ -160,15 +175,15 @@ class Plane:
             Temperature increase [°C]
         """
         if np.isscalar(t):
-            T = self._continuous(z, t, zp)
+            T = self._continuous(z, t)
 
         else:
             T = np.empty_like(t)
             for i, tt in enumerate(t):
-                T[i] = self._continuous(z, tt, zp)
+                T[i] = self._continuous(z, tt)
         return T
 
-    def _pulsed(self, z, t, zp, t_pulse):
+    def _pulsed(self, z, t, t_pulse):
         """
         Calculate temperature rise due to a 1 J/m² pulsed xy-planar source at time t.
 
@@ -186,12 +201,12 @@ class Plane:
         if t <= 0:
             T = 0
         else:
-            T = self._continuous(z, t, zp)
+            T = self._continuous(z, t)
             if t > t_pulse:
-                T -= self._continuous(z, t - t_pulse, zp)
+                T -= self._continuous(z, t - t_pulse)
         return T / t_pulse
 
-    def pulsed(self, z, t, zp, t_pulse):
+    def pulsed(self, z, t, t_pulse):
         """
         Calculate temperature rise due to a 1 J/m² pulsed xy-planar source.
 
@@ -205,9 +220,9 @@ class Plane:
             Temperature increase [°C]
         """
         if np.isscalar(t):
-            T = self._pulsed(z, t, zp, t_pulse)
+            T = self._pulsed(z, t, t_pulse)
         else:
             T = np.empty_like(t)
             for i, tt in enumerate(t):
-                T[i] = self._pulsed(z, tt, zp, t_pulse)
+                T[i] = self._pulsed(z, tt, t_pulse)
         return T
