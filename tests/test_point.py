@@ -57,7 +57,18 @@ class ContinuousPoint(unittest.TestCase):
         X, Y = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
         T = point.continuous(X, Y, 0, t)
 
+    def test_04_scalar(self):
+        xp, yp, zp = 0, 0, 0.001      # meters
+        point = grheat.Point(xp, yp, zp)
+        t = 1
+        T1 = point.continuous(0, 0, 0, t)
+        N= 50 
+        tp = np.linspace(0,1,N)
+        T = point.instantaneous(0, 0, 0, t, tp)
+        T2 = T.sum()/N
+        self.assertAlmostEqual(T1, T2, delta=0.01)
 
+ 
 class PulsedPoint(unittest.TestCase):
 
     def test_01_scalar(self):
