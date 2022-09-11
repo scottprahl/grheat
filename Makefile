@@ -53,5 +53,6 @@ rcheck:
 test:
 	python3 -m pytest tests/test_point.py
 	python3 -m pytest tests/test_line.py
+	python3 -m pytest tests/test_plane.py
 
 .PHONY: clean check rcheck html
