@@ -121,12 +121,24 @@ class Point:
             Temperature Increase [°C]
         """
         if np.isscalar(t):
-            T = self._instantaneous(x, y, z, t, tp)
-
+            if np.isscalar(tp):
+                T = self._instantaneous(x, y, z, t, tp)
+            else:
+                T = np.empty_like(tp)
+                for i in range(len(tp)):
+                    T[i] = self._instantaneous(x, y, z, t, tp[i])
         else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._instantaneous(x, y, z, tt, tp)
+            if np.isscalar(tp):
+                T = np.empty_like(t)
+                for i in range(len(t)):
+                    T[i] = self._instantaneous(x, y, z, t[i], tp)
+            else:
+                if len(t) != len(tp):
+                    raise ValueError('t and tp must have same length.')
+                    return 0
+                T = np.empty_like(t)
+                for i in range(len(t)):
+                    T[i] = self._instantaneous(x, y, z, t[i], tp[i])
         return T
 
     def _continuous(self, x, y, z, t):
