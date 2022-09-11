@@ -115,30 +115,26 @@ class Point:
         Parameters:
             x, y, z: location for desired temperature [meters]
             t: time(s) of desired temperature [seconds]
-            tp: time of source impulse [seconds]
+            tp: time(s) of source impulse [seconds]
 
         Returns:
             Temperature Increase [°C]
         """
+        T = 0
         if np.isscalar(t):
             if np.isscalar(tp):
                 T = self._instantaneous(x, y, z, t, tp)
             else:
                 T = np.empty_like(tp)
-                for i in range(len(tp)):
+                for i in range(len(T)):
                     T[i] = self._instantaneous(x, y, z, t, tp[i])
         else:
             if np.isscalar(tp):
                 T = np.empty_like(t)
-                for i in range(len(t)):
+                for i in range(len(T)):
                     T[i] = self._instantaneous(x, y, z, t[i], tp)
             else:
-                if len(t) != len(tp):
-                    raise ValueError('t and tp must have same length.')
-                    return 0
-                T = np.empty_like(t)
-                for i in range(len(t)):
-                    T[i] = self._instantaneous(x, y, z, t[i], tp[i])
+                raise ValueError('One of t or tp must be a scalar.')
         return T
 
     def _continuous(self, x, y, z, t):
