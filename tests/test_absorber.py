@@ -57,6 +57,7 @@ class PulsedAbsorber(unittest.TestCase):
         medium = grheat.Absorber(mua)
         T = medium.pulsed(0, t, t_pulse)
 
+
 class InstantVsPulsed(unittest.TestCase):
 
     def test_01_instant(self):
@@ -89,7 +90,6 @@ class ConstantBoundary(unittest.TestCase):
     def test_01_constant(self):
         """Surface temperature should be zero."""
         mua = 1000  # 1/meter
-        zp = 0.001                          # meters
         medium = grheat.Absorber(mua, boundary='constant')
         t_pulse = 1
         t = 2
