@@ -4,7 +4,7 @@
    :caption: Example Usage
    :hidden:
 
-   01-grin-lens-basics.ipynb
+   point_source.ipynb
 
 .. toctree::
    :caption: API
