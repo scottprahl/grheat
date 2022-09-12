@@ -16,13 +16,12 @@ Typical usage::
         import matplotlib.pyplot as plt
 
         t = np.linspace(0, 500, 100) / 1000   # seconds
-        mua = 0.25 * 1000                     # 1/m
         z = 0                                 # meters
         zp = 0.001                            # meters
         t_pulse = 0.100                       # seconds
 
-        plane = grheat.Plane()
-        T = plane.pulsed(x,y,z,t,xp,yp,zp,t_pulse)
+        plane = grheat.Plane(zp)
+        T = plane.pulsed(z, t, t_pulse)
 
         plt.plot(t * 1000, T, color='blue')
         plt.xlabel("Time (ms)")
@@ -107,9 +106,21 @@ Typical usage::
         if t <= tp:
             return 0
 
-        r = np.abs(z - self.zp)
+        r2 = (z - self.zp)**2
         factor = self.capacity * 2 * np.sqrt(np.pi * self.diffusivity * (t - tp))
-        return 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+        T = 1 / factor * np.exp(-r2 / (4 * self.diffusivity * (t - tp)))
+
+        if self.boundary != 'infinite':
+            r2 = (z + self.zp)**2
+            T1 = 1 / factor * np.exp(-r2 / (4 * self.diffusivity * (t - tp)))
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
+        return T
 
     def instantaneous(self, z, t, tp):
         """
@@ -158,7 +169,20 @@ Typical usage::
 
         alpha = np.sqrt((z - self.zp)**2 / (4 * self.diffusivity * t))
         T = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
-        return np.sqrt(t / self.diffusivity) / self.capacity * T
+        T *= np.sqrt(t / self.diffusivity) / self.capacity
+
+        if self.boundary != 'infinite':
+            alpha = np.sqrt((z + self.zp)**2 / (4 * self.diffusivity * t))
+            T1 = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
+            T1 *= np.sqrt(t / self.diffusivity) / self.capacity
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
+        return T
 
     def continuous(self, z, t):
         """

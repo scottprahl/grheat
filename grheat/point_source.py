@@ -14,13 +14,12 @@ Typical usage::
     import matplotlib.pyplot as plt
 
     t = np.linspace(0, 500, 100) / 1000   # seconds
-    mua = 0.25 * 1000                     # 1/m
     x,y,z = 0,0,0                         # meters
     xp,yp,zp = 0,0,0.001                  # meters
     t_pulse = 0.100                       # seconds
 
-    medium = new grheat.Point()
-    T = medium.pulsed(x,y,z,t,xp,yp,zp,t_pulse)
+    medium = new grheat.Point(xp, yp, zp)
+    T = medium.pulsed(x, y, z, t, t_pulse)
 
     plt.plot(t * 1000, T, color='blue')
     plt.xlabel("Time (ms)")
@@ -109,7 +108,7 @@ class Point:
         T = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
 
         if self.boundary != 'infinite':
-            r = np.sqrt((x + self.xp)**2 + (y + self.yp)**2 + (z + self.zp)**2)
+            r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z + self.zp)**2)
             factor = self.capacity * 8 * (np.pi * self.diffusivity * (t - tp))**1.5
             T1 = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
 
@@ -139,13 +138,13 @@ class Point:
                 T = self._instantaneous(x, y, z, t, tp)
             else:
                 T = np.empty_like(tp)
-                for i in range(len(T)):
-                    T[i] = self._instantaneous(x, y, z, t, tp[i])
+                for i, tt in enumerate(tp):
+                    T[i] = self._instantaneous(x, y, z, t, tt)
         else:
             if np.isscalar(tp):
                 T = np.empty_like(t)
-                for i in range(len(T)):
-                    T[i] = self._instantaneous(x, y, z, t[i], tp)
+                for i, tt in enumerate(t):
+                    T[i] = self._instantaneous(x, y, z, tt, tp)
             else:
                 raise ValueError('One of t or tp must be a scalar.')
         return T
@@ -171,7 +170,7 @@ class Point:
         T = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 
         if self.boundary != 'infinite':
-            r = np.sqrt((x + self.xp)**2 + (y + self.yp)**2 + (z + self.zp)**2)
+            r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z + self.zp)**2)
             factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
             T1 = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 
