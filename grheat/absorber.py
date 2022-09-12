@@ -95,6 +95,17 @@ class Absorber:
         zeta = self.mu * z
         factor = 1 / 2 / self.capacity * np.exp(tau - zeta)
         T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
+
+        if self.boundary != 'infinite':
+            factor = 1 / 2 / self.capacity * np.exp(tau + zeta)
+            T1 = factor * scipy.special.erfc((2 * tau + zeta) / (2 * np.sqrt(tau)))
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
         return T
 
     def instantaneous(self, z, t, tp):
@@ -147,7 +158,25 @@ class Absorber:
         T -= np.exp(-zeta)
         T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
         T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
-        return T / self.capacity
+        T /= self.capacity
+
+        if self.boundary != 'infinite':
+            zeta = -zeta
+            zz = zeta / np.sqrt(4 * tau)
+            T1 = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+            T1 -= zeta * scipy.special.erfc(zz)
+            T1 -= np.exp(-zeta)
+            T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
+            T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
+            T1 /= self.capacity
+
+            if self.boundary == 'adiabatic':
+                T += T1
+
+            if self.boundary == 'constant':
+                T -= T1
+
+        return T
 
     def continuous(self, z, t):
         """
