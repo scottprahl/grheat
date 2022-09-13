@@ -35,7 +35,6 @@ import numpy as np
 water_heat_capacity = 4.184 * 1000          # J/degree / kg
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
-
 class Absorber:
     """
     Green's function heat transfer solutions for exponential heating of infinite media.
@@ -69,7 +68,7 @@ class Absorber:
         self.mu = mua                      # 1/meter
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
-        self.boundary = boundary.lower()   # infinite, adiabatic, constant
+        self.boundary = boundary.lower()   # infinite, adiabatic, zero
 
     def _instantaneous(self, z, t, tp):
         """
@@ -103,7 +102,7 @@ class Absorber:
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T
@@ -150,32 +149,30 @@ class Absorber:
 
         tau = self.mu**2 * self.diffusivity * t
         zeta = self.mu * z
-
         zz = zeta / np.sqrt(4 * tau)
 
         T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-        T -= zeta * scipy.special.erfc(zz)
-        T -= np.exp(-zeta)
+        T += zeta * scipy.special.erfc(zz)
+#        T += np.exp(-zeta)
         T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
         T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
-        T /= self.capacity
 
         if self.boundary != 'infinite':
             zeta = -zeta
             zz = zeta / np.sqrt(4 * tau)
             T1 = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-            T1 -= zeta * scipy.special.erfc(zz)
-            T1 -= np.exp(-zeta)
+            T1 += zeta * scipy.special.erfc(zz)
+#            T1 -= np.exp(-zeta)
             T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
             T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
-            T1 /= self.capacity
 
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
+        T *= self.mu / self.capacity / tau
         return T
 
     def continuous(self, z, t):

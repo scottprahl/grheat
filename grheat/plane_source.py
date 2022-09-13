@@ -77,14 +77,14 @@ Typical usage::
             zp: depth of xy-planar source                [meters]
             diffusivity: thermal diffusivity             [m**2/s]
             capacity: heat capacity                      [J/degree/kg]
-            boundary: 'infinite', 'adiabatic', 'constant'
+            boundary: 'infinite', 'adiabatic', 'zero'
         Returns:
             Planar heat source object
         """
         self.zp = zp
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
-        self.boundary = boundary.lower()   # infinite, adiabatic, constant
+        self.boundary = boundary.lower()   # infinite, adiabatic, zero
 
     def _instantaneous(self, z, t, tp):
         """
@@ -117,7 +117,7 @@ Typical usage::
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T
@@ -179,7 +179,7 @@ Typical usage::
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T

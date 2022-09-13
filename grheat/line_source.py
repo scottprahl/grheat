@@ -5,8 +5,8 @@
 """
 Green's function heat transfer solutions for x-line source in semi-infinite media.
 
-The surface is defined by z=0 and the line source extends horizontally 
-from -∞ < z < +∞.  
+The surface is defined by z=0 and the line source extends horizontally
+from -∞ < z < +∞.
 
 More documentation at <https://grheat.readthedocs.io>
 
@@ -77,7 +77,7 @@ class Line:
             zp: z location of x-line                     [meters]
             diffusivity: thermal diffusivity             [m**2/s]
             capacity: heat capacity                      [J/degree/kg]
-            boundary: 'infinite', 'adiabatic', 'constant'
+            boundary: 'infinite', 'adiabatic', 'zero'
         Returns:
             Planar heat source object
         """
@@ -85,7 +85,7 @@ class Line:
         self.zp = zp
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
-        self.boundary = boundary.lower()   # infinite, adiabatic, constant
+        self.boundary = boundary.lower()   # infinite, adiabatic, zero
 
     def _instantaneous(self, y, z, t, tp):
         """
@@ -117,7 +117,7 @@ class Line:
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T
@@ -170,7 +170,7 @@ class Line:
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T

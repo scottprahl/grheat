@@ -87,19 +87,19 @@ class InstantVsPulsed(unittest.TestCase):
 
 class ConstantBoundary(unittest.TestCase):
 
-    def test_01_constant(self):
+    def test_01_zero(self):
         """Surface temperature should be zero."""
         zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='constant')
+        plane = grheat.Plane(zp, boundary='zero')
         t_pulse = 1
         t = 2
         T = plane.pulsed(0, t, t_pulse)
         self.assertEqual(T, 0)
 
-    def test_02_constant(self):
+    def test_02_zero(self):
         """Surface temperature should be zero at all times."""
         zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='constant')
+        plane = grheat.Plane(zp, boundary='zero')
         t_pulse = 1
         t = np.linspace(0,10)
         T = plane.pulsed(0, t, t_pulse)

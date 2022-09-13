@@ -5,6 +5,7 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-module-docstring
 # pylint: disable=line-too-long
+# pylint: disable=no-self-use
 
 import unittest
 import numpy as np
@@ -62,13 +63,13 @@ class ContinuousPoint(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t = 1
         T1 = point.continuous(0, 0, 0, t)
-        N= 50 
+        N= 50
         tp = np.linspace(0,1,N)
         T = point.instantaneous(0, 0, 0, t, tp)
         T2 = T.sum()/N
         self.assertAlmostEqual(T1, T2, delta=0.01)
 
- 
+
 class PulsedPoint(unittest.TestCase):
 
     def test_01_scalar(self):
@@ -134,29 +135,29 @@ class InstantVsPulsed(unittest.TestCase):
 
 class ConstantBoundary(unittest.TestCase):
 
-    def test_01_constant(self):
+    def test_01_zero(self):
         """Surface temperature should be zero."""
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp, boundary='constant')
+        point = grheat.Point(xp, yp, zp, boundary='zero')
         t_pulse = 1
         t = 2
         T = point.pulsed(0, 0, 0, t, t_pulse)
         self.assertEqual(T, 0)
 
-    def test_02_constant(self):
+    def test_02_zero(self):
         """Surface temperature should be zero at all times."""
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp, boundary='constant')
+        point = grheat.Point(xp, yp, zp, boundary='zero')
         t_pulse = 1
         t = np.linspace(0,10)
         T = point.pulsed(0, 0, 0, t, t_pulse)
         self.assertEqual(T[3], 0)
         self.assertEqual(T[13], 0)
 
-    def test_03_constant(self):
+    def test_03_zero(self):
         """Short pulse result should be same as instantaneous source."""
         xp, yp, zp = 0, 0, 0.0001      # meters
-        point = grheat.Point(xp, yp, zp, boundary='constant')
+        point = grheat.Point(xp, yp, zp, boundary='zero')
         t_pulse = 1
         t = 1.1
         X, Y = np.meshgrid(np.arange(-0.0005, 0.0005, 0.0001), np.arange(-0.0005, 0.0005, 0.0001))

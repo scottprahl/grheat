@@ -75,7 +75,7 @@ class Point:
             zp: z location of source                     [meters]
             diffusivity: thermal diffusivity             [m**2/s]
             capacity: heat capacity                      [J/degree/kg]
-            boundary: 'infinite', 'adiabatic', 'constant'
+            boundary: 'infinite', 'adiabatic', 'zero'
         Returns:
             Planar heat source object
         """
@@ -115,7 +115,7 @@ class Point:
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T
@@ -177,7 +177,7 @@ class Point:
             if self.boundary == 'adiabatic':
                 T += T1
 
-            if self.boundary == 'constant':
+            if self.boundary == 'zero':
                 T -= T1
 
         return T
