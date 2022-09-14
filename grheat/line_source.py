@@ -76,7 +76,7 @@ class Line:
             yp: y location of x-line                     [meters]
             zp: z location of x-line                     [meters]
             diffusivity: thermal diffusivity             [m**2/s]
-            capacity: heat capacity                      [J/degree/kg]
+            capacity: volumetric heat capacity           [J/degree/m**3]
             boundary: 'infinite', 'adiabatic', 'zero'
         Returns:
             Planar heat source object

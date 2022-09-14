@@ -76,7 +76,7 @@ Typical usage::
         Parameters:
             zp: depth of xy-planar source                [meters]
             diffusivity: thermal diffusivity             [m**2/s]
-            capacity: heat capacity                      [J/degree/kg]
+            capacity: volumetric heat capacity           [J/degree/m**3]
             boundary: 'infinite', 'adiabatic', 'zero'
         Returns:
             Planar heat source object

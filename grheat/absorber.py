@@ -61,11 +61,22 @@ class Absorber:
     """
 
     def __init__(self,
-                 mua,
+                 mu,
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
-        self.mu = mua                      # 1/meter
+        """
+        Initialize exponential heating object.
+
+        Parameters:
+            mu: exponential attenuation coefficient      [1/meters]
+            diffusivity: thermal diffusivity             [m**2/s]
+            capacity: volumetric heat capacity           [J/degree/m**3]
+            boundary: 'infinite', 'adiabatic', 'zero'
+        Returns:
+            Planar heat source object
+        """
+        self.mu = mu                       # 1/meter
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
         self.boundary = boundary.lower()   # infinite, adiabatic, zero
@@ -96,7 +107,7 @@ class Absorber:
         T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
 
         if self.boundary != 'infinite':
-            factor = 1 / 2 / self.capacity * np.exp(tau + zeta)
+            factor = self.mu / 2 / self.capacity * np.exp(tau + zeta)
             T1 = factor * scipy.special.erfc((2 * tau + zeta) / (2 * np.sqrt(tau)))
 
             if self.boundary == 'adiabatic':
