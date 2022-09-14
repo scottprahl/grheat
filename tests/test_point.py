@@ -155,7 +155,7 @@ class ConstantBoundary(unittest.TestCase):
         self.assertEqual(T[13], 0)
 
     def test_03_zero(self):
-        """Short pulse result should be same as instantaneous source."""
+        """Surface temperature should be zero at all locations."""
         xp, yp, zp = 0, 0, 0.0001      # meters
         point = grheat.Point(xp, yp, zp, boundary='zero')
         t_pulse = 1
