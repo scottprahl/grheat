@@ -32,7 +32,7 @@ Typical usage::
 import scipy.special
 import numpy as np
 
-water_heat_capacity = 4.184 * 1000          # J/degree / kg
+water_heat_capacity = 4.184 * 1e6          # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 class Absorber:
@@ -92,7 +92,7 @@ class Absorber:
 
         tau = self.mu**2 * self.diffusivity * (t - tp)
         zeta = self.mu * z
-        factor = 1 / 2 / self.capacity * np.exp(tau - zeta)
+        factor = self.mu / 2 / self.capacity * np.exp(tau - zeta)
         T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
 
         if self.boundary != 'infinite':
@@ -152,19 +152,15 @@ class Absorber:
         zz = zeta / np.sqrt(4 * tau)
 
         T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-        T += zeta * scipy.special.erfc(zz)
-#        T += np.exp(-zeta)
-        T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
-        T += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
+        T += (-1 + zeta) * scipy.special.erfc(-zz)
+        T += np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zz)
 
         if self.boundary != 'infinite':
             zeta = -zeta
             zz = zeta / np.sqrt(4 * tau)
             T1 = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-            T1 += zeta * scipy.special.erfc(zz)
-#            T1 -= np.exp(-zeta)
-            T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zeta)
-            T1 += 0.5 * np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) + zeta)
+            T1 += (-1 + zeta) * scipy.special.erfc(-zz)
+            T1 += np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zz)
 
             if self.boundary == 'adiabatic':
                 T += T1
@@ -172,7 +168,7 @@ class Absorber:
             if self.boundary == 'zero':
                 T -= T1
 
-        T *= self.mu / self.capacity / tau
+        T /= 2 * self.diffusivity * self.capacity * self.mu
         return T
 
     def continuous(self, z, t):
