@@ -71,8 +71,6 @@ class InstantVsPulsed(unittest.TestCase):
         medium = grheat.Absorber(mua)
         T1 = radiant_exposure * medium.instantaneous(z, t, tp)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
-        print(T1/T2)
-        print(T2/T1)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
     def test_02_instant(self):
@@ -86,8 +84,6 @@ class InstantVsPulsed(unittest.TestCase):
         medium = grheat.Absorber(mua)
         T1 = radiant_exposure * medium.instantaneous(z, t, tp)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
-        print(T1/T2)
-        print(T2/T1)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
     def test_03_instant(self):
@@ -102,6 +98,49 @@ class InstantVsPulsed(unittest.TestCase):
         T2 = radiant_exposure * medium.pulsed(0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
+
+class IntegratedPlane(unittest.TestCase):
+
+    def test_01_instant(self):
+        """Matches numerical integration of plane sources."""
+        mua = 100  # 1/meter
+        tp = 0
+        t = 0.5
+        z = 0.001
+        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        medium = grheat.Absorber(mua)
+        T1 = radiant_exposure * medium.instantaneous(z, t, tp)
+        zp_array = np.linspace(0, 20*z, 1000)
+        total = 0
+        plane = grheat.Plane(0)
+        for i, zp in enumerate(zp_array):
+            plane.zp = zp
+            total += np.exp(-mua * zp) * plane.instantaneous(z, t, tp)
+        T2 = radiant_exposure * total * mua * (zp_array[1]-zp_array[0])
+        print(T1/T2)
+        print(T2/T1)
+        self.assertAlmostEqual(T1, T2, delta=0.01)
+
+
+    def test_02_pulsed(self):
+        """Matches numerical integration of plane sources."""
+        mua = 100  # 1/meter
+        tpulse = 0.1
+        t = 0.2
+        z = 0.001
+        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        medium = grheat.Absorber(mua)
+        T1 = radiant_exposure * medium.pulsed(z, t, tpulse)
+        zp_array = np.linspace(0, 20*z, 1000)
+        total = 0
+        plane = grheat.Plane(0)
+        for i, zp in enumerate(zp_array):
+            plane.zp = zp
+            total += np.exp(-mua * zp) * plane.pulsed(z, t, tpulse)
+        T2 = radiant_exposure * total * mua * (zp_array[1]-zp_array[0])
+        print(T1/T2)
+        print(T2/T1)
+        self.assertAlmostEqual(T1, T2, delta=0.001)
 
 class ConstantBoundary(unittest.TestCase):
 
