@@ -18,13 +18,14 @@ Typical usage::
     z = 0                                 # meters
     t_pulse = 0.100                       # seconds
 
-    medium = new Absorber(mua)
-    T = medium.pulsed(z, t, t_pulse)
+    medium = grheat.Absorber(mua)
+    T = medium.pulsed(z, t, t_pulse)      # 1 J/m^2
+    T *= 1e6                              # 1 J/mm^2
 
     plt.plot(t * 1000, T, color='blue')
     plt.xlabel("Time (ms)")
     plt.ylabel("Temperature Increase (°C)")
-    plt.title("1J/m² pulse lasting %.0f ms" % t_pulse)
+    plt.title("1J/mm² pulse lasting %.0f ms" % t_pulse)
     plt.show()
 
 """
