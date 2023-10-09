@@ -3,7 +3,7 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = docs
 BUILDDIR      = docs/_build
 
-pycheck:
+lint:
 	-pylint grheat/point_source.py
 	-pylint grheat/line_source.py
 	-pylint grheat/plane_source.py
@@ -24,15 +24,15 @@ html:
 
 clean:
 	rm -rf .pytest_cache
+	rm -rf .ruff_cache
+	rm -rf build
 	rm -rf dist
 	rm -rf grheat.egg-info
-	rm -rf grheat/__pycache__
+	rm -rf docs/.ipynb_checkpoints
 	rm -rf docs/_build
 	rm -rf docs/api
+	rm -rf grheat/__pycache__
 	rm -rf tests/__pycache__
-	rm -rf .tox
-	rm -rf build
-	rm -rf 
 
 notecheck:
 	make clean
@@ -49,12 +49,11 @@ rcheck:
 	make html
 	check-manifest
 	pyroma -d .
-	tox
 
 test:
-	python3 -m pytest tests/test_point.py
-	python3 -m pytest tests/test_line.py
-	python3 -m pytest tests/test_plane.py
-	python3 -m pytest tests/test_absorber.py
+	pytest tests/test_point.py
+	pytest tests/test_line.py
+	pytest tests/test_plane.py
+	pytest tests/test_absorber.py
 
 .PHONY: clean check rcheck html
