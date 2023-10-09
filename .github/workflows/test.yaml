@@ -1,0 +1,39 @@
+---
+name: test
+
+on:    # yamllint disable-line rule:truthy
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # allow manual triggering
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Build and test
+
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.11']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@master
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -e .  # current package in editable mode
+
+      - name: Test with pytest
+        run: |
+          pytest tests/test_absorber.py
+          pytest tests/test_point.py
+          pytest tests/test_plane.py
+          pytest tests/test_line.py
