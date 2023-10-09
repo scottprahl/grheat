@@ -35,6 +35,7 @@ import numpy as np
 water_heat_capacity = 4.184 * 1e6          # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
+
 class Absorber:
     """
     Green's function heat transfer solutions for exponential heating of infinite media.
