@@ -10,6 +10,7 @@ import unittest
 import numpy as np
 import grheat
 
+
 class InstantaneousPlane(unittest.TestCase):
 
     def test_01_scalar(self):
@@ -22,7 +23,7 @@ class InstantaneousPlane(unittest.TestCase):
     def test_02_time_array(self):
         zp = 0.001  # meters
         tp = 0
-        t = np.linspace(0,10)
+        t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
         T = plane.instantaneous(0, t, tp)
 
@@ -37,7 +38,7 @@ class ContinuousPlane(unittest.TestCase):
 
     def test_02_time_array(self):
         zp = 0.001  # meters
-        t = np.linspace(0,10)
+        t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
         T = plane.continuous(0, t)
 
@@ -54,9 +55,10 @@ class PulsedPlane(unittest.TestCase):
     def test_02_time_array(self):
         zp = 0.001  # meters
         t_pulse = 0.5
-        t = np.linspace(0,10)
+        t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
         T = plane.pulsed(0, t, t_pulse)
+
 
 class InstantVsPulsed(unittest.TestCase):
 
@@ -77,13 +79,14 @@ class InstantVsPulsed(unittest.TestCase):
         zp = 0.001  # meters
         t_pulse = 0.00001
         tp = 0
-        t = np.linspace(0,10)
+        t = np.linspace(0, 10)
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
         plane = grheat.Plane(zp)
         T1 = radiant_exposure * plane.instantaneous(0, t, tp)
         T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
+
 
 class ConstantBoundary(unittest.TestCase):
 
@@ -101,7 +104,7 @@ class ConstantBoundary(unittest.TestCase):
         zp = 0.001                          # meters
         plane = grheat.Plane(zp, boundary='zero')
         t_pulse = 1
-        t = np.linspace(0,10)
+        t = np.linspace(0, 10)
         T = plane.pulsed(0, t, t_pulse)
         self.assertEqual(T[3], 0)
         self.assertEqual(T[13], 0)
@@ -124,7 +127,7 @@ class AdiabaticBoundary(unittest.TestCase):
         zp = 0.001                          # meters
         plane = grheat.Plane(zp, boundary='adiabatic')
         t_pulse = 1
-        t = np.linspace(0,2)
+        t = np.linspace(0, 2)
         T1 = plane.pulsed(+0.0001, t, t_pulse)
         T2 = plane.pulsed(-0.0001, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=1e-8)
