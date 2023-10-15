@@ -54,7 +54,6 @@ nbsphinx_execute = 'never'
 nbsphinx_allow_errors = True
 
 # -- Options for HTML output -------------------------------------------------
-
 html_theme = 'sphinx_rtd_theme'
 html_scaled_image_link = False
 html_sourcelink_suffix = ''
