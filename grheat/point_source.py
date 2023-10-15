@@ -43,7 +43,7 @@ class Point:
     """
 
     def __init__(self,
-                 xp, yp, zp,
+                 xp, yp, zp, tp=0,
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
@@ -57,6 +57,7 @@ class Point:
             xp (float): The x-coordinate of the point source in meters.
             yp (float): The y-coordinate of the point source in meters.
             zp (float): The z-coordinate of the point source in meters.
+            tp (scalar): Time at which the source impulse occurs [seconds].
             diffusivity (float, optional): The thermal diffusivity of the medium in
                 square meters per second (m**2/s). Defaults to water_thermal_diffusivity.
             capacity (float, optional): The volumetric heat capacity of the medium in
@@ -72,6 +73,7 @@ class Point:
         self.xp = xp
         self.yp = yp
         self.zp = zp
+        self.tp = tp
         self.diffusivity = diffusivity
         self.capacity = capacity
         self.boundary = boundary.lower()
@@ -91,7 +93,6 @@ class Point:
             y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
             z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
             t (scalar): Time at which the desired temperature is computed [seconds].
-            tp (scalar): Time at which the source impulse occurs [seconds].
 
         Returns:
             numpy.ndarray: Normalized temperature rise at the specified location(s) and time.
@@ -103,13 +104,14 @@ class Point:
             else:
                 return np.zeros_like(r)
 
-        factor = self.capacity * 8 * (np.pi * self.diffusivity * (t - tp))**1.5
-        T = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+        dt = self.diffusivity * (t - tp)
+        factor = self.capacity * 8 * (np.pi * dt)**1.5
+        T = 1 / factor * np.exp(-r**2 / (4 * dt))
 
         if self.boundary != 'infinite':
             r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z + self.zp)**2)
-            factor = self.capacity * 8 * (np.pi * self.diffusivity * (t - tp))**1.5
-            T1 = 1 / factor * np.exp(-r**2 / (4 * self.diffusivity * (t - tp)))
+            factor = self.capacity * 8 * (np.pi * dt)**1.5
+            T1 = 1 / factor * np.exp(-r**2 / (4 * dt))
 
             if self.boundary == 'adiabatic':
                 T += T1
@@ -119,7 +121,7 @@ class Point:
 
         return T
 
-    def instantaneous(self, x, y, z, t, tp):
+    def instantaneous(self, x, y, z, t):
         """
         Calculates the temperature rise due to a 1J instant point source at specified time(s).
 
@@ -149,16 +151,16 @@ class Point:
                 import matplotlib.pyplot as plt
 
                 # Define time, source, and observation points
-                t = np.linspace(0, 500, 100) / 1000   # seconds
+                t = np.linspace(10, 500, 100) / 1000  # seconds
                 x, y, z = 0, 0, 0                     # meters
                 xp, yp, zp = 0, 0, 0.001              # meters
-                t_pulse = 0.100                       # seconds
+                t_p = 0                               # seconds
 
                 # Create a Point object representing the heat source
-                medium = grheat.Point(xp, yp, zp)
+                point = grheat.Point(xp, yp, zp, tp)
 
                 # Calculate the temperature rise due to a pulsed heat source
-                T = medium.pulsed(x, y, z, t, t_pulse)
+                T = point.instantaneous(x, y, z, t)
 
                 # Plot the temperature rise over time
                 plt.plot(t * 1000, T, color='blue')
@@ -169,19 +171,19 @@ class Point:
         """
         T = 0
         if np.isscalar(t):
-            if np.isscalar(tp):
-                T = self._instantaneous(x, y, z, t, tp)
+            if np.isscalar(self.tp):
+                T = self._instantaneous(x, y, z, t, self.tp)
             else:
-                T = np.empty_like(tp)
-                for i, tt in enumerate(tp):
+                T = np.empty_like(self.tp)
+                for i, tt in enumerate(self.tp):
                     T[i] = self._instantaneous(x, y, z, t, tt)
         else:
-            if np.isscalar(tp):
+            if np.isscalar(self.tp):
                 T = np.empty_like(t)
                 for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(x, y, z, tt, tp)
+                    T[i] = self._instantaneous(x, y, z, tt, self.tp)
             else:
-                raise ValueError('One of t or tp must be a scalar.')
+                raise ValueError('One of t or self.tp must be a scalar.')
         return T
 
     def _continuous(self, x, y, z, t):
@@ -248,13 +250,12 @@ class Point:
                 t = np.linspace(0, 500, 100) / 1000   # seconds
                 x, y, z = 0, 0, 0                     # meters
                 xp, yp, zp = 0, 0, 0.001              # meters
-                t_pulse = 0.100                       # seconds
 
                 # Create a Point object representing the heat source
-                medium = grheat.Point(xp, yp, zp)
+                point = grheat.Point(xp, yp, zp)
 
                 # Calculate the temperature rise due to a pulsed heat source
-                T = medium.pulsed(x, y, z, t, t_pulse)
+                T = point.continuous(x, y, z, t)
 
                 # Plot the temperature rise over time
                 plt.plot(t * 1000, T, color='blue')

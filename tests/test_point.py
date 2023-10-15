@@ -19,10 +19,10 @@ class InstantaneousPoint(unittest.TestCase):
         compute the temperature at a single point in space at a given time.
         """
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp)
         tp = 0
+        point = grheat.Point(xp, yp, zp, tp)
         t = 1
-        T = point.instantaneous(0, 0, 0, t, tp)
+        T = point.instantaneous(0, 0, 0, t)
 
     def test_02_time_array(self):
         """
@@ -30,10 +30,10 @@ class InstantaneousPoint(unittest.TestCase):
         and compute the temperature at a single point in space across these times.
         """
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp)
         tp = 0
+        point = grheat.Point(xp, yp, zp, tp)
         t = np.linspace(0, 10)
-        T = point.instantaneous(0, 0, 0, t, tp)
+        T = point.instantaneous(0, 0, 0, t)
 
     def test_03_surface(self):
         """
@@ -41,11 +41,11 @@ class InstantaneousPoint(unittest.TestCase):
         coordinates and compute the temperature across a surface at a given time.
         """
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp)
         tp = 0
+        point = grheat.Point(xp, yp, zp, tp)
         t = 1
         X, Y = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
-        T = point.instantaneous(X, Y, 0, t, tp)
+        T = point.instantaneous(X, Y, 0, t)
 
     def test_invalid_boundary_01(self):
         """
@@ -66,8 +66,8 @@ class InstantaneousPoint(unittest.TestCase):
         z = np.linspace(0, 0.002, 101)  # m
         zz = 1000 * z                   # mm
 
-        point = grheat.Point(xp, yp, zp, boundary='zero')
-        T = point.instantaneous(x, y, z, t, tp)
+        point = grheat.Point(xp, yp, zp, tp, boundary='zero')
+        T = point.instantaneous(x, y, z, t)
         self.assertIsInstance(T, np.ndarray)     # is an array
         self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
         self.assertEqual(T.shape, z.shape)       # same shape
@@ -84,8 +84,8 @@ class InstantaneousPoint(unittest.TestCase):
         z = np.linspace(0, 0.002, 101)  # m
         zz = 1000 * z                   # mm
 
-        point = grheat.Point(xp, yp, zp, boundary='zero')
-        T = point.instantaneous(x, y, z, t, tp)
+        point = grheat.Point(xp, yp, zp, tp, boundary='zero')
+        T = point.instantaneous(x, y, z, t)
         self.assertIsInstance(T, np.ndarray)     # is an array
         self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
         self.assertEqual(T.shape, z.shape)       # same shape
@@ -102,8 +102,8 @@ class InstantaneousPoint(unittest.TestCase):
         z = 0.001                       # m
         zz = 1000 * z                   # mm
 
-        point = grheat.Point(xp, yp, zp, boundary='zero')
-        T = point.instantaneous(x, y, z, t, tp)
+        point = grheat.Point(xp, yp, zp, tp)
+        T = point.instantaneous(x, y, z, t)
         self.assertEqual(T, 0)
 
 
@@ -147,13 +147,13 @@ class ContinuousPoint(unittest.TestCase):
         consistent with the averaged output of method `instantaneous`
         over a range of time points.
         """
+        N = 50
         xp, yp, zp = 0, 0, 0.001      # meters
-        point = grheat.Point(xp, yp, zp)
+        tp = np.linspace(0, 1, N)
+        point = grheat.Point(xp, yp, zp, tp)
         t = 1
         T1 = point.continuous(0, 0, 0, t)
-        N = 50
-        tp = np.linspace(0, 1, N)
-        T = point.instantaneous(0, 0, 0, t, tp)
+        T = point.instantaneous(0, 0, 0, t)
         T2 = T.sum() / N
         self.assertAlmostEqual(T1, T2, delta=0.01)
 
@@ -253,9 +253,8 @@ class InstantVsPulsed(unittest.TestCase):
         xp, yp, zp = 0, 0, 0.001      # meters
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
-        tp = 0
         t = 1
-        T1 = point.instantaneous(0, 0, 0, t, tp)
+        T1 = point.instantaneous(0, 0, 0, t)
         T2 = point.pulsed(0, 0, 0, t, t_pulse)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
@@ -264,9 +263,8 @@ class InstantVsPulsed(unittest.TestCase):
         xp, yp, zp = 0, 0, 0.001      # meters
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
-        tp = 0
         t = np.linspace(0, 10)
-        T1 = point.instantaneous(0, 0, 0, t, tp)
+        T1 = point.instantaneous(0, 0, 0, t)
         T2 = point.pulsed(0, 0, 0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
@@ -276,11 +274,10 @@ class InstantVsPulsed(unittest.TestCase):
         xp, yp, zp = 0, 0, 0.001      # meters
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
-        tp = 0
         t = 1
         X, Y = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
 
-        T1 = point.instantaneous(X, Y, 0, t, tp)
+        T1 = point.instantaneous(X, Y, 0, t)
         T2 = point.pulsed(X, Y, 0, t, t_pulse)
         self.assertAlmostEqual(T1[0, 3], T2[0, 3], delta=0.001)
         self.assertAlmostEqual(T1[3, 1], T2[3, 1], delta=0.001)
