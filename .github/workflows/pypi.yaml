@@ -12,7 +12,7 @@ jobs:
 
     environment:
       name: pypi repository
-      url: https://pypi.org/p/lenstest
+      url: https://pypi.org/p/grheat
 
     permissions:
       id-token: write
