@@ -117,7 +117,7 @@ class IntegratedPlane(unittest.TestCase):
         plane = grheat.Plane(0)
         for i, zp in enumerate(zp_array):
             plane.zp = zp
-            total += np.exp(-mua * zp) * plane.instantaneous(z, t, tp)
+            total += np.exp(-mua * zp) * plane.instantaneous(z, t)
         T2 = radiant_exposure * total * mua * (zp_array[1] - zp_array[0])
 #        print(T1 / T2)
 #        print(T2 / T1)

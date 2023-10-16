@@ -17,15 +17,15 @@ class InstantaneousPlane(unittest.TestCase):
         zp = 0.001  # meters
         tp = 0
         t = 1
-        plane = grheat.Plane(zp)
-        T = plane.instantaneous(0, t, tp)
+        plane = grheat.Plane(zp, tp)
+        T = plane.instantaneous(0, t)
 
     def test_02_time_array(self):
         zp = 0.001  # meters
         tp = 0
         t = np.linspace(0, 10)
-        plane = grheat.Plane(zp)
-        T = plane.instantaneous(0, t, tp)
+        plane = grheat.Plane(zp, tp)
+        T = plane.instantaneous(0, t)
 
 
 class ContinuousPlane(unittest.TestCase):
@@ -65,12 +65,12 @@ class InstantVsPulsed(unittest.TestCase):
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
         zp = 0.001  # meters
-        t_pulse = 0.00001
         tp = 0
+        t_pulse = 0.00001
         t = 1
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        plane = grheat.Plane(zp)
-        T1 = radiant_exposure * plane.instantaneous(0, t, tp)
+        plane = grheat.Plane(zp, tp)
+        T1 = radiant_exposure * plane.instantaneous(0, t)
         T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
@@ -81,8 +81,8 @@ class InstantVsPulsed(unittest.TestCase):
         tp = 0
         t = np.linspace(0, 10)
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        plane = grheat.Plane(zp)
-        T1 = radiant_exposure * plane.instantaneous(0, t, tp)
+        plane = grheat.Plane(zp, tp)
+        T1 = radiant_exposure * plane.instantaneous(0, t)
         T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
