@@ -3,8 +3,8 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's Function Heat Transfer Solutions for Point Source in Infinite Media
-===========================================================================
+Green's Functions for Point Source in Semi-Infinite Media
+=========================================================
 
 This module provides Green's function solutions for heat transfer due to a point
 source in an infinite medium, encapsulated within the `Point` class. The
@@ -14,13 +14,22 @@ Jaeger's work.
 The `Point` class represents a point heat source located at a specified position
 `(xp, yp, zp)` in the medium. It provides methods to calculate the temperature
 rise at any given location `(x, y, z)` at a specified time `t` due to different
-types of heat source behavior: instantaneous, continuous, or pulsed.
+types of heat source behavior.
+
+Three types of point sources are supported:
+
+- **Instantaneous**: Represents a single, instantaneous release of heat from (xp,yp,zp) at time `tp`.
+
+- **Continuous**: Represents a continuous release of heat from (xp,yp,zp) starting at t=0
+
+- **Pulsed**: Represents a pulsed release of heat from (xp,yp,zp) for t=0 to `t_pulse`.
 
 The module supports various boundary conditions such as infinite, adiabatic, or
 zero boundary, and allows for specifying thermal properties like diffusivity and
 volumetric heat capacity of the medium.
 
-For further documentation and examples, visit `grheat Documentation <https://grheat.readthedocs.io>`_.
+More documentation can be found at <https://grheat.readthedocs.io>
+
 """
 import scipy.special
 import numpy as np

@@ -16,15 +16,15 @@ class InstantaneousAbsorber(unittest.TestCase):
         mua = 1000  # 1/meter
         tp = 0
         t = 1
-        medium = grheat.Absorber(mua)
-        T = medium.instantaneous(0, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T = medium.instantaneous(0, t)
 
     def test_02_time_array(self):
         mua = 1000  # 1/meter
         tp = 0
         t = np.linspace(0, 10)
-        medium = grheat.Absorber(mua)
-        T = medium.instantaneous(0, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T = medium.instantaneous(0, t)
 
 
 class ContinuousAbsorber(unittest.TestCase):
@@ -69,8 +69,8 @@ class InstantVsPulsed(unittest.TestCase):
         t = 0.5
         z = 0.001
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua)
-        T1 = radiant_exposure * medium.instantaneous(z, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T1 = radiant_exposure * medium.instantaneous(z, t)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
@@ -82,8 +82,8 @@ class InstantVsPulsed(unittest.TestCase):
         t = 2
         z = 0.001
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua)
-        T1 = radiant_exposure * medium.instantaneous(z, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T1 = radiant_exposure * medium.instantaneous(z, t)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
@@ -94,8 +94,8 @@ class InstantVsPulsed(unittest.TestCase):
         tp = 0
         t = np.linspace(0, 10)
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua)
-        T1 = radiant_exposure * medium.instantaneous(0, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T1 = radiant_exposure * medium.instantaneous(0, t)
         T2 = radiant_exposure * medium.pulsed(0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
@@ -110,8 +110,8 @@ class IntegratedPlane(unittest.TestCase):
         t = 0.5
         z = 0.001
         radiant_exposure = 1e6    # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua)
-        T1 = radiant_exposure * medium.instantaneous(z, t, tp)
+        medium = grheat.Absorber(mua, tp)
+        T1 = radiant_exposure * medium.instantaneous(z, t)
         zp_array = np.linspace(0, 20 * z, 1000)
         total = 0
         plane = grheat.Plane(0)

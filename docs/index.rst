@@ -11,7 +11,13 @@
    :caption: API
    :hidden:
 
-   grheat.rst
+   point.rst
+
+   line.rst
+
+   plane.rst
+
+   absorber.rst
 
 .. toctree::
    :caption: Versions

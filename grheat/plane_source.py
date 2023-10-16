@@ -3,9 +3,30 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's function heat transfer solutions for xy-planar source in infinite media.
+Green's Function Heat Transfer Solutions for xy-Planar Source in Infinite Media
+===============================================================================
 
-More documentation at <https://grheat.readthedocs.io>
+This module provides Green's function solutions for heat transfer due to an xy-planar
+source in an infinite medium, encapsulated within the `Plane` class. The solutions are
+based on the mathematical formulations provided in Carslaw and Jaeger's work.
+
+The `Plane` class represents a planar heat source located at a specified depth `zp` in
+the medium. It provides methods to calculate the temperature rise at any given depth `z`
+at a specified time `t` due to different types of heat source behavior.
+
+Three types of planar sources are supported:
+
+- **Instantaneous**: Represents a single, instantaneous release of heat from zp-plane at time `tp`.
+
+- **Continuous**: Represents a continuous release of heat from the zp-plane starting at t=0
+
+- **Pulsed**: Represents a pulsed release of heat from the zp-plane for t=0 to `t_pulse`.
+
+The module supports various boundary conditions such as infinite, adiabatic, or zero
+boundary, and allows for specifying thermal properties like diffusivity and volumetric
+heat capacity of the medium.
+
+More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
 
 """
 
@@ -18,10 +39,24 @@ water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 class Plane:
     """
-    Green's function heat transfer solutions for point source in infinite media.
+    Green's Function Heat Transfer Solutions for xy-Planar Source in Infinite Media.
 
+    This class encapsulates the Green's function solutions for an xy-planar heat source
+    in an infinite medium. It provides methods for calculating the temperature rise at a
+    specified depth `z` and time `t` due to different behaviors of the heat source:
+    instantaneous, continuous, or pulsed.
+
+    The `Plane` object should be initialized with the depth of the xy-planar source `zp`,
+    and optionally, the time of source impulse `tp`, thermal diffusivity, volumetric heat
+    capacity, and boundary condition can also be specified.
+
+    Attributes:
+        zp (scalar or array): Depth of the xy-planar source [meters].
+        tp (scalar or array): Time of source impulse [seconds]. Default is 0.
+        diffusivity (float): Thermal diffusivity [m**2/s].
+        capacity (float): Volumetric heat capacity [J/degree/m**3].
+        boundary (str): Boundary condition, one of 'infinite', 'adiabatic', or 'zero'.
     """
-
     def __init__(self,
                  zp, tp=0,
                  diffusivity=water_thermal_diffusivity,
@@ -30,26 +65,26 @@ class Plane:
         """
         Initializes a Plane object for a planar heat source in an semi-infinite medium.
 
-        This method initializes the Plane object with the specified properties and settings 
-        for the planar heat source, including its depth, time of occurrence, thermal 
-        properties of the medium, and boundary condition. These settings will be used 
+        This method initializes the Plane object with the specified properties and settings
+        for the planar heat source, including its depth, time of occurrence, thermal
+        properties of the medium, and boundary condition. These settings will be used
         in subsequent calculations of temperature rise due to the planar source.
 
         Args:
             zp (float): Depth of the xy-planar source in meters.
             tp (float, optional): Time of the source impulse in seconds. Defaults to 0.
-            diffusivity (float, optional): Thermal diffusivity of the medium in m**2/s. 
+            diffusivity (float, optional): Thermal diffusivity of the medium in m**2/s.
                 Defaults to `water_thermal_diffusivity`.
-            capacity (float, optional): Volumetric heat capacity of the medium in J/degree/m**3. 
+            capacity (float, optional): Volumetric heat capacity of the medium in J/degree/m**3.
                 Defaults to `water_heat_capacity`.
-            boundary (str, optional): Boundary condition of the medium. 
+            boundary (str, optional): Boundary condition of the medium.
                 Options include 'infinite', 'adiabatic', or 'zero'. Defaults to 'infinite'.
 
         Raises:
             ValueError: If an invalid value is provided for the `boundary` argument.
         """
         self.zp = zp
-        
+
         self.tp = tp
         self.diffusivity = diffusivity     # m**2/s
         self.capacity = capacity           # J/degree/kg
@@ -61,10 +96,10 @@ class Plane:
         """
         Computes the temperature rise due to a 1 J/m² instantaneous xy-planar source at time `t`.
 
-        This method calculates the temperature increase at a specified depth `z` at time `t` 
-        due to an instantaneous planar heat source of 1 J/m² occurring at time `tp`. 
-        The source plane is parallel to the surface and passes through depth `zp`, 
-        as specified during the initialization of the `Plane` object. 
+        This method calculates the temperature increase at a specified depth `z` at time `t`
+        due to an instantaneous planar heat source of 1 J/m² occurring at time `tp`.
+        The source plane is parallel to the surface and passes through depth `zp`,
+        as specified during the initialization of the `Plane` object.
 
         The formulation is based on Carslaw and Jaeger (page 259, equation 10.3(4)).
 
@@ -76,8 +111,8 @@ class Plane:
         Returns:
             float or numpy.ndarray: Temperature increase in degrees Celsius at the specified depth(s) and time.
 
-        The method handles scalar and array-like input for the depth `z`. 
-        When `z` is a scalar, a single float representing the temperature increase is returned. 
+        The method handles scalar and array-like input for the depth `z`.
+        When `z` is a scalar, a single float representing the temperature increase is returned.
         When `z` is array-like, a NumPy array of temperature increases corresponding to each depth value is returned.
         """
         z2 = (z - self.zp)**2
@@ -107,8 +142,8 @@ class Plane:
         Computes the temperature rise due to a 1 J/m² instant xy-planar source.
 
         This method calculates the temperature increase at a specified depth `z` at time(s) `t`
-        due to an instantaneous planar heat source of 1 J/m². The source plane is parallel 
-        to the surface and passes through depth `zp`, as specified during the initialization 
+        due to an instantaneous planar heat source of 1 J/m². The source plane is parallel
+        to the surface and passes through depth `zp`, as specified during the initialization
         of the `Plane` object. The formulation is based on Carslaw and Jaeger
         (page 259, equation 10.3(4)).
 
@@ -168,8 +203,8 @@ class Plane:
         """
         Computes the temperature rise due to a continuous 1 W/m² xy-planar heat source.
 
-        The heat source, positioned at a depth of `zp`, initiates at t=0 and continues 
-        until the specified time `t`. The computation is achieved by integrating the 
+        The heat source, positioned at a depth of `zp`, initiates at t=0 and continues
+        until the specified time `t`. The computation is achieved by integrating the
         planar Green's function from 0 to `t` using Mathematica.
 
         Args:
@@ -177,8 +212,8 @@ class Plane:
             t (float): Time(s) at which the temperature is evaluated [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s) 
-            and time(s) in degrees Celsius. The return type matches the input type (scalar 
+            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
         """
         dz = z - self.zp
@@ -209,9 +244,9 @@ class Plane:
         """
         Computes the temperature rise due to a continuous 1W/m² xy-planar heat source.
 
-        The heat source, situated at a depth of `zp`, initiates at t=0 and persists 
-        continuously until the specified time `t`. This method serves as a wrapper 
-        for the `_continuous` method, facilitating handling of scalar or array-like 
+        The heat source, situated at a depth of `zp`, initiates at t=0 and persists
+        continuously until the specified time `t`. This method serves as a wrapper
+        for the `_continuous` method, facilitating handling of scalar or array-like
         input for time `t`.
 
         Args:
@@ -219,8 +254,8 @@ class Plane:
             t (float or array-like): Time(s) at which the temperature is evaluated [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s) 
-            and time(s) in degrees Celsius. The return type matches the input type (scalar 
+            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
 
         Example:
@@ -279,8 +314,8 @@ class Plane:
         """
         Computes the temperature rise due to a 1 J/m² pulsed xy-planar heat source.
 
-        The xy-planar source, situated at a depth of `zp`, emits a pulse of 1 J/m² 
-        from time t=0 to time t=`t_pulse`. This method acts as a wrapper for the 
+        The xy-planar source, situated at a depth of `zp`, emits a pulse of 1 J/m²
+        from time t=0 to time t=`t_pulse`. This method acts as a wrapper for the
         `_pulsed` method, accommodating scalar or array-like input for time `t`.
 
         Args:
@@ -289,8 +324,8 @@ class Plane:
             t_pulse (float): Duration of the heat pulse [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s) 
-            and time(s) in degrees Celsius. The return type matches the input type (scalar 
+            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
 
         Raises:

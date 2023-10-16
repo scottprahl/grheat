@@ -15,25 +15,25 @@ class InstantaneousLine(unittest.TestCase):
 
     def test_01_scalar(self):
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
         tp = 0
+        line = grheat.Line(yp, zp, tp)
         t = 1
-        T = line.instantaneous(0, 0, t, tp)
+        T = line.instantaneous(0, 0, t)
 
     def test_02_time_array(self):
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
         tp = 0
+        line = grheat.Line(yp, zp, tp)
         t = np.linspace(0, 10)
-        T = line.instantaneous(0, 0, t, tp)
+        T = line.instantaneous(0, 0, t)
 
     def test_03_surface(self):
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
         tp = 0
+        line = grheat.Line(yp, zp, tp)
         t = 1
         Y, Z = np.meshgrid(np.arange(-0.0051, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
-        T = line.instantaneous(Y, Z, t, tp)
+        T = line.instantaneous(Y, Z, t)
 
 
 class ContinuousLine(unittest.TestCase):
@@ -89,22 +89,22 @@ class InstantVsPulsed(unittest.TestCase):
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
-        t_pulse = 0.00001
         tp = 0
+        line = grheat.Line(yp, zp, tp)
+        t_pulse = 0.00001
         t = 1
-        T1 = line.instantaneous(0, 0, t, tp)
+        T1 = line.instantaneous(0, 0, t)
         T2 = line.pulsed(0, 0, t, t_pulse)
         self.assertAlmostEqual(T1, T2, delta=0.001)
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source."""
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
-        t_pulse = 0.00001
         tp = 0
+        line = grheat.Line(yp, zp, tp)
+        t_pulse = 0.00001
         t = np.linspace(0, 10)
-        T1 = line.instantaneous(0, 0, t, tp)
+        T1 = line.instantaneous(0, 0, t)
         T2 = line.pulsed(0, 0, t, t_pulse)
         self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
         self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
@@ -112,13 +112,13 @@ class InstantVsPulsed(unittest.TestCase):
     def test_03_instant(self):
         """Short pulse result should be same as instantaneous source."""
         yp, zp = 0, 0.001         # meters
-        line = grheat.Line(yp, zp)
-        t_pulse = 0.00001
         tp = 0
+        line = grheat.Line(yp, zp, tp)
+        t_pulse = 0.00001
         t = 1
         Y, Z = np.meshgrid(np.arange(-0.0051, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
 
-        T1 = line.instantaneous(Y, Z, t, tp)
+        T1 = line.instantaneous(Y, Z, t)
         T2 = line.pulsed(Y, Z, t, t_pulse)
         self.assertAlmostEqual(T1[0, 3], T2[0, 3], delta=0.001)
         self.assertAlmostEqual(T1[3, 1], T2[3, 1], delta=0.001)

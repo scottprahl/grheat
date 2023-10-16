@@ -206,6 +206,7 @@ class ContinuousPoint(unittest.TestCase):
         T = point.continuous(x, y, z, t)
         self.assertEqual(T, 0)
 
+
 class PulsedPoint(unittest.TestCase):
 
     def test_01_scalar(self):

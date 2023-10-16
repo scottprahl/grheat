@@ -5,27 +5,38 @@
 """
 Green's function heat transfer solutions for exponential source in infinite media.
 
-More documentation at <https://grheat.readthedocs.io>
+This module provides solutions to heat transfer for uniform
+illumination of am absorbing semi-infinite medium. The solutions are
+based on the mathematical formulations provided in Carslaw and Jaeger's work.
 
-Typical usage::
+The `Line` class represents a linear heat source that extends along all x-values passing 
+through coordinates (yp, zp) in the medium. The medium's surface is defined by z=0. The 
+class provides methods to calculate the temperature rise at any position (y, z) at a 
+specified time `t`, due to different types of heat source behaviors.
 
-    import grheat
-    import numpy as np
-    import matplotlib.pyplot as plt
+Three types of line sources are supported:
 
-    t = np.linspace(0, 500, 100) / 1000   # seconds
-    x,y,z = 0,0,0                         # meters
-    xp,yp,zp = 0,0,0.001                  # meters
-    t_pulse = 0.100                       # seconds
+- **Instantaneous**: 
+  Represents a single, instantaneous release of heat along the x-line at time `tp`.
 
-    medium = grheat.Point(xp, yp, zp)
-    T = medium.pulsed(x, y, z, t, t_pulse)
+- **Continuous**: 
+  Represents a continuous release of heat along the x-line source starting at t=0.
 
-    plt.plot(t * 1000, T, color='blue')
-    plt.xlabel("Time (ms)")
-    plt.ylabel("Temperature Increase (°C)")
-    plt.title("1J pulse lasting %.0f ms" % t_pulse)
-    plt.show()
+- **Pulsed**: 
+  Represents a pulsed release of heat along the line source from t=0 to t=`t_pulse`.
+
+Each of these line sources can be analyzed under different boundary conditions at z=0:
+
+- `'infinite'`: No boundary (infinite medium).
+
+- `'adiabatic'`: No heat flow across the boundary.
+
+- `'zero'`: Boundary is fixed at T=0.
+
+Any other boundary condition will trigger a ValueError.
+
+More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
+
 """
 
 import scipy.special
@@ -34,31 +45,10 @@ import numpy as np
 water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
-
 class ExpSource:
     """
     Green's function heat transfer solutions for point source in infinite media.
 
-    Typical usage::
-
-        import grheat
-        import numpy as np
-        import matplotlib.pyplot as plt
-
-        t = np.linspace(0, 500, 100) / 1000   # seconds
-        mu = 0.25 * 1000                      # 1/m
-        x,y,z = 0,0,0                         # meters
-        xp,yp = 0,0                           # meters
-        t_pulse = 0.100                       # seconds
-
-        medium = grheat.ExpSource(mu, xp, yp)
-        T = medium.pulsed(x,y,z,t,t_pulse)
-
-        plt.plot(t * 1000, T, color='blue')
-        plt.xlabel("Time (ms)")
-        plt.ylabel("Temperature Increase (°C)")
-        plt.title("1J pulse lasting %.0f ms" % t_pulse)
-        plt.show()
     """
 
     def __init__(self,
@@ -220,6 +210,28 @@ class ExpSource:
 
         Returns
             Temperature Increase [°C]
+
+        Typical usage::
+
+            import grheat
+            import numpy as np
+            import matplotlib.pyplot as plt
+
+            t = np.linspace(0, 500, 100) / 1000   # seconds
+            mu = 0.25 * 1000                      # 1/m
+            x,y,z = 0,0,0                         # meters
+            xp,yp = 0,0                           # meters
+            t_pulse = 0.100                       # seconds
+
+            medium = grheat.ExpSource(mu, xp, yp)
+            T = medium.pulsed(x,y,z,t,t_pulse)
+
+            plt.plot(t * 1000, T, color='blue')
+            plt.xlabel("Time (ms)")
+            plt.ylabel("Temperature Increase (°C)")
+            plt.title("1J pulse lasting %.0f ms" % t_pulse)
+            plt.show()
+
         """
         if np.isscalar(t):
             T = self._pulsed(x, y, z, t, t_pulse)

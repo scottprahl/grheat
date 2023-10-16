@@ -3,33 +3,69 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's function heat transfer solutions for x-line source in semi-infinite media.
+x-Line Source
+=============
 
-The surface is defined by z=0 and the line source extends horizontally
-from -∞ < z < +∞.
+This module provides Green's function solutions for heat transfer due to an x-line
+source in a semi-infinite medium, encapsulated within the `Line` class. The solutions are
+based on the mathematical formulations provided in Carslaw and Jaeger's work.
 
-More documentation at <https://grheat.readthedocs.io>
+The `Line` class represents a linear heat source that extends along all x-values passing 
+through coordinates (yp, zp) in the medium. The medium's surface is defined by z=0. The 
+class provides methods to calculate the temperature rise at any position (y, z) at a 
+specified time `t`, due to different types of heat source behaviors.
+
+Three types of line sources are supported:
+
+- **Instantaneous**: 
+  Represents a single, instantaneous release of heat along the x-line at time `tp`.
+
+- **Continuous**: 
+  Represents a continuous release of heat along the x-line source starting at t=0.
+
+- **Pulsed**: 
+  Represents a pulsed release of heat along the line source from t=0 to t=`t_pulse`.
+
+Each of these line sources can be analyzed under different boundary conditions at z=0:
+
+- `'infinite'`: No boundary (infinite medium).
+
+- `'adiabatic'`: No heat flow across the boundary.
+
+- `'zero'`: Boundary is fixed at T=0.
+
+Any other boundary condition will trigger a ValueError.
+
+More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
 
 """
 import scipy.special
 import numpy as np
 
+# Constants for water properties
 water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
-
 
 class Line:
     """Provides Green's function heat transfer solutions for a line source.
 
-    The line source is in a semi-infinite medium with a surface at z=0, and extends
-    horizontally along all x-values passing through coordinates (yp, zp). At time tp,
-    the line delivers a heat impulse of 1 Joule per meter along the line.
+    The Line class encapsulates the behavior of a line source situated in a 
+    semi-infinite medium with a surface defined at z=0. The line source extends 
+    horizontally along all x-values passing through coordinates (yp, zp). At time tp, 
+    the line source delivers a heat impulse of 1 Joule per meter along its length.
 
     Boundary conditions at z=0 can be:
-        - 'infinite': No boundary.
+        - 'infinite': No boundary (infinite medium).
         - 'adiabatic': No heat flow across the boundary.
         - 'zero': Boundary is fixed at T=0.
-    An error is raised for any other boundary condition.
+    A ValueError is raised for any other specified boundary condition.
+
+    Attributes:
+        yp (float): y-coordinate of the line source. [meters]
+        zp (float): z-coordinate of the line source. [meters]
+        diffusivity (float): Thermal diffusivity of the medium. [m^2/s]
+        capacity (float): Volumetric heat capacity of the medium. [J/degree/m^3]
+        boundary (str): Boundary condition at z=0. ['infinite', 'adiabatic', 'zero']
     """
 
     def __init__(self,
