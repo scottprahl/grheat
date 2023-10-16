@@ -144,32 +144,32 @@ class Point:
             numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
 
         Example:
-            .. code-block:: python
 
-                import grheat
-                import numpy as np
-                import matplotlib.pyplot as plt
+        .. code-block:: python
 
-                # Define time, source, and observation points
-                t = np.linspace(10, 500, 100) / 1000  # seconds
-                x, y, z = 0, 0, 0                     # meters
-                xp, yp, zp = 0, 0, 0.001              # meters
-                t_p = 0                               # seconds
+            import grheat
+            import numpy as np
+            import matplotlib.pyplot as plt
 
-                # Create a Point object representing the heat source
-                point = grheat.Point(xp, yp, zp, tp)
+            # Define time, source, and observation points
+            t = np.linspace(10, 500, 100) / 1000  # seconds
+            x, y, z = 0, 0, 0                     # meters
+            xp, yp, zp = 0, 0, 0.001              # meters
+            t_p = 0                               # seconds
 
-                # Calculate the temperature rise due to a pulsed heat source
-                T = point.instantaneous(x, y, z, t)
+            # Create a Point object representing the heat source
+            point = grheat.Point(xp, yp, zp, tp)
 
-                # Plot the temperature rise over time
-                plt.plot(t * 1000, T, color='blue')
-                plt.xlabel("Time (ms)")
-                plt.ylabel("Temperature Increase (°C)")
-                plt.title("1J pulse lasting %.0f ms" % t_pulse)
-                plt.show()
+            # Calculate the temperature rise due to a pulsed heat source
+            T = point.instantaneous(x, y, z, t)
+
+            # Plot the temperature rise over time
+            plt.plot(t * 1000, T, color='blue')
+            plt.xlabel("Time (ms)")
+            plt.ylabel("Temperature Increase (°C)")
+            plt.title("1J pulse lasting %.0f ms" % t_pulse)
+            plt.show()
         """
-        T = 0
         if np.isscalar(t):
             if np.isscalar(self.tp):
                 T = self._instantaneous(x, y, z, t, self.tp)
@@ -240,6 +240,7 @@ class Point:
             numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
 
         Example:
+
             .. code-block:: python
 
                 import grheat
@@ -313,6 +314,7 @@ class Point:
             numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
 
         Example:
+
             .. code-block:: python
 
                 import grheat
