@@ -12,13 +12,13 @@ based on the mathematical formulations provided in the 1995 SPIE paper by Prahl.
 
 Three types of illumination are supported:
 
-- **Instantaneous**: 
+- **Instantaneous**:
   Represents a single, instantaneous pulse of light on the surface at time ``tp``.
 
-- **Continuous**: 
+- **Continuous**:
   Represents continuous illumination of the surface starting at ``t=0``.
 
-- **Pulsed**: 
+- **Pulsed**:
   Represents a pulse of light on the surface from ``t=0`` to ``t=t_pulse``.
 
 Each of these illumination types can be analyzed under different boundary conditions at ``z=0``:
@@ -48,41 +48,24 @@ class Absorber:
     """
     Heat transfer solutions for exponential heating of semi-infinite absorbing-only media.
 
-    This class provides solutions for the temperature rise in a semi-infinite medium due to 
-    uniform illumination over its surface. The illumination is exponentially absorbed within 
+    This class provides solutions for the temperature rise in a semi-infinite medium due to
+    uniform illumination over its surface. The illumination is exponentially absorbed within
     the medium, with the volumetric heating being proportional to mu_a * exp(-mu_a * z).
-    
+
     This is a one-dimensional solution in the depth z.
 
     The solutions are applicable under three different boundary conditions at z=0:
-    
-    - 'infinite': No boundary (infinite medium).
-    
-    - 'adiabatic': No heat flow across the boundary.
-    
-    - 'zero': Boundary is fixed at T=0.
+        - 'infinite': No boundary (infinite medium).
+        - 'adiabatic': No heat flow across the boundary.
+        - 'zero': Boundary is fixed at T=0.
 
     Attributes
     ----------
-
         mu_a (float): Exponential attenuation coefficient [1/meters].
-        
         tp (float): Time of source impulse [seconds].
-        
         diffusivity (float): Thermal diffusivity [m**2/s].
-        
         capacity (float): Volumetric heat capacity [J/degree/m**3].
-        
         boundary (str): Boundary condition at z=0 ('infinite', 'adiabatic', or 'zero').
-
-    Examples
-    --------
-    Example usage can be found in the method documentation.
-
-    See Also
-    --------
-    <https://grheat.readthedocs.io>
-
     """
 
     def __init__(self,
@@ -99,15 +82,15 @@ class Absorber:
                 illumination attenuates with depth in the medium [1/meters].
             tp (float, optional): Time of source impulse, which is assumed to be
                 instantaneous at tp [seconds]. Defaults to 0.
-            diffusivity (float, optional): Thermal diffusivity of the medium [m**2/s]. 
+            diffusivity (float, optional): Thermal diffusivity of the medium [m**2/s].
                 Defaults to water_thermal_diffusivity.
             capacity (float, optional): Volumetric heat capacity of the medium
                 [J/degree/m**3]. Defaults to water_heat_capacity.
-            boundary (str, optional): Boundary condition at z=0. 
+            boundary (str, optional): Boundary condition at z=0.
                 Can be 'infinite', 'adiabatic', or 'zero'. Defaults to 'infinite'.
 
         Raises:
-            ValueError: If the specified boundary condition is not one of the 
+            ValueError: If the specified boundary condition is not one of the
                 recognized types ('infinite', 'adiabatic', 'zero').
         """
         self.mu_a = mu_a                   # 1/meter
@@ -142,11 +125,11 @@ class Absorber:
                 return np.zeros_like(zeta)
 
         tau = self.mu_a**2 * self.diffusivity * (t - tp)
-        factor = self.mu_a / 2 / self.capacity * np.exp(tau - zeta)
+        factor = (self.mu_a / 2 / self.capacity) * np.exp(tau - zeta)
         T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
 
         if self.boundary != 'infinite':
-            factor = self.mu_a / 2 / self.capacity * np.exp(tau + zeta)
+            factor = (self.mu_a / 2 / self.capacity) * np.exp(tau + zeta)
             T1 = factor * scipy.special.erfc((2 * tau + zeta) / (2 * np.sqrt(tau)))
 
             if self.boundary == 'adiabatic':
@@ -161,15 +144,15 @@ class Absorber:
         """
         Calculate temperature rise due to an instant surface exposure.
 
-        This method computes the temperature increase at a specified depth `z` and time `t` 
-        following an instantaneous radiant exposure of 1 J/m² on the medium's surface. The 
-        computation is based on the formulations provided in Prahl's 1995 SPIE paper, 
+        This method computes the temperature increase at a specified depth `z` and time `t`
+        following an instantaneous radiant exposure of 1 J/m² on the medium's surface. The
+        computation is based on the formulations provided in Prahl's 1995 SPIE paper,
         "Charts to rapidly estimate temperature following laser irradiation".
 
-        The method handles scalar or array-like inputs for `z` and `t`, allowing for 
+        The method handles scalar or array-like inputs for `z` and `t`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
-        
-        The `self.tp` attribute of the Absorber object specifies the time of the source 
+
+        The `self.tp` attribute of the Absorber object specifies the time of the source
         impulse, which is used in the underlying `_instantaneous` method call.
 
         Args:
@@ -217,18 +200,17 @@ class Absorber:
                 raise ValueError('One of t or self.tp must be a scalar.')
         return T
 
-
     def _continuous(self, z, t):
         """
         Calculate temperature rise due to a continuous 1 W/m² surface exposure.
 
-        The method computes the temperature increase at a specified depth `z` and time `t` 
-        following a continuous radiant exposure of 1 W/m² on the medium's surface. The 
-        volumetric heating within the medium decreases as self.mu_a * exp(-self.mu * z) [W/m³], 
+        The method computes the temperature increase at a specified depth `z` and time `t`
+        following a continuous radiant exposure of 1 W/m² on the medium's surface. The
+        volumetric heating within the medium decreases as self.mu_a * exp(-self.mu * z) [W/m³],
         The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
         estimate temperature following laser irradiation".
 
-        The method handles scalar or array-like inputs for `z`, allowing for 
+        The method handles scalar or array-like inputs for `z`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
 
         Args:
@@ -273,16 +255,16 @@ class Absorber:
         """
         Calculate temperature rise due to continuous surface irradiance on an absorber.
 
-        The method computes the temperature increase at a specified depth `z` and time `t` 
-        due to a continuous irradiance of 1 W/m² on the absorber's surface. The 
-        volumetric heating within the medium decreases exponentially with depth, following 
-        the expression: mu_a * exp(-mu * z) [W/m³]. The heating starts at t=0 and continues 
-        up to the specified time `t`.  
-        
+        The method computes the temperature increase at a specified depth `z` and time `t`
+        due to a continuous irradiance of 1 W/m² on the absorber's surface. The
+        volumetric heating within the medium decreases exponentially with depth, following
+        the expression: mu_a * exp(-mu * z) [W/m³]. The heating starts at t=0 and continues
+        up to the specified time `t`.
+
         The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
         estimate temperature following laser irradiation".
 
-        The method handles scalar or array-like inputs for `z` and `t`, allowing for 
+        The method handles scalar or array-like inputs for `z` and `t`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
 
         Args:
@@ -326,10 +308,10 @@ class Absorber:
         """
         Calculate temperature rise due to pulsed radiant exposure on absorber surface.
 
-        The method computes the temperature increase at a specified depth `z` and time `t` 
-        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance 
-        starts at t=0 and continues up to time `t_pulse`. The volumetric heating within 
-        the medium decreases exponentially with depth, following the expression: 
+        The method computes the temperature increase at a specified depth `z` and time `t`
+        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance
+        starts at t=0 and continues up to time `t_pulse`. The volumetric heating within
+        the medium decreases exponentially with depth, following the expression:
         mu_a * exp(-mu * z) [W/m³].
 
         The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
@@ -345,8 +327,8 @@ class Absorber:
             float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Notes:
-            - If the specified time `t` exceeds the pulse duration `t_pulse`, the method 
-              subtracts the temperature increase due to continuous irradiance after `t_pulse` 
+            - If the specified time `t` exceeds the pulse duration `t_pulse`, the method
+              subtracts the temperature increase due to continuous irradiance after `t_pulse`
               from the total temperature increase.
 
         """
@@ -360,13 +342,13 @@ class Absorber:
         Calculate temperature rise due to a 1 J/m² pulsed radiant exposure on the absorber surface.
 
         This method computes the temperature increase at specified depth(s) `z` and time(s) `t`
-        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance starts at t=0 
-        and continues up to time `t_pulse`. The volumetric heating within the medium decreases 
+        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance starts at t=0
+        and continues up to time `t_pulse`. The volumetric heating within the medium decreases
         exponentially with depth, following the expression: mu_a * exp(-mu * z) [W/m³].
 
         The temperatures are calculated based on the formulations in Prahl's 1995 SPIE paper,
-        "Charts to rapidly estimate temperature following laser irradiation". The calculations of temperature
-        should work for times before, during, and after the pulse.
+        "Charts to rapidly estimate temperature following laser irradiation". The calculations 
+        of temperature should work for times before, during, and after the pulse.
 
         Parameters:
             z (float or array-like): Depth(s) at which the temperature is desired [meters].

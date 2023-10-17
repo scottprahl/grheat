@@ -103,17 +103,15 @@ class Plane:
 
         The formulation is based on Carslaw and Jaeger (page 259, equation 10.3(4)).
 
+        The method handles scalar and array-like input for the depth `z`.
+
         Args:
             z (float or array-like): Depth(s) of desired temperature in meters.
             t (float): Time of desired temperature in seconds.
             tp (float): Time of source impulse in seconds.
 
         Returns:
-            float or numpy.ndarray: Temperature increase in degrees Celsius at the specified depth(s) and time.
-
-        The method handles scalar and array-like input for the depth `z`.
-        When `z` is a scalar, a single float representing the temperature increase is returned.
-        When `z` is array-like, a NumPy array of temperature increases corresponding to each depth value is returned.
+            float or array: Temperature increase in °C at the specified depth(s) and time.
         """
         z2 = (z - self.zp)**2
         if t <= tp:

@@ -4,7 +4,7 @@ Green's Functions for Heat Transfer
 
 `grheat` is a library offering Green's function solutions for heat transfer
 problems in various geometries and boundary conditions. This module provides
-solutions for point sources, line sources, plane sources, and exponential heating 
+solutions for point sources, line sources, plane sources, and exponential heating
 in semi-infinite media.
 
 Main Features
@@ -12,7 +12,7 @@ Main Features
 - Green's function solutions for point, line, and plane sources in semi-infinite media.
 - Solutions for exponential heating of a semi-infinite absorbing medium.
 - Supports different boundary conditions at the surface (z=0): infinite, adiabatic, and zero.
-- Accurate and efficient calculations based on mathematical formulations provided in 
+- Accurate and efficient calculations based on mathematical formulations provided in
   recognized literature (e.g., Carslaw and Jaeger, Prahl's 1995 SPIE paper).
 
 Installation

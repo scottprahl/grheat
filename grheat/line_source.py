@@ -10,20 +10,20 @@ This module provides Green's function solutions for heat transfer due to an x-li
 source in a semi-infinite medium, encapsulated within the `Line` class. The solutions are
 based on the mathematical formulations provided in Carslaw and Jaeger's work.
 
-The `Line` class represents a linear heat source that extends along all x-values passing 
-through coordinates (yp, zp) in the medium. The medium's surface is defined by z=0. The 
-class provides methods to calculate the temperature rise at any position (y, z) at a 
+The `Line` class represents a linear heat source that extends along all x-values passing
+through coordinates (yp, zp) in the medium. The medium's surface is defined by z=0. The
+class provides methods to calculate the temperature rise at any position (y, z) at a
 specified time `t`, due to different types of heat source behaviors.
 
 Three types of line sources are supported:
 
-- **Instantaneous**: 
+- **Instantaneous**:
   Represents a single, instantaneous release of heat along the x-line at time `tp`.
 
-- **Continuous**: 
+- **Continuous**:
   Represents a continuous release of heat along the x-line source starting at t=0.
 
-- **Pulsed**: 
+- **Pulsed**:
   Represents a pulsed release of heat along the line source from t=0 to t=`t_pulse`.
 
 Each of these line sources can be analyzed under different boundary conditions at z=0:
@@ -44,12 +44,13 @@ import numpy as np
 water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
+
 class Line:
     """Provides Green's function heat transfer solutions for a line source.
 
-    The Line class encapsulates the behavior of a line source situated in a 
-    semi-infinite medium with a surface defined at z=0. The line source extends 
-    horizontally along all x-values passing through coordinates (yp, zp). At time tp, 
+    The Line class encapsulates the behavior of a line source situated in a
+    semi-infinite medium with a surface defined at z=0. The line source extends
+    horizontally along all x-values passing through coordinates (yp, zp). At time tp,
     the line source delivers a heat impulse of 1 Joule per meter along its length.
 
     Boundary conditions at z=0 can be:

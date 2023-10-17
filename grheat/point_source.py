@@ -18,7 +18,7 @@ types of heat source behavior.
 
 Three types of point sources are supported:
 
-- **Instantaneous**: Represents a single, instantaneous release of heat from (xp,yp,zp) at time `tp`.
+- **Instantaneous**: Represents a instantaneous release of heat from (xp,yp,zp) at time `tp`.
 
 - **Continuous**: Represents a continuous release of heat from (xp,yp,zp) starting at t=0
 
@@ -140,17 +140,17 @@ class Point:
         should be a scalar while the other can be an array.
 
         Args:
-            x (array-like): x-coordinate(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
-            t (scalar or array-like): Time(s) at which the desired temperature is computed [seconds].
-            tp (scalar or array-like): Time(s) at which the source impulse occurs [seconds].
+            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
+            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
+            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            t (scalar or array): Time(s) at which the desired temperature is computed [seconds].
+            tp (scalar or array): Time(s) at which the source impulse occurs [seconds].
 
         Raises:
             ValueError: If both `t` and `tp` are arrays. One of them must be a scalar.
 
         Returns:
-            numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
+            scalar or array: Temperature increase in °C at the specified location(s) and time(s).
 
         Example:
 
@@ -236,17 +236,17 @@ class Point:
         Calculates the temperature rise due to a 1W continuous point source at specified time(s).
 
         This method computes the temperature rise at given location(s) `(x, y, z)` at time(s) `t`
-        due to a 1W continuous point source located at `(xp, yp, zp)` that was turned on at time `t=0`,
-        following the formula from Carslaw and Jaeger (page 261, 10.4(2)).
+        due to a 1W continuous point source located at `(xp, yp, zp)` that was turned on at
+        time `t=0`, following the formula from Carslaw and Jaeger (page 261, 10.4(2)).
 
         Args:
-            x (array-like): x-coordinate(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
-            t (scalar or array-like): Time(s) at which the desired temperature is computed [seconds].
+            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
+            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
+            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            t (scalar or array): Time(s) for temperature to be computed [seconds].
 
         Returns:
-            numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
+            scalar or array: Temperature increase (°C) at the specified location(s) and time(s).
 
         Example:
 
@@ -313,14 +313,14 @@ class Point:
         from time `t=0` to `t=t_pulse`.
 
         Args:
-            x (array-like): x-coordinate(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
-            t (scalar or array-like): Time(s) at which the desired temperature is computed [seconds].
+            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
+            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
+            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            t (scalar or array): Time(s) at which the desired temperature is computed [seconds].
             t_pulse (scalar): Duration of the pulse during which heat is deposited [seconds].
 
         Returns:
-            numpy.ndarray: Temperature increase at the specified location(s) and time(s) in degrees Celsius.
+            scalar or array: Temperature increase (°C) at the location(s) and time(s).
 
         Example:
 
