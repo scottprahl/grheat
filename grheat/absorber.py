@@ -75,18 +75,6 @@ class Absorber:
         
         boundary (str): Boundary condition at z=0 ('infinite', 'adiabatic', or 'zero').
 
-    Methods
-    -------
-
-        instantaneous(z: float, t: float) -> float
-            Calculate temperature rise due to 1 J/m² radiant exposure on absorbing medium.
-        
-        continuous(z: float, t: float) -> float
-            Calculate temperature rise due to continuous irradiation of 1 W/m² on absorber.
-
-        pulsed(z: float, t: float, t_pulse: float) -> float
-            Calculate temperature rise due to a 1 J/m² pulsed radiant exposure.
-
     Examples
     --------
     Example usage can be found in the method documentation.

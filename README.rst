@@ -53,7 +53,7 @@ Main Features
 - Solutions for exponential heating of a semi-infinite absorbing medium.
 - Supports different boundary conditions at the surface (z=0): infinite, adiabatic, and zero.
 - Accurate and efficient calculations based on mathematical formulations provided in 
-  recognized literature (e.g., Carslaw and Jaeger, Prahl's 1995 SPIE paper).
+  recognized literature (e.g., Carslaw and Jaeger).
 
 Installation
 ------------
