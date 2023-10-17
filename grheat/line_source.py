@@ -35,6 +35,7 @@ Each of these line sources can be analyzed under different boundary conditions a
 - `'zero'`: Boundary is fixed at T=0.
 
 More documentation at <https://grheat.readthedocs.io>
+
 """
 import scipy.special
 import numpy as np
@@ -55,7 +56,6 @@ class Line:
         - 'infinite': No boundary (infinite medium).
         - 'adiabatic': No heat flow across the boundary.
         - 'zero': Boundary is fixed at T=0.
-    A ValueError is raised for any other specified boundary condition.
 
     Attributes:
         yp (float): y-coordinate of the line source. [meters]
@@ -63,6 +63,7 @@ class Line:
         diffusivity (float): Thermal diffusivity of the medium. [m^2/s]
         capacity (float): Volumetric heat capacity of the medium. [J/degree/m^3]
         boundary (str): Boundary condition at z=0. ['infinite', 'adiabatic', 'zero']
+
     """
 
     def __init__(self,
@@ -71,7 +72,8 @@ class Line:
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
-        """Initializes a Line object representing a line source in a medium.
+        """
+        Initializes a Line object representing a line source in a medium.
 
         The line source extends infinitely parallel to the x-axis and passes through
         the coordinates (yp, zp) in the medium. At time tp, the line source delivers a
@@ -86,19 +88,16 @@ class Line:
             yp (float): The y-coordinate through which the x-line source passes. [meters]
             zp (float): The z-coordinate through which the x-line source passes,
                         defining its depth below the surface z=0. [meters]
-            tp (float): The time at which the line source impulse occurs. [seconds]
-            diffusivity (float): The thermal diffusivity of the medium.
+            tp (float, optional): The time at which the line source impulse occurs. [seconds]
+            diffusivity (float, optional): The thermal diffusivity of the medium.
                                  Defaults to water_thermal_diffusivity. [m^2/s]
-            capacity (float): The volumetric heat capacity of the medium.
+            capacity (float, optional): The volumetric heat capacity of the medium.
                               Defaults to water_heat_capacity. [J/degree/m^3]
-            boundary (str): string describing boundary conditions at z=0
+            boundary (str, optional): string describing boundary conditions at z=0
 
         Raises:
             ValueError: If the specified boundary condition is not one of 'infinite',
                         'adiabatic', or 'zero'.
-
-        Returns:
-            None. Initializes the Line object.
         """
         self.yp = yp
         self.zp = zp

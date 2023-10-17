@@ -5,11 +5,8 @@
    :hidden:
 
    point_examples.ipynb
-   
    line_examples.ipynb
-   
    plane_examples.ipynb
-
    absorber_examples.ipynb
 
 .. toctree::
@@ -17,11 +14,8 @@
    :hidden:
 
    point.rst
-   
    line.rst
-   
    plane.rst
-   
    absorber.rst
 
 .. toctree::

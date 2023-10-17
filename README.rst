@@ -39,26 +39,43 @@ by Scott Prahl
 
 __________
 
-A collection of Green's functions for point, line, and planar source.
+Green's Functions for Heat Transfer
+-----------------------------------
 
-Usage
------
+`grheat` is a library offering Green's function solutions for heat transfer
+problems in various geometries and boundary conditions. This module provides
+solutions for point sources, line sources, plane sources, and exponential heating 
+in semi-infinite media.
 
-DO NOT USE::
-
-    import grheat
-
-Produces::
-
+Main Features
+-------------
+- Green's function solutions for point, line, and plane sources in semi-infinite media.
+- Solutions for exponential heating of a semi-infinite absorbing medium.
+- Supports different boundary conditions at the surface (z=0): infinite, adiabatic, and zero.
+- Accurate and efficient calculations based on mathematical formulations provided in 
+  recognized literature (e.g., Carslaw and Jaeger, Prahl's 1995 SPIE paper).
 
 Installation
 ------------
 
-Source code is available at <https://github.com/scottprahl/grheat> or the module
-can be installed using `pip`::
+**these don't work yet**
+
+Use ``pip``::
 
     pip install grheat
 
+or ``conda``::
+
+    conda install -c conda-forge grheat
+
+or use a Jupyter notebook immediately by clicking the Google Colaboratory button below
+
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+  :target: https://colab.research.google.com/github/scottprahl/grheat/blob/master
+  :alt: Colab
+
+
 License
 -------
-grheat is licensed under the terms of the MIT license.
+
+``grheat`` is licensed under the terms of the MIT license.

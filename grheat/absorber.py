@@ -13,28 +13,26 @@ based on the mathematical formulations provided in the 1995 SPIE paper by Prahl.
 Three types of illumination are supported:
 
 - **Instantaneous**: 
-  Represents a single, instantaneous pulse of light on the surface at time `tp`.
+  Represents a single, instantaneous pulse of light on the surface at time ``tp``.
 
 - **Continuous**: 
-  Represents continuous illumination of the surface starting at t=0.
+  Represents continuous illumination of the surface starting at ``t=0``.
 
 - **Pulsed**: 
-  Represents a pulse of light on the surface from t=0 to t=`t_pulse`.
+  Represents a pulse of light on the surface from ``t=0`` to ``t=t_pulse``.
 
-Each of these illumination types can be analyzed under different boundary conditions at z=0:
+Each of these illumination types can be analyzed under different boundary conditions at ``z=0``:
 
 - `'infinite'`: No boundary (infinite medium).
-
 - `'adiabatic'`: No heat flow across the boundary.
-
-- `'zero'`: Boundary is fixed at T=0.
+- `'zero'`: Boundary is fixed at ``T=0``.
 
 Any other boundary condition will trigger a ValueError.
 
 Reference:
 
-Scott A. Prahl "Charts to rapidly estimate temperature following laser irradiation", 
-Proc. SPIE 2391, Laser-Tissue Interaction VI, (22 May 1995).
+Scott A. Prahl "Charts to rapidly estimate temperature following laser irradiation",
+`Proc. SPIE 2391, Laser-Tissue Interaction VI, (22 May 1995) <https://doi.org/10.1117/12.209919>`_.
 
 More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
 
@@ -95,7 +93,7 @@ class Absorber:
 
     See Also
     --------
-    `grheat Documentation <https://grheat.readthedocs.io>`_.
+    <https://grheat.readthedocs.io>
 
     """
 
