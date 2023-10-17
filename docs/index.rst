@@ -1,22 +1,25 @@
 .. include:: ../README.rst
 
 .. toctree::
-   :caption: Example Notebooks
+   :caption: Examples
    :hidden:
 
    point_source.ipynb
-   planar_irradiation.ipynb
+   
+   line_source.ipynb
+   
+   plane_source.ipynb
 
 .. toctree::
    :caption: API
    :hidden:
 
    point.rst
-
+   
    line.rst
-
+   
    plane.rst
-
+   
    absorber.rst
 
 .. toctree::

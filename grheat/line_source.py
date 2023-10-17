@@ -34,10 +34,7 @@ Each of these line sources can be analyzed under different boundary conditions a
 
 - `'zero'`: Boundary is fixed at T=0.
 
-Any other boundary condition will trigger a ValueError.
-
-More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
-
+More documentation at <https://grheat.readthedocs.io>
 """
 import scipy.special
 import numpy as np
