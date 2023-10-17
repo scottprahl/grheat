@@ -1,14 +1,16 @@
 .. include:: ../README.rst
 
 .. toctree::
-   :caption: Examples
+   :caption: Usage
    :hidden:
 
-   point_source.ipynb
+   point_examples.ipynb
    
-   line_source.ipynb
+   line_examples.ipynb
    
-   plane_source.ipynb
+   plane_examples.ipynb
+
+   absorber_examples.ipynb
 
 .. toctree::
    :caption: API
