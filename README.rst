@@ -7,7 +7,7 @@ by Scott Prahl
    :target: https://pypi.org/project/grheat/
    :alt: pypi
 
-.. image:: https://img.shields.io/github/v/tag/scottprahl/grheat?label=github&color=v
+.. image:: https://img.shields.io/github/v/tag/scottprahl/grheat?label=github&color=68CA66
    :target: https://github.com/scottprahl/grheat
    :alt: github
 
