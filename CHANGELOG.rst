@@ -3,6 +3,11 @@ Changelog
 
 0.2.0
 -----
+* Initial version
+* working Absorber class
+* support multiple pulse times
+* much more testing
+* better documentation
 * add citation
 * add github test action
 * add github pypi action
@@ -11,8 +16,3 @@ Changelog
 * add ruff support
 * use build.os for .readthedocs
 * add more badges, tweak colors
-
-
-v0.1.0
-------
-* Initial version

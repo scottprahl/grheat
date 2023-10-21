@@ -14,14 +14,6 @@ Main Features
 - Accurate and efficient calculations based on mathematical formulations provided in
   recognized literature (e.g., Carslaw and Jaeger, Prahl's 1995 SPIE paper).
 
-Installation
-------------
-`grheat` can be installed via pip:
-
-.. code-block:: bash
-
-    pip install grheat
-
 Documentation
 -------------
 Complete documentation is available at <https://grheat.readthedocs.io>
@@ -45,7 +37,7 @@ Example Usage
     T = medium.continuous(z, t)
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
 __copyright__ = '2022-23, Scott Prahl'
