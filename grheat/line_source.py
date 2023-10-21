@@ -3,12 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-x-Line Source
-=============
-
-This module provides Green's function solutions for heat transfer due to an x-line
-source in a semi-infinite medium, encapsulated within the `Line` class. The solutions are
-based on the mathematical formulations provided in Carslaw and Jaeger's work.
+Heat transfer Green's function solutions due to an x-line in a semi-infinite medium.
 
 The `Line` class represents a linear heat source that extends along all x-values passing
 through coordinates (yp, zp) in the medium. The medium's surface is defined by z=0. The
@@ -33,6 +28,9 @@ Each of these line sources can be analyzed under different boundary conditions a
 - `'adiabatic'`: No heat flow across the boundary.
 
 - `'zero'`: Boundary is fixed at T=0.
+
+The solutions are based on the mathematical formulations provided in Carslaw and
+Jaeger's work.
 
 More documentation at <https://grheat.readthedocs.io>
 
@@ -74,7 +72,7 @@ class Line:
                  capacity=water_heat_capacity,
                  boundary='infinite'):
         """
-        Initializes a Line object representing a line source in a medium.
+        Initialize a Line object representing a line source in a medium.
 
         The line source extends infinitely parallel to the x-axis and passes through
         the coordinates (yp, zp) in the medium. At time tp, the line source delivers a
@@ -112,7 +110,7 @@ class Line:
 
     def _instantaneous(self, y, z, t, tp):
         """
-        Calculates temperature rise due to a 1 J/m instantaneous x-line source at time t.
+        Calculate temperature rise due to a 1 J/m instantaneous x-line source at time t.
 
         This method computes the temperature rise at a specified location and time due to
         an instantaneous x-line source with a heat impulse of 1 J/m at time `tp`. The line
@@ -153,7 +151,7 @@ class Line:
 
     def instantaneous(self, y, z, t):
         """
-        Calculates the temperature rise due to a 1 J/m instant x-line source.
+        Calculate the temperature rise due to a 1 J/m instant x-line source.
 
         This method computes the temperature rise at a specified location and time
         due to an instant x-line source. The line source is parallel to the x-axis
@@ -244,7 +242,7 @@ class Line:
 
     def continuous(self, y, z, t):
         """
-        Calculates temperature rise due to a 1W/m continuous x-line source.
+        Calculate temperature rise due to a 1W/m continuous x-line source.
 
         The x-line source turns on at t=0 and passes through the coordinates (yp, zp).
 
@@ -302,7 +300,7 @@ class Line:
 
     def pulsed(self, y, z, t, t_pulse):
         """
-        Calculates temperature rise due to a 1 J/m pulsed x-line source.
+        Calculate temperature rise due to a 1 J/m pulsed x-line source.
 
         This method computes the temperature rise at a specified location and time due
         to a pulsed x-line source. 1 J/m of heat is deposited along the x-line passing

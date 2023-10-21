@@ -3,16 +3,11 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's Function Heat Transfer Solutions for xy-Planar Source in Infinite Media
-===============================================================================
-
-This module provides Green's function solutions for heat transfer due to an xy-planar
-source in an infinite medium, encapsulated within the `Plane` class. The solutions are
-based on the mathematical formulations provided in Carslaw and Jaeger's work.
+Heat transfer Green's function for planar Source in semi-infinite media.
 
 The `Plane` class represents a planar heat source located at a specified depth `zp` in
-the medium. It provides methods to calculate the temperature rise at any given depth `z`
-at a specified time `t` due to different types of heat source behavior.
+the medium. It provides methods to calculate the temperature rise at any given depth(s) `z`
+at time(s) to different types of heat source behavior.
 
 Three types of planar sources are supported:
 
@@ -22,12 +17,18 @@ Three types of planar sources are supported:
 
 - **Pulsed**: Represents a pulsed release of heat from the zp-plane for t=0 to `t_pulse`.
 
-The module supports various boundary conditions such as infinite, adiabatic, or zero
-boundary, and allows for specifying thermal properties like diffusivity and volumetric
-heat capacity of the medium.
+Each of these line sources can be analyzed under different boundary conditions at z=0:
 
-More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
+- `'infinite'`: No boundary (infinite medium).
 
+- `'adiabatic'`: No heat flow across the boundary.
+
+- `'zero'`: Boundary is fixed at T=0.
+
+The solutions are
+based on the mathematical formulations provided in Carslaw and Jaeger's work.
+
+More documentation at <https://grheat.readthedocs.io>
 """
 
 import scipy.special
@@ -57,13 +58,14 @@ class Plane:
         capacity (scalar): Volumetric heat capacity [J/degree/m**3].
         boundary (str): Boundary condition, one of 'infinite', 'adiabatic', or 'zero'.
     """
+
     def __init__(self,
                  zp, tp=0,
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
                  boundary='infinite'):
         """
-        Initializes a Plane object for a planar heat source in an semi-infinite medium.
+        Initialize a Plane object for a planar heat source in an semi-infinite medium.
 
         This method initializes the Plane object with the specified properties and settings
         for the planar heat source, including its depth, time of occurrence, thermal
@@ -94,7 +96,7 @@ class Plane:
 
     def _instantaneous(self, z, t, tp):
         """
-        Computes the temperature rise due to a 1 J/m² instantaneous xy-planar source at time `t`.
+        Calculate the temperature rise due to a 1 J/m² instantaneous xy-planar source at time `t`.
 
         This method calculates the temperature increase at a specified depth `z` at time `t`
         due to an instantaneous planar heat source of 1 J/m² occurring at time `tp`.
@@ -115,10 +117,7 @@ class Plane:
         """
         z2 = (z - self.zp)**2
         if t <= tp:
-            if np.isscalar(z2):
-                return 0
-            else:
-                return np.zeros_like(z2)
+            return 0 * z2
 
         factor = self.capacity * 2 * np.sqrt(np.pi * self.diffusivity * (t - tp))
         T = 1 / factor * np.exp(-z2 / (4 * self.diffusivity * (t - tp)))
@@ -137,7 +136,7 @@ class Plane:
 
     def instantaneous(self, z, t):
         """
-        Computes the temperature rise due to a 1 J/m² instant xy-planar source.
+        Calculate the temperature rise due to a 1 J/m² instant xy-planar source.
 
         This method calculates the temperature increase at a specified depth `z` at time(s) `t`
         due to an instantaneous planar heat source of 1 J/m². The source plane is parallel
@@ -201,7 +200,7 @@ class Plane:
 
     def _continuous(self, z, t):
         """
-        Computes the temperature rise due to a continuous 1 W/m² xy-planar heat source.
+        Calculate the temperature rise due to a continuous 1 W/m² xy-planar heat source.
 
         The heat source, positioned at a depth of `zp`, initiates at t=0 and continues
         until the specified time `t`. The computation is achieved by integrating the
@@ -218,10 +217,7 @@ class Plane:
         """
         dz = z - self.zp
         if t <= 0:
-            if np.isscalar(dz):
-                return 0
-            else:
-                return np.zeros_like(dz)
+            return 0 * dz
 
         alpha = np.sqrt(dz**2 / (4 * self.diffusivity * t))
         T = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
@@ -242,7 +238,7 @@ class Plane:
 
     def continuous(self, z, t):
         """
-        Computes the temperature rise due to a continuous 1W/m² xy-planar heat source.
+        Calculate the temperature rise due to a continuous 1W/m² xy-planar heat source.
 
         The heat source, situated at a depth of `zp`, initiates at t=0 and persists
         continuously until the specified time `t`. This method serves as a wrapper
@@ -299,7 +295,7 @@ class Plane:
 
     def pulsed(self, z, t, t_pulse):
         """
-        Computes the temperature rise due to a 1 J/m² pulsed xy-planar heat source.
+        Calculate the temperature rise due to a 1 J/m² pulsed xy-planar heat source.
 
         The xy-planar source, situated at depth(s) `zp`, emits a pulse of 1 J/m²
         from time `t=tp` to `tp+t_pulse`.
@@ -342,4 +338,3 @@ class Plane:
         T = self.continuous(z, t)
         T -= self.continuous(z, t - t_pulse)
         return T / t_pulse
-

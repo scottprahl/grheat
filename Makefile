@@ -35,25 +35,22 @@ clean:
 	rm -rf tests/__pycache__
 
 notecheck:
-	make clean
-	pytest --verbose test_all_notebooks.py
-	rm -rf __pycache__
+	pytest --verbose tests/test_all_notebooks.py
 
 rcheck:
 	make clean
-	make pycheck
+	make lint
 	make doccheck
-	make notecheck
-	touch docs/*ipynb
-	touch docs/*rst
+	make test
 	make html
 	check-manifest
 	pyroma -d .
+	make notecheck
 
 test:
-	pytest tests/test_point.py
-	pytest tests/test_line.py
-	pytest tests/test_plane.py
-	pytest tests/test_absorber.py
+	pytest --verbose tests/test_point.py
+	pytest --verbose tests/test_line.py
+	pytest --verbose tests/test_plane.py
+	pytest --verbose tests/test_absorber.py
 
 .PHONY: clean check rcheck html

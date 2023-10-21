@@ -3,12 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Heat Transfer Solutions for Exponential Heating of Semi-Infinite Media
-======================================================================
-
-This module provides heat transfer solutions for the problem of uniform
-illumination of an absorbing semi-infinite medium. The solutions are
-based on the mathematical formulations provided in the 1995 SPIE paper by Prahl.
+Heat transfer solutions for uniform illumination of an absorbing semi-infinite medium.
 
 Three types of illumination are supported:
 
@@ -27,16 +22,14 @@ Each of these illumination types can be analyzed under different boundary condit
 - `'adiabatic'`: No heat flow across the boundary.
 - `'zero'`: Boundary is fixed at ``T=0``.
 
-Any other boundary condition will trigger a ValueError.
-
 Reference:
 
 Scott A. Prahl "Charts to rapidly estimate temperature following laser irradiation",
 `Proc. SPIE 2391, Laser-Tissue Interaction VI, (22 May 1995) <https://doi.org/10.1117/12.209919>`_.
 
-More documentation can be found at `grheat Documentation <https://grheat.readthedocs.io>`_.
-
+More documentation can be found at <https://grheat.readthedocs.io>
 """
+
 import scipy.special
 import numpy as np
 
@@ -128,8 +121,7 @@ class Absorber:
         if tau == 0:
             if z < 0:
                 return 0
-            else:
-                return scale * np.exp(-zeta)
+            return scale * np.exp(-zeta)
 
         sqrt_tau = np.sqrt(tau)
         zz = zeta / 2 / sqrt_tau
@@ -257,6 +249,7 @@ class Absorber:
         return T
 
     def _continuous_scalar_zero(self, z, t):
+        """Calculate the temperature assuming z=0 has T=0."""
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -287,6 +280,7 @@ class Absorber:
         return T
 
     def _continuous_scalar_adiabatic(self, z, t):
+        """Calculate the temperature assuming z=0 has dT/dz=0."""
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -318,6 +312,7 @@ class Absorber:
         return T
 
     def _continuous_scalar_infinite(self, z, t):
+        """Calculate the temperature assuming no boundary at z=0."""
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -329,7 +324,7 @@ class Absorber:
         zz = zeta / 2 / sqrt_tau
 
         T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-        
+
         arg = sqrt_tau - zz
         if arg >= 0:
             T += np.exp(-zz**2) * scipy.special.erfcx(arg)
@@ -346,9 +341,7 @@ class Absorber:
         return T
 
     def _continuous_scalar(self, z, t):
-        """
-        Calculate temperature rise due to a continuous 1 W/m² surface exposure.
-        """
+        """Calculate temperature rise due to a continuous 1 W/m² surface exposure."""
         if self.boundary == 'adiabatic':
             return self._continuous_scalar_adiabatic(z, t)
 

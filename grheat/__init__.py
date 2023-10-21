@@ -1,6 +1,5 @@
 """
-Green's Functions for Heat Transfer
-===================================
+Green's Functions for Heat Transfer.
 
 `grheat` is a library offering Green's function solutions for heat transfer
 problems in various geometries and boundary conditions. This module provides

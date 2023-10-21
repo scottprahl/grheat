@@ -152,7 +152,7 @@ class ContinuousPoint(unittest.TestCase):
         t = 1
         point = grheat.Point(xp, yp, zp)
         T1 = point.continuous(0, 0, 0, t)
-        
+
         # create N pulses evenly spaced from 0 to t
         point.tp = np.linspace(0, t, N)
         T = point.instantaneous(0, 0, 0, t)

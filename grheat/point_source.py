@@ -3,13 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Green's Functions for Point Source in Semi-Infinite Media
-=========================================================
-
-This module provides Green's function solutions for heat transfer due to a point
-source in an infinite medium, encapsulated within the `Point` class. The
-solutions are based on the mathematical formulations provided in Carslaw and
-Jaeger's work.
+Heat transfer Green's functions for a point source in a semi-infinite medium.
 
 The `Point` class represents a point heat source located at a specified position
 `(xp, yp, zp)` in the medium. It provides methods to calculate the temperature
@@ -18,18 +12,25 @@ types of heat source behavior.
 
 Three types of point sources are supported:
 
-- **Instantaneous**: Represents a instantaneous release of heat from (xp,yp,zp) at time `tp`.
+- **Instantaneous**: Instantaneous release of heat from `(xp,yp,zp)` at time(s) `tp`.
 
-- **Continuous**: Represents a continuous release of heat from (xp,yp,zp) starting at t=0
+- **Continuous**: Continuous release of heat from `(xp,yp,zp)` at time(s) `tp`.
 
-- **Pulsed**: Represents a pulsed release of heat from (xp,yp,zp) for t=0 to `t_pulse`.
+- **Pulsed**: Pulsed release of heat from `(xp,yp,zp)` with pulse start at time(s) `tp`.
 
-The module supports various boundary conditions such as infinite, adiabatic, or
-zero boundary, and allows for specifying thermal properties like diffusivity and
+Each of these illumination types can be analyzed for boundary conditions at ``z=0``:
+
+- `'infinite'`: No boundary (infinite medium).
+- `'adiabatic'`: No heat flow across the boundary.
+- `'zero'`: Boundary is fixed at ``T=0``.
+
+The module allows for specifying thermal properties like diffusivity and
 volumetric heat capacity of the medium.
 
-More documentation can be found at <https://grheat.readthedocs.io>
+The solutions are based on the mathematical formulations provided in Carslaw and
+Jaeger's work.
 
+More documentation can be found at <https://grheat.readthedocs.io>
 """
 import scipy.special
 import numpy as np
@@ -57,7 +58,7 @@ class Point:
                  capacity=water_heat_capacity,
                  boundary='infinite'):
         """
-        Initializes a Point object representing a point heat source in a medium.
+        Initialize a Point object representing a point heat source in a medium.
 
         This method sets up a point heat source at a specified location, with specified
         thermal properties and boundary conditions.
@@ -108,10 +109,7 @@ class Point:
         """
         r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
         if t <= tp:
-            if np.isscalar(r):
-                return 0
-            else:
-                return np.zeros_like(r)
+            return r * 0
 
         dt = self.diffusivity * (t - tp)
         factor = self.capacity * 8 * (np.pi * dt)**1.5
@@ -132,7 +130,7 @@ class Point:
 
     def instantaneous(self, x, y, z, t):
         """
-        Calculates the temperature rise due to a 1J instant point source at specified time(s).
+        Calculate the temperature rise due to a 1J instant point source at specified time(s).
 
         This method computes the temperature rise at given location(s) `(x, y, z)` at time(s) `t`
         due to a 1J instantaneous point source located at `(xp, yp, zp)` occurring at time(s) `tp`,
@@ -230,7 +228,7 @@ class Point:
 
     def continuous(self, x, y, z, t):
         """
-        Calculates the temperature rise due to a 1W continuous point source at specified time(s).
+        Calculate the temperature rise due to a 1W continuous point source at specified time(s).
 
         This method computes the temperature rise at given location(s) `(x, y, z)` at time(s) `t`
         due to a 1W continuous point source located at `(xp, yp, zp)` that was turned on at
