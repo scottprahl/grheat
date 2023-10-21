@@ -15,8 +15,8 @@ by Scott Prahl
    :target: https://github.com/conda-forge/grheat-feedstock
    :alt: conda
 
-.. image:: https://zenodo.org/badge/357035523.svg
-   :target: https://zenodo.org/badge/latestdoi/357035523
+.. image:: https://zenodo.org/badge/533509810.svg
+   :target: https://zenodo.org/badge/latestdoi/533509810
    :alt: zenodo
 
 |
