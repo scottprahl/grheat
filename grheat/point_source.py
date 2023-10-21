@@ -63,13 +63,13 @@ class Point:
         thermal properties and boundary conditions.
 
         Args:
-            xp (float): The x-coordinate of the point source in meters.
-            yp (float): The y-coordinate of the point source in meters.
-            zp (float): The z-coordinate of the point source in meters.
+            xp (scalar): The x-coordinate of the point source in meters.
+            yp (scalar): The y-coordinate of the point source in meters.
+            zp (scalar): The z-coordinate of the point source in meters.
             tp (scalar): Time at which the source impulse occurs [seconds].
-            diffusivity (float, optional): The thermal diffusivity of the medium in
+            diffusivity (scalar, optional): The thermal diffusivity of the medium in
                 square meters per second (m**2/s). Defaults to water_thermal_diffusivity.
-            capacity (float, optional): The volumetric heat capacity of the medium in
+            capacity (scalar, optional): The volumetric heat capacity of the medium in
                 joules per cubic meter per degree Celsius (J/degree/m**3).
                 Defaults to water_heat_capacity.
             boundary (str, optional): The boundary condition applied at the surface of
@@ -98,13 +98,13 @@ class Point:
         from Carslaw and Jaeger (page 256, 10.2(2)). Both `t` and `tp` are assumed to be scalars.
 
         Args:
-            x (array-like): x-coordinate(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
+            x (array): x-coordinate(s) of the location(s) for desired temperature [meters].
+            y (array): y-coordinate(s) of the location(s) for desired temperature [meters].
+            z (array): z-coordinate(s) of the location(s) for desired temperature [meters].
             t (scalar): Time at which the desired temperature is computed [seconds].
 
         Returns:
-            numpy.ndarray: Normalized temperature rise at the specified location(s) and time.
+            array: Normalized temperature rise at the specified location(s) and time.
         """
         r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
         if t <= tp:
@@ -140,14 +140,10 @@ class Point:
         should be a scalar while the other can be an array.
 
         Args:
-            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            x (scalar or array): x-coord(s) of desired temperature [meters].
+            y (scalar or array): y-coord(s) of desired temperature [meters].
+            z (scalar or array): z-coord(s) of desired temperature [meters].
             t (scalar or array): Time(s) at which the desired temperature is computed [seconds].
-            tp (scalar or array): Time(s) at which the source impulse occurs [seconds].
-
-        Raises:
-            ValueError: If both `t` and `tp` are arrays. One of them must be a scalar.
 
         Returns:
             scalar or array: Temperature increase in °C at the specified location(s) and time(s).
@@ -180,19 +176,21 @@ class Point:
             plt.show()
         """
         if np.isscalar(t):
+            T = 0                # return a scalar
             if np.isscalar(self.tp):
-                T = self._instantaneous(x, y, z, t, self.tp)
+                T += self._instantaneous(x, y, z, t, self.tp)
             else:
-                T = np.empty_like(self.tp)
-                for i, tt in enumerate(self.tp):
-                    T[i] = self._instantaneous(x, y, z, t, tt)
+                for i, tp in enumerate(self.tp):
+                    T += self._instantaneous(x, y, z, t, tp)
+
         else:
-            if np.isscalar(self.tp):
-                T = np.empty_like(t)
-                for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(x, y, z, tt, self.tp)
-            else:
-                raise ValueError('One of t or self.tp must be a scalar.')
+            T = np.zeros_like(t)  # return an array
+            for i, tt in enumerate(t):
+                if np.isscalar(self.tp):
+                    T[i] += self._instantaneous(x, y, z, tt, self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._instantaneous(x, y, z, tt, tp)
         return T
 
     def _continuous(self, x, y, z, t):
@@ -202,18 +200,17 @@ class Point:
         Carslaw and Jaeger page 261, 10.4(2)
 
         Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time of desired temperature [seconds]
+            x (scalar or array): x-coord(s) of desired temperature [meters].
+            y (scalar or array): y-coord(s) of desired temperature [meters].
+            z (scalar or array): z-coord(s) of desired temperature [meters].
+            t (scalar): time of desired temperature [seconds]
 
         Returns:
             Temperature Increase [°C]
         """
         r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
         if t <= 0:
-            if np.isscalar(r):
-                return 0
-            else:
-                return np.zeros_like(r)
+            return r * 0
 
         factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
         T = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
@@ -240,9 +237,9 @@ class Point:
         time `t=0`, following the formula from Carslaw and Jaeger (page 261, 10.4(2)).
 
         Args:
-            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            x (scalar or array): x-coord(s) of desired temperature [meters].
+            y (scalar or array): y-coord(s) of desired temperature [meters].
+            z (scalar or array): z-coord(s) of desired temperature [meters].
             t (scalar or array): Time(s) for temperature to be computed [seconds].
 
         Returns:
@@ -275,47 +272,35 @@ class Point:
                 plt.show()
         """
         if np.isscalar(t):
-            T = self._continuous(x, y, z, t)
+            T = 0                # return a scalar
+            if np.isscalar(self.tp):
+                T += self._continuous(x, y, z, t - self.tp)
+            else:
+                for i, tp in enumerate(self.tp):
+                    T += self._continuous(x, y, z, t - tp)
 
         else:
-            T = np.empty_like(t)
+            T = np.zeros_like(t)  # return an array
             for i, tt in enumerate(t):
-                T[i] = self._continuous(x, y, z, tt)
+                if np.isscalar(self.tp):
+                    T[i] += self._continuous(x, y, z, tt - self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._continuous(x, y, z, tt - tp)
         return T
-
-    def _pulsed(self, x, y, z, t, t_pulse):
-        """
-        Calculate temperature rise due to a 1J pulsed point source at time(s) t.
-
-        1J of heat deposited at (xp, yp, zp) from t=0 to t=t_pulse.
-
-        Args:
-            x (array-like): x-coordinate(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coordinate(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coordinate(s) of the location(s) for desired temperature [meters].
-            t (scalar): Time at which the desired temperature is computed [seconds].
-            t_pulse (scalar): Duration of the pulse during which heat is deposited [seconds].
-
-        Returns:
-            Temperature Increase [°C]
-        """
-        T = self._continuous(x, y, z, t)
-        if t > t_pulse:
-            T -= self._continuous(x, y, z, t - t_pulse)
-        return T / t_pulse
 
     def pulsed(self, x, y, z, t, t_pulse):
         """
-        Calculates the temperature rise due to a 1J pulsed point source at specified time(s).
+        Calculate temperature rise due to a 1J pulsed point source at time(s) t.
 
-        This method computes the temperature rise at given location(s) `(x, y, z)` at time(s) `t`
-        due to a 1J pulsed point source located at `(xp, yp, zp)`. The point source deposits heat
-        from time `t=0` to `t=t_pulse`.
+        This method computes the temperature rise at given location(s) `(x, y, z)`
+        at time(s) `t` due to a 1J pulsed point source located at `(xp, yp, zp)`.
+        The point source deposits heat from time `t=self.tp` to `t=self.tp+t_pulse`.
 
         Args:
-            x (array-like): x-coord(s) of the location(s) for desired temperature [meters].
-            y (array-like): y-coord(s) of the location(s) for desired temperature [meters].
-            z (array-like): z-coord(s) of the location(s) for desired temperature [meters].
+            x (scalar or array): x-coord(s) of desired temperature [meters].
+            y (scalar or array): y-coord(s) of desired temperature [meters].
+            z (scalar or array): z-coord(s) of desired temperature [meters].
             t (scalar or array): Time(s) at which the desired temperature is computed [seconds].
             t_pulse (scalar): Duration of the pulse during which heat is deposited [seconds].
 
@@ -349,10 +334,9 @@ class Point:
                 plt.title("1J pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if np.isscalar(t):
-            T = self._pulsed(x, y, z, t, t_pulse)
-        else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._pulsed(x, y, z, tt, t_pulse)
-        return T
+        if t_pulse < 0:
+            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+
+        T = self.continuous(x, y, z, t)
+        T -= self.continuous(x, y, z, t - t_pulse)
+        return T / t_pulse

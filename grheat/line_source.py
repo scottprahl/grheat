@@ -59,10 +59,10 @@ class Line:
         - 'zero': Boundary is fixed at T=0.
 
     Attributes:
-        yp (float): y-coordinate of the line source. [meters]
-        zp (float): z-coordinate of the line source. [meters]
-        diffusivity (float): Thermal diffusivity of the medium. [m^2/s]
-        capacity (float): Volumetric heat capacity of the medium. [J/degree/m^3]
+        yp (scalar): y-coordinate of the line source. [meters]
+        zp (scalar): z-coordinate of the line source. [meters]
+        diffusivity (scalar): Thermal diffusivity of the medium. [m^2/s]
+        capacity (scalar): Volumetric heat capacity of the medium. [J/degree/m^3]
         boundary (str): Boundary condition at z=0. ['infinite', 'adiabatic', 'zero']
 
     """
@@ -86,13 +86,13 @@ class Line:
             - 'zero': Boundary temperature is fixed at T=0.
 
         Args:
-            yp (float): The y-coordinate through which the x-line source passes. [meters]
-            zp (float): The z-coordinate through which the x-line source passes,
+            yp (scalar): The y-coordinate through which the x-line source passes. [meters]
+            zp (scalar): The z-coordinate through which the x-line source passes,
                         defining its depth below the surface z=0. [meters]
-            tp (float, optional): The time at which the line source impulse occurs. [seconds]
-            diffusivity (float, optional): The thermal diffusivity of the medium.
+            tp (scalar, optional): The time at which the line source impulse occurs. [seconds]
+            diffusivity (scalar, optional): The thermal diffusivity of the medium.
                                  Defaults to water_thermal_diffusivity. [m^2/s]
-            capacity (float, optional): The volumetric heat capacity of the medium.
+            capacity (scalar, optional): The volumetric heat capacity of the medium.
                               Defaults to water_heat_capacity. [J/degree/m^3]
             boundary (str, optional): string describing boundary conditions at z=0
 
@@ -124,21 +124,17 @@ class Line:
         Reference: Carslaw and Jaeger (1959), page 258, Equation 10.3(1).
 
         Args:
-            y (float): The y-coordinate for the desired temperature location. [meters]
-            z (float): The z-coordinate for the desired temperature location. [meters]
-            t (float): The time of the desired temperature. Should be a scalar. [seconds]
-            tp (float): The time at which the line source impulse occurs.
-                        Should be a scalar. [seconds]
+            y (scalar or array): The y-coordinate(s) for the temperature location. [meters]
+            z (scalar or array): The z-coordinate(s) for the temperature location. [meters]
+            t (scalar): The time of the temperature. [seconds]
+            tp (scalar): The time of the line source impulse. [seconds]
         Returns:
-            float: Normalized temperature rise.
+            scalar: Normalized temperature rise.
         """
         r2 = (y - self.yp)**2 + (z - self.zp)**2
 
         if t <= tp:
-            if np.isscalar(r2):
-                return 0
-            else:
-                return np.zeros_like(r2)
+            return 0 * r2
 
         factor = self.capacity * 4 * np.pi * self.diffusivity * (t - tp)
         T = 1 / factor * np.exp(-r2 / (4 * self.diffusivity * (t - tp)))
@@ -164,12 +160,12 @@ class Line:
         and passes through the coordinates (yp, zp).
 
         Args:
-            y (float): The y-coordinate for the desired temperature location. [meters]
-            z (float): The z-coordinate for the desired temperature location. [meters]
-            t (float): The time of the desired temperature. [seconds]
+            y (scalar or array): The y-coordinate(s) for the temperature location. [meters]
+            z (scalar or array): The z-coordinate(s) for the temperature location. [meters]
+            t (scalar or array): The time(s) of the temperature. [seconds]
 
         Returns:
-            float: Temperature increase in degrees Celsius [°C].
+            scalar: Temperature increase in degrees Celsius [°C].
 
         Example:
             The following example demonstrates how to use this method to calculate and
@@ -195,19 +191,21 @@ class Line:
                 plt.show()
         """
         if np.isscalar(t):
+            T = 0                # return a scalar
             if np.isscalar(self.tp):
-                T = self._instantaneous(y, z, t, self.tp)
+                T += self._instantaneous(y, z, t, self.tp)
             else:
-                T = np.empty_like(self.tp)
-                for i, tt in enumerate(self.tp):
-                    T[i] = self._instantaneous(y, z, t, tt)
+                for i, tp in enumerate(self.tp):
+                    T += self._instantaneous(y, z, t, tp)
+
         else:
-            if np.isscalar(self.tp):
-                T = np.empty_like(t)
-                for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(y, z, tt, self.tp)
-            else:
-                raise ValueError('One of t or self.tp must be a scalar.')
+            T = np.zeros_like(t)  # return an array
+            for i, tt in enumerate(t):
+                if np.isscalar(self.tp):
+                    T[i] += self._instantaneous(y, z, tt, self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._instantaneous(y, z, tt, tp)
         return T
 
     def _continuous(self, y, z, t):
@@ -216,17 +214,19 @@ class Line:
 
         Carslaw and Jaeger page 261, 10.4(5)
 
-        Parameters:
-            y, z: location for desired temperature [meters]
-            t: time of desired temperature [seconds]
+        Args:
+            y (scalar or array): The y-coordinate(s) for the temperature location. [meters]
+            z (scalar or array): The z-coordinate(s) for the temperature location. [meters]
+            t (scalar): The time of the temperature. [seconds]
 
         Returns:
             Temperature Increase [°C]
         """
-        if t <= 0:
-            return 0
-
         r2 = (y - self.yp)**2 + (z - self.zp)**2
+
+        if t <= 0:
+            return 0 * r2
+
         factor = -self.capacity * 4 * np.pi * self.diffusivity
         T = 1 / factor * scipy.special.expi(-r2 / (4 * self.diffusivity * t))
 
@@ -251,12 +251,12 @@ class Line:
         Reference: Carslaw and Jaeger (1959), page 261, Equation 10.4(5).
 
         Parameters:
-            y (float): The y-coordinate for the desired temperature location. [meters]
-            z (float): The z-coordinate for the desired temperature location. [meters]
-            t (float or array-like): Time(s) of desired temperature. [seconds]
+            y (scalar): The y-coordinate for the desired temperature location. [meters]
+            z (scalar): The z-coordinate for the desired temperature location. [meters]
+            t (scalar or array): Time(s) of desired temperature. [seconds]
 
         Returns:
-            float or numpy.ndarray: Temperature increase in degrees Celsius [°C].
+            scalar or array: Temperature increase in degrees Celsius [°C].
 
         Example:
             The following example demonstrates how to use this method to calculate and
@@ -283,41 +283,22 @@ class Line:
                 plt.show()
         """
         if np.isscalar(t):
-            T = self._continuous(y, z, t)
+            T = 0                # return a scalar
+            if np.isscalar(self.tp):
+                T += self._continuous(y, z, t - self.tp)
+            else:
+                for i, tp in enumerate(self.tp):
+                    T += self._continuous(y, z, t - tp)
 
         else:
-            T = np.empty_like(t)
+            T = np.zeros_like(t)  # return an array
             for i, tt in enumerate(t):
-                T[i] = self._continuous(y, z, tt)
+                if np.isscalar(self.tp):
+                    T[i] += self._continuous(y, z, tt - self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._continuous(y, z, tt - tp)
         return T
-
-    def _pulsed(self, y, z, t, t_pulse):
-        """
-        Calculates temperature rise due to a 1 J/m pulsed x-line source at time(s) t.
-
-        This method computes the temperature rise at a specified location and time due
-        to a pulsed x-line source. 1 J/m of heat is deposited along the x-line passing
-        through the coordinates (yp, zp) from t=0 to t=t_pulse.
-
-        Parameters:
-            y (float): The y-coordinate for the desired temperature location. [meters]
-            z (float): The z-coordinate for the desired temperature location. [meters]
-            t (float): Time of desired temperature. [seconds]
-            t_pulse (float): Duration of the pulse. [seconds]
-
-        Returns:
-            float: Temperature increase in degrees Celsius [°C].
-
-        Raises:
-            ValueError: If `t_pulse` is negative.
-        """
-        if t_pulse < 0:
-            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
-
-        T = self._continuous(y, z, t)
-        if t > t_pulse:
-            T -= self._continuous(y, z, t - t_pulse)
-        return T / t_pulse
 
     def pulsed(self, y, z, t, t_pulse):
         """
@@ -328,13 +309,13 @@ class Line:
         through the coordinates (yp, zp) from t=0 to t=t_pulse.
 
         Parameters:
-            y (float): The y-coordinate for the desired temperature location. [meters]
-            z (float): The z-coordinate for the desired temperature location. [meters]
-            t (float or array-like): Time(s) of desired temperature. [seconds]
-            t_pulse (float): Duration of the pulse. [seconds]
+            y (scalar or array): The y-coordinate for the desired temperature location. [meters]
+            z (scalar or array): The z-coordinate for the desired temperature location. [meters]
+            t (scalar or array): Time(s) of desired temperature. [seconds]
+            t_pulse (scalar): Duration of the pulse. [seconds]
 
         Returns:
-            float or numpy.ndarray: Temperature increase in degrees Celsius [°C].
+            scalar or array: Temperature increase in degrees Celsius [°C].
 
         Example:
             The following example demonstrates how to use this method to calculate and
@@ -360,10 +341,9 @@ class Line:
                 plt.title("Pulsed Line Source at 1mm depth")
                 plt.show()
         """
-        if np.isscalar(t):
-            T = self._pulsed(y, z, t, t_pulse)
-        else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._pulsed(y, z, tt, t_pulse)
-        return T
+        if t_pulse < 0:
+            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+
+        T = self.continuous(y, z, t)
+        T -= self.continuous(y, z, t - t_pulse)
+        return T / t_pulse

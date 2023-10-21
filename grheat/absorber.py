@@ -13,13 +13,13 @@ based on the mathematical formulations provided in the 1995 SPIE paper by Prahl.
 Three types of illumination are supported:
 
 - **Instantaneous**:
-  Represents a single, instantaneous pulse of light on the surface at time ``tp``.
+  Represents an instantaneous pulse of light on the surface at time(s) ``tp``.
 
 - **Continuous**:
-  Represents continuous illumination of the surface starting at ``t=0``.
+  Represents continuous illumination of the surface starting at time(s) ``tp``.
 
 - **Pulsed**:
-  Represents a pulse of light on the surface from ``t=0`` to ``t=t_pulse``.
+  Represents a pulses of light at times ``t=tp`` to ``t=tp+t_pulse``.
 
 Each of these illumination types can be analyzed under different boundary conditions at ``z=0``:
 
@@ -61,10 +61,10 @@ class Absorber:
 
     Attributes
     ----------
-        mu_a (float): Exponential attenuation coefficient [1/meters].
-        tp (float): Time of source impulse [seconds].
-        diffusivity (float): Thermal diffusivity [m**2/s].
-        capacity (float): Volumetric heat capacity [J/degree/m**3].
+        mu_a (scalar): Exponential attenuation coefficient [1/meters].
+        tp (scalar): Time of source impulse [seconds].
+        diffusivity (scalar): Thermal diffusivity [m**2/s].
+        capacity (scalar): Volumetric heat capacity [J/degree/m**3].
         boundary (str): Boundary condition at z=0 ('infinite', 'adiabatic', or 'zero').
     """
 
@@ -78,13 +78,13 @@ class Absorber:
         Initialize an exponential heating object.
 
         Args:
-            mu_a (float): Exponential absorption coefficient, which dictates how the
+            mu_a (scalar): Exponential absorption coefficient, which dictates how the
                 illumination attenuates with depth in the medium [1/meters].
-            tp (float, optional): Time of source impulse, which is assumed to be
+            tp (scalar, optional): Time of source impulse, which is assumed to be
                 instantaneous at tp [seconds]. Defaults to 0.
-            diffusivity (float, optional): Thermal diffusivity of the medium [m**2/s].
+            diffusivity (scalar, optional): Thermal diffusivity of the medium [m**2/s].
                 Defaults to water_thermal_diffusivity.
-            capacity (float, optional): Volumetric heat capacity of the medium
+            capacity (scalar, optional): Volumetric heat capacity of the medium
                 [J/degree/m**3]. Defaults to water_heat_capacity.
             boundary (str, optional): Boundary condition at z=0.
                 Can be 'infinite', 'adiabatic', or 'zero'. Defaults to 'infinite'.
@@ -109,9 +109,9 @@ class Absorber:
         instant volumetric heating is proportional to mu_a * exp(-mu_a * z) [J/m³].
 
         Args:
-            z (float): Depth at which the temperature is desired [meters].
-            t (float): Time at which the temperature is desired [seconds].
-            tp (float): Time at which the source impulse occurs [seconds].
+            z (scalar): Depth at which the temperature is desired [meters].
+            t (scalar): Time at which the temperature is desired [seconds].
+            tp (scalar): Time at which the source impulse occurs [seconds].
 
         Returns:
             Temperature increase at depth z and time t due to the radiant exposure [°C].
@@ -150,9 +150,9 @@ class Absorber:
         instant volumetric heating is proportional to mu_a * exp(-mu_a * z) [J/m³].
 
         Args:
-            z (float): Depth at which the temperature is desired [meters].
-            t (float): Time at which the temperature is desired [seconds].
-            tp (float): Time at which the source impulse occurs [seconds].
+            z (scalar): Depth at which the temperature is desired [meters].
+            t (scalar): Time at which the temperature is desired [seconds].
+            tp (scalar): Time at which the source impulse occurs [seconds].
 
         Returns:
             Temperature increase at depth z and time t due to the radiant exposure [°C].
@@ -162,12 +162,12 @@ class Absorber:
         if self.boundary != 'infinite':
             T1 = self._instantaneous_scalar_no_bndry(-z, t, tp)
 
-            if self.boundary == 'adiabatic':
-                if t > 0:   # only use method of images after pulse
+            if t > 0:   # only use method of images after pulse
+                if self.boundary == 'adiabatic':
                     T += T1
 
-            if self.boundary == 'zero':
-                T -= T1
+                if self.boundary == 'zero':
+                    T -= T1
 
         return T
 
@@ -179,9 +179,9 @@ class Absorber:
         instant volumetric heating is proportional to mu_a * exp(-mu_a * z) [J/m³].
 
         Args:
-            z (float or array): Depth at which the temperature is desired [meters].
-            t (float): Time at which the temperature is desired [seconds].
-            tp (float): Time at which the source impulse occurs [seconds].
+            z (scalar or array): Depth at which the temperature is desired [meters].
+            t (scalar): Time at which the temperature is desired [seconds].
+            tp (scalar): Time at which the source impulse occurs [seconds].
 
         Returns:
             Temperature increase at depth z and time t due to the radiant exposure [°C].
@@ -210,8 +210,8 @@ class Absorber:
         impulse, which is used in the underlying `_instantaneous` method call.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is desired [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
             scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
@@ -375,7 +375,7 @@ class Absorber:
             t (scalar): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
+            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
         """
         if np.isscalar(z):
             T = self._continuous_scalar(z, t)
@@ -447,7 +447,7 @@ class Absorber:
                         T[i] += self._continuous(z, tt - tp)
         return T
 
-    def _pulsed(self, z, t, t_pulse):
+    def pulsed(self, z, t, t_pulse):
         """
         Calculate temperature rise due to pulsed radiant exposure on absorber surface.
 
@@ -465,31 +465,6 @@ class Absorber:
             z (scalar or array): Depth(s) at which the temperature is desired [meters].
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
             t_pulse (scalar): Duration of the irradiance pulse [seconds].
-
-        Returns:
-            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
-        """
-        T = self.continuous(z, t)
-        T -= self.continuous(z, t - t_pulse)
-        return T / t_pulse
-
-    def pulsed(self, z, t, t_pulse):
-        """
-        Calculate temperature rise due to a 1 J/m² pulsed radiant exposure on the absorber surface.
-
-        This method computes the temperature increase at specified depth(s) `z` and time(s) `t`
-        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance starts at t=0
-        and continues up to time `t_pulse`. The volumetric heating within the medium decreases
-        exponentially with depth, following the expression: mu_a * exp(-mu * z) [W/m³].
-
-        The temperatures are calculated based on the formulations in Prahl's 1995 SPIE paper,
-        "Charts to rapidly estimate temperature following laser irradiation". The calculations 
-        of temperature should work for times before, during, and after the pulse.
-
-        Parameters:
-            z (scalar or array): Depth(s) at which the temperature is desired [meters].
-            t (scalar or array): Time(s) at which the temperature is desired [seconds].
-            t_pulse (scalar or array): Duration of the irradiance pulse [seconds].
 
         Returns:
             scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
@@ -516,10 +491,6 @@ class Absorber:
                 plt.title("1 J/m² pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if np.isscalar(t_pulse):
-            T = self._pulsed(z, t, t_pulse)
-        else:
-            T = np.empty_like(t_pulse)
-            for i, tt_pulse in enumerate(t_pulse):
-                T[i] = self._pulsed(z, t, tt_pulse)
-        return T
+        T = self.continuous(z, t)
+        T -= self.continuous(z, t - t_pulse)
+        return T / t_pulse

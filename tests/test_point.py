@@ -149,10 +149,12 @@ class ContinuousPoint(unittest.TestCase):
         """
         N = 50
         xp, yp, zp = 0, 0, 0.001      # meters
-        tp = np.linspace(0, 1, N)
-        point = grheat.Point(xp, yp, zp, tp)
         t = 1
+        point = grheat.Point(xp, yp, zp)
         T1 = point.continuous(0, 0, 0, t)
+        
+        # create N pulses evenly spaced from 0 to t
+        point.tp = np.linspace(0, t, N)
         T = point.instantaneous(0, 0, 0, t)
         T2 = T.sum() / N
         self.assertAlmostEqual(T1, T2, delta=0.01)

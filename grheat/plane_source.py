@@ -53,8 +53,8 @@ class Plane:
     Attributes:
         zp (scalar or array): Depth of the xy-planar source [meters].
         tp (scalar or array): Time of source impulse [seconds]. Default is 0.
-        diffusivity (float): Thermal diffusivity [m**2/s].
-        capacity (float): Volumetric heat capacity [J/degree/m**3].
+        diffusivity (scalar): Thermal diffusivity [m**2/s].
+        capacity (scalar): Volumetric heat capacity [J/degree/m**3].
         boundary (str): Boundary condition, one of 'infinite', 'adiabatic', or 'zero'.
     """
     def __init__(self,
@@ -71,11 +71,11 @@ class Plane:
         in subsequent calculations of temperature rise due to the planar source.
 
         Args:
-            zp (float): Depth of the xy-planar source in meters.
-            tp (float, optional): Time of the source impulse in seconds. Defaults to 0.
-            diffusivity (float, optional): Thermal diffusivity of the medium in m**2/s.
+            zp (scalar): Depth of the xy-planar source in meters.
+            tp (scalar, optional): Time of the source impulse in seconds. Defaults to 0.
+            diffusivity (scalar, optional): Thermal diffusivity of the medium in m**2/s.
                 Defaults to `water_thermal_diffusivity`.
-            capacity (float, optional): Volumetric heat capacity of the medium in J/degree/m**3.
+            capacity (scalar, optional): Volumetric heat capacity of the medium in J/degree/m**3.
                 Defaults to `water_heat_capacity`.
             boundary (str, optional): Boundary condition of the medium.
                 Options include 'infinite', 'adiabatic', or 'zero'. Defaults to 'infinite'.
@@ -103,15 +103,15 @@ class Plane:
 
         The formulation is based on Carslaw and Jaeger (page 259, equation 10.3(4)).
 
-        The method handles scalar and array-like input for the depth `z`.
+        The method handles scalar and array input for the depth `z`.
 
         Args:
-            z (float or array-like): Depth(s) of desired temperature in meters.
-            t (float): Time of desired temperature in seconds.
-            tp (float): Time of source impulse in seconds.
+            z (scalar or array): Depth(s) of desired temperature in meters.
+            t (scalar): Time of desired temperature in seconds.
+            tp (scalar): Time of source impulse in seconds.
 
         Returns:
-            float or array: Temperature increase in °C at the specified depth(s) and time.
+            scalar or array: Temperature increase in °C at the specified depth(s) and time.
         """
         z2 = (z - self.zp)**2
         if t <= tp:
@@ -145,19 +145,19 @@ class Plane:
         of the `Plane` object. The formulation is based on Carslaw and Jaeger
         (page 259, equation 10.3(4)).
 
-        This method handles scalar and array-like input for time `t`. When `t` is a scalar,
-        a single float representing the temperature increase is returned. When `t` is array-like,
+        This method handles scalar and array input for time `t`. When `t` is a scalar,
+        a single scalar representing the temperature increase is returned. When `t` is array,
         a NumPy array of temperature increases corresponding to each time value is returned.
 
         Args:
-            z (float or array-like): Depth(s) for desired temperature in meters.
-            t (scalar or array-like): Time(s) of desired temperature in seconds.
+            z (scalar or array): Depth(s) for desired temperature in meters.
+            t (scalar or array): Time(s) of desired temperature in seconds.
 
         Raises:
             ValueError: If both `t` and `tp` are arrays. One of them must be a scalar.
 
         Returns:
-            float or array: Temp increase in degrees Celsius at the depth(s) and time(s).
+            scalar or array: Temp increase in degrees Celsius at the depth(s) and time(s).
 
         Example:
 
@@ -182,19 +182,21 @@ class Plane:
 
         """
         if np.isscalar(t):
+            T = 0                # return a scalar
             if np.isscalar(self.tp):
-                T = self._instantaneous(z, t, self.tp)
+                T += self._instantaneous(z, t, self.tp)
             else:
-                T = np.empty_like(self.tp)
-                for i, tt in enumerate(self.tp):
-                    T[i] = self._instantaneous(z, t, tt)
+                for i, tp in enumerate(self.tp):
+                    T += self._instantaneous(z, t, tp)
+
         else:
-            if np.isscalar(self.tp):
-                T = np.empty_like(t)
-                for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(z, tt, self.tp)
-            else:
-                raise ValueError('One of t or self.tp must be a scalar.')
+            T = np.zeros_like(t)  # return an array
+            for i, tt in enumerate(t):
+                if np.isscalar(self.tp):
+                    T[i] += self._instantaneous(z, tt, self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._instantaneous(z, tt, tp)
         return T
 
     def _continuous(self, z, t):
@@ -206,11 +208,11 @@ class Plane:
         planar Green's function from 0 to `t` using Mathematica.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float): Time(s) at which the temperature is evaluated [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar): Time(s) at which the temperature is evaluated [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            scalar or array: The temperature increase(s) at the specified depth(s)
             and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
         """
@@ -244,15 +246,15 @@ class Plane:
 
         The heat source, situated at a depth of `zp`, initiates at t=0 and persists
         continuously until the specified time `t`. This method serves as a wrapper
-        for the `_continuous` method, facilitating handling of scalar or array-like
+        for the `_continuous` method, facilitating handling of scalar or array
         input for time `t`.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is evaluated [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is evaluated [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            scalar or array: The temperature increase(s) at the specified depth(s)
             and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
 
@@ -278,56 +280,39 @@ class Plane:
                 plt.show()
         """
         if np.isscalar(t):
-            T = self._continuous(z, t)
+            T = 0                # return a scalar
+            if np.isscalar(self.tp):
+                T += self._continuous(z, t - self.tp)
+            else:
+                for i, tp in enumerate(self.tp):
+                    T += self._continuous(z, t - tp)
 
         else:
-            T = np.empty_like(t)
+            T = np.zeros_like(t)  # return an array
             for i, tt in enumerate(t):
-                T[i] = self._continuous(z, tt)
+                if np.isscalar(self.tp):
+                    T[i] += self._continuous(z, tt - self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._continuous(z, tt - tp)
         return T
-
-    def _pulsed(self, z, t, t_pulse):
-        """
-        Calculate temperature rise due to a 1 J/m² pulsed xy-planar source at time t.
-
-        1 J/m² of heat deposited in an xy-plane passing at zp from t=0 to t=t_pulse.
-
-        Args:
-            z: depth for desired temperature [meters]
-            t: time of desired temperature [seconds]
-            t_pulse: duration of pulse [seconds]
-
-        Returns:
-            Temperature increase [°C]
-        """
-        if t_pulse < 0:
-            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
-
-        T = self._continuous(z, t)
-        if t > t_pulse:
-            T -= self._continuous(z, t - t_pulse)
-        return T / t_pulse
 
     def pulsed(self, z, t, t_pulse):
         """
         Computes the temperature rise due to a 1 J/m² pulsed xy-planar heat source.
 
-        The xy-planar source, situated at a depth of `zp`, emits a pulse of 1 J/m²
-        from time t=0 to time t=`t_pulse`. This method acts as a wrapper for the
-        `_pulsed` method, accommodating scalar or array-like input for time `t`.
+        The xy-planar source, situated at depth(s) `zp`, emits a pulse of 1 J/m²
+        from time `t=tp` to `tp+t_pulse`.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is evaluated [seconds].
-            t_pulse (float): Duration of the heat pulse [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is evaluated [seconds].
+            t_pulse (scalar): Duration of the heat pulse [seconds].
 
         Returns:
-            float or numpy.ndarray: The temperature increase(s) at the specified depth(s)
+            scalar or array: The temperature increase(s) at the specified depth(s)
             and time(s) in degrees Celsius. The return type matches the input type (scalar
             for scalar input, array for array input).
-
-        Raises:
-            ValueError: If `t_pulse` is not a positive number.
 
         Example:
 
@@ -351,10 +336,10 @@ class Plane:
                 plt.title("1J pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if np.isscalar(t):
-            T = self._pulsed(z, t, t_pulse)
-        else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._pulsed(z, tt, t_pulse)
-        return T
+        if t_pulse < 0:
+            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+
+        T = self.continuous(z, t)
+        T -= self.continuous(z, t - t_pulse)
+        return T / t_pulse
+
