@@ -101,6 +101,76 @@ class Absorber:
         if self.boundary not in ['infinite', 'adiabatic', 'zero']:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
+    def _instantaneous_scalar_no_bndry(self, z, t, tp):
+        """
+        Calculate temperature rise due to instant surface exposure (scalar z, t, and tp).
+
+        The radiant exposure occurs instantaneously at time tp.  The resulting
+        instant volumetric heating is proportional to mu_a * exp(-mu_a * z) [J/m³].
+
+        Args:
+            z (float): Depth at which the temperature is desired [meters].
+            t (float): Time at which the temperature is desired [seconds].
+            tp (float): Time at which the source impulse occurs [seconds].
+
+        Returns:
+            Temperature increase at depth z and time t due to the radiant exposure [°C].
+        """
+        zeta = self.mu_a * z
+        tau = self.mu_a**2 * self.diffusivity * (t - tp)
+        scale = self.mu_a / self.capacity
+
+        # before pulse, no temperature rise
+        if tau < 0:
+            return 0
+
+        # at pulse, exponential heating for positive z
+        if tau == 0:
+            if z < 0:
+                return 0
+            else:
+                return scale * np.exp(-zeta)
+
+        sqrt_tau = np.sqrt(tau)
+        zz = zeta / 2 / sqrt_tau
+        arg = sqrt_tau - zz
+
+        # stable calculations require erfcx() for positive arg
+        if arg >= 0:
+            T = 0.5 * scale * np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T = 0.5 * scale * np.exp(tau - zeta) * scipy.special.erfc(arg)
+        return T
+
+    def _instantaneous_scalar(self, z, t, tp):
+        """
+        Calculate temperature rise due to instant surface exposure (scalar z, t, and tp).
+
+        The radiant exposure occurs instantaneously at time tp.  The resulting
+        instant volumetric heating is proportional to mu_a * exp(-mu_a * z) [J/m³].
+
+        Args:
+            z (float): Depth at which the temperature is desired [meters].
+            t (float): Time at which the temperature is desired [seconds].
+            tp (float): Time at which the source impulse occurs [seconds].
+
+        Returns:
+            Temperature increase at depth z and time t due to the radiant exposure [°C].
+        """
+        T = self._instantaneous_scalar_no_bndry(z, t, tp)
+
+        if self.boundary != 'infinite':
+            T1 = self._instantaneous_scalar_no_bndry(-z, t, tp)
+
+            if self.boundary == 'adiabatic':
+                if t > 0:   # only use method of images after pulse
+                    T += T1
+
+            if self.boundary == 'zero':
+                T -= T1
+
+        return T
+
     def _instantaneous(self, z, t, tp):
         """
         Calculate temperature rise due to instant surface exposure (scalar t and tp).
@@ -116,28 +186,12 @@ class Absorber:
         Returns:
             Temperature increase at depth z and time t due to the radiant exposure [°C].
         """
-        zeta = self.mu_a * z
-
-        if t <= tp:
-            if np.isscalar(zeta):
-                return 0
-            else:
-                return np.zeros_like(zeta)
-
-        tau = self.mu_a**2 * self.diffusivity * (t - tp)
-        factor = (self.mu_a / 2 / self.capacity) * np.exp(tau - zeta)
-        T = factor * scipy.special.erfc((2 * tau - zeta) / (2 * np.sqrt(tau)))
-
-        if self.boundary != 'infinite':
-            factor = (self.mu_a / 2 / self.capacity) * np.exp(tau + zeta)
-            T1 = factor * scipy.special.erfc((2 * tau + zeta) / (2 * np.sqrt(tau)))
-
-            if self.boundary == 'adiabatic':
-                T += T1
-
-            if self.boundary == 'zero':
-                T -= T1
-
+        if np.isscalar(z):
+            T = self._instantaneous_scalar(z, t, tp)
+        else :
+            T = np.zeros_like(z)
+            for i, zz in enumerate(z):
+                T[i] = self._instantaneous_scalar(zz, t, tp)
         return T
 
     def instantaneous(self, z, t):
@@ -160,7 +214,7 @@ class Absorber:
             t (float or array-like): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
+            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
 
@@ -185,20 +239,123 @@ class Absorber:
                 plt.show()
         """
         if np.isscalar(t):
+            T = 0                # return a scalar
             if np.isscalar(self.tp):
-                T = self._instantaneous(z, t, self.tp)
+                T += self._instantaneous(z, t, self.tp)
             else:
-                T = np.empty_like(self.tp)
-                for i, tt in enumerate(self.tp):
-                    T[i] = self._instantaneous(z, t, tt)
+                for i, tp in enumerate(self.tp):
+                    T += self._instantaneous(z, t, tp)
+
         else:
-            if np.isscalar(self.tp):
-                T = np.empty_like(t)
-                for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(z, tt, self.tp)
-            else:
-                raise ValueError('One of t or self.tp must be a scalar.')
+            T = np.zeros_like(t)  # return an array
+            for i, tt in enumerate(t):
+                if np.isscalar(self.tp):
+                    T[i] += self._instantaneous(z, tt, self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._instantaneous(z, tt, tp)
         return T
+
+    def _continuous_scalar_zero(self, z, t):
+        tau = self.mu_a**2 * self.diffusivity * t
+        zeta = self.mu_a * z
+        scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
+
+        if t <= 0:
+            return zeta * 0
+
+        sqrt_tau = np.sqrt(tau)
+        zz = zeta / 2 / sqrt_tau
+
+        T = 2 * scipy.special.erfc(zz)
+        T -= 2 * np.exp(-zeta)
+
+        # stable calculations require erfcx() for positive arg
+        arg = sqrt_tau - zz
+        if arg >= 0:
+            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T += np.exp(tau - zeta) * scipy.special.erfc(arg)
+
+        arg = sqrt_tau + zz
+        if arg >= 0:
+            T -= np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T -= np.exp(tau + zeta) * scipy.special.erfc(arg)
+
+        T *= scale
+        return T
+
+    def _continuous_scalar_adiabatic(self, z, t):
+        tau = self.mu_a**2 * self.diffusivity * t
+        zeta = self.mu_a * z
+        scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
+
+        if t <= 0:
+            return zeta * 0
+
+        sqrt_tau = np.sqrt(tau)
+        zz = zeta / 2 / sqrt_tau
+
+        T = 4 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+        T -= 2 * zeta * scipy.special.erfc(zz)
+        T -= 2 * np.exp(-zeta)
+
+        # stable calculations require erfcx() for positive arg
+        arg = sqrt_tau - zz
+        if arg >= 0:
+            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T += np.exp(tau - zeta) * scipy.special.erfc(arg)
+
+        arg = sqrt_tau + zz
+        if arg >= 0:
+            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T += np.exp(tau + zeta) * scipy.special.erfc(arg)
+
+        T *= scale
+        return T
+
+    def _continuous_scalar_infinite(self, z, t):
+        tau = self.mu_a**2 * self.diffusivity * t
+        zeta = self.mu_a * z
+        scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
+
+        if t <= 0:
+            return zeta * 0
+
+        sqrt_tau = np.sqrt(tau)
+        zz = zeta / 2 / sqrt_tau
+
+        T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+        
+        arg = sqrt_tau - zz
+        if arg >= 0:
+            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+        else:
+            T += np.exp(tau - zeta) * scipy.special.erfc(arg)
+
+        if z < 0:
+            T += (zeta - 1) * scipy.special.erfc(-zz)
+        else:
+            T -= 2 * np.exp(-zeta)
+            T -= (zeta - 1) * scipy.special.erfc(zz)
+
+        T *= scale
+        return T
+
+    def _continuous_scalar(self, z, t):
+        """
+        Calculate temperature rise due to a continuous 1 W/m² surface exposure.
+        """
+        if self.boundary == 'adiabatic':
+            return self._continuous_scalar_adiabatic(z, t)
+
+        if self.boundary == 'zero':
+            return self._continuous_scalar_zero(z, t)
+
+        return self._continuous_scalar_infinite(z, t)
 
     def _continuous(self, z, t):
         """
@@ -214,41 +371,18 @@ class Absorber:
         the calculation of temperature increases at multiple depths and/or times.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float): Time(s) at which the temperature is desired [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar): Time(s) at which the temperature is desired [seconds].
 
         Returns:
             float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
         """
-        zeta = self.mu_a * z
-
-        if t <= 0:
-            if np.isscalar(zeta):
-                return 0
-            else:
-                return np.zeros_like(zeta)
-
-        tau = self.mu_a**2 * self.diffusivity * t
-        zz = zeta / np.sqrt(4 * tau)
-
-        T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-        T += (-1 + zeta) * scipy.special.erfc(-zz)
-        T += np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zz)
-
-        if self.boundary != 'infinite':
-            zeta = -zeta
-            zz = zeta / np.sqrt(4 * tau)
-            T1 = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
-            T1 += (-1 + zeta) * scipy.special.erfc(-zz)
-            T1 += np.exp(-zz**2) * scipy.special.erfcx(np.sqrt(tau) - zz)
-
-            if self.boundary == 'adiabatic':
-                T += T1
-
-            if self.boundary == 'zero':
-                T -= T1
-
-        T /= 2 * self.diffusivity * self.capacity * self.mu_a
+        if np.isscalar(z):
+            T = self._continuous_scalar(z, t)
+        else :
+            T = np.zeros_like(z)
+            for i, zz in enumerate(z):
+                T[i] = self._continuous_scalar(zz, t)
         return T
 
     def continuous(self, z, t):
@@ -268,11 +402,11 @@ class Absorber:
         the calculation of temperature increases at multiple depths and/or times.
 
         Args:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is desired [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
+            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
 
@@ -296,12 +430,21 @@ class Absorber:
                 plt.show()
         """
         if np.isscalar(t):
-            T = self._continuous(z, t)
+            T = 0                # return a scalar
+            if np.isscalar(self.tp):
+                T += self._continuous(z, t - self.tp)
+            else:
+                for i, tp in enumerate(self.tp):
+                    T += self._continuous(z, t - tp)
 
         else:
-            T = np.empty_like(t)
+            T = np.zeros_like(t)  # return an array
             for i, tt in enumerate(t):
-                T[i] = self._continuous(z, tt)
+                if np.isscalar(self.tp):
+                    T[i] += self._continuous(z, tt - self.tp)
+                else:
+                    for tp in self.tp:
+                        T[i] += self._continuous(z, tt - tp)
         return T
 
     def _pulsed(self, z, t, t_pulse):
@@ -319,22 +462,15 @@ class Absorber:
         should work for times before, during, and after the pulse.
 
         Parameters:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is desired [seconds].
-            t_pulse (float): Duration of the irradiance pulse [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
+            t_pulse (scalar): Duration of the irradiance pulse [seconds].
 
         Returns:
-            float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
-
-        Notes:
-            - If the specified time `t` exceeds the pulse duration `t_pulse`, the method
-              subtracts the temperature increase due to continuous irradiance after `t_pulse`
-              from the total temperature increase.
-
+            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
         """
-        T = self._continuous(z, t)
-        if t > t_pulse:
-            T -= self._continuous(z, t - t_pulse)
+        T = self.continuous(z, t)
+        T -= self.continuous(z, t - t_pulse)
         return T / t_pulse
 
     def pulsed(self, z, t, t_pulse):
@@ -351,12 +487,12 @@ class Absorber:
         of temperature should work for times before, during, and after the pulse.
 
         Parameters:
-            z (float or array-like): Depth(s) at which the temperature is desired [meters].
-            t (float or array-like): Time(s) at which the temperature is desired [seconds].
-            t_pulse (float): Duration of the irradiance pulse [seconds].
+            z (scalar or array): Depth(s) at which the temperature is desired [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
+            t_pulse (scalar or array): Duration of the irradiance pulse [seconds].
 
         Returns:
-            float or array-like: Temperature increase at the specified depth(s) and time(s) [°C].
+            scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
 
@@ -380,10 +516,10 @@ class Absorber:
                 plt.title("1 J/m² pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if np.isscalar(t):
+        if np.isscalar(t_pulse):
             T = self._pulsed(z, t, t_pulse)
         else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._pulsed(z, tt, t_pulse)
+            T = np.empty_like(t_pulse)
+            for i, tt_pulse in enumerate(t_pulse):
+                T[i] = self._pulsed(z, t, tt_pulse)
         return T

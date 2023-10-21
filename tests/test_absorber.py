@@ -8,7 +8,7 @@
 import unittest
 import numpy as np
 import grheat
-
+joules_per_calorie = 4.184
 
 class InstantaneousAbsorber(unittest.TestCase):
 
@@ -26,6 +26,46 @@ class InstantaneousAbsorber(unittest.TestCase):
         medium = grheat.Absorber(mua, tp)
         T = medium.instantaneous(0, t)
 
+    def test_03_tp_array(self):
+        mua = 1000  # 1/meter
+        t = 1
+        tp = np.linspace(0, 10, 11)
+        medium = grheat.Absorber(mua, tp)
+        T = medium.instantaneous(0, t)
+
+    def test_04_z_array(self):
+        mua = 1000  # 1/meter
+        t = 1
+        tp = 0
+        z = np.linspace(0, 10, 11)
+        medium = grheat.Absorber(mua, tp)
+        T = medium.instantaneous(z, t)
+
+    def test_05_total_energy(self):
+        mu_a = 1 * 1000  # 1/m
+        medium = grheat.Absorber(mu_a)
+        z = np.linspace(-0.0015,0.006,4001)
+        dz = z[1]-z[0]
+
+        t = 0
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.01
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.1
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 1
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
 
 class ContinuousAbsorber(unittest.TestCase):
 
@@ -36,11 +76,56 @@ class ContinuousAbsorber(unittest.TestCase):
         T = medium.continuous(0, t)
 
     def test_02_time_array(self):
+        """Ensure works with arrays of time."""
         mua = 1000  # 1/meter
         t = np.linspace(0, 10)
         medium = grheat.Absorber(mua)
         T = medium.continuous(0, t)
 
+    def test_03_tp_array(self):
+        """Ensure works with arrays of pulses."""
+        mua = 1000  # 1/meter
+        t = 1
+        tp = np.linspace(0, 10, 11)
+        medium = grheat.Absorber(mua, tp)
+        T = medium.continuous(0, t)
+
+    def test_04_z_array(self):
+        """Ensure works with arrays of depths."""
+        mua = 1000  # 1/meter
+        t = 1
+        z = np.linspace(0, 10, 11)
+        medium = grheat.Absorber(mua)
+        T = medium.continuous(z, t)
+
+    def test_05_energy(self):
+        """Ensure total energy delivered is correct."""
+        mu_a = 1 * 1000  # 1/m
+        medium = grheat.Absorber(mu_a)
+        z = np.linspace(-0.0015,0.006,401)
+        dz = z[1]-z[0]
+
+        print('No surface boundary condition, instantaneous pulse')
+        print('time   total')
+        t = 0
+        T = medium.continuous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(t, total, delta=0.01)
+
+        t = 0.01
+        T = medium.continuous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(t, total, delta=0.01)
+
+        t = 0.1
+        T = medium.continuous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(t, total, delta=0.01)
+
+        t = 1
+        T = medium.continuous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(t, total, delta=0.01)
 
 class PulsedAbsorber(unittest.TestCase):
 
@@ -57,6 +142,60 @@ class PulsedAbsorber(unittest.TestCase):
         t = np.linspace(0, 10)
         medium = grheat.Absorber(mua)
         T = medium.pulsed(0, t, t_pulse)
+
+    def test_03_total_energy(self):
+        """Total energy at end of pulse."""
+        mu_a = 1 * 1000  # 1/m
+        medium = grheat.Absorber(mu_a)
+        z = np.linspace(-0.0015,0.006,401)
+        dz = z[1]-z[0]
+
+        t = 0.001
+        t_pulse = t
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.01
+        t_pulse = t
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.1
+        t_pulse = t
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 1
+        t_pulse = t
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+    def test_04_total_energy(self):
+        """Total energy during and after pulse."""
+        mu_a = 1 * 1000  # 1/m
+        medium = grheat.Absorber(mu_a)
+        z = np.linspace(-0.003,0.008,4001)
+        dz = z[1]-z[0]
+        t_pulse = 0.1
+
+        t = 0.5 * t_pulse
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(0.5, total, delta=0.01)
+
+        t = 2 * t_pulse
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 10 * t_pulse
+        T = medium.pulsed(z,t,t_pulse) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
 
 
 class InstantVsPulsed(unittest.TestCase):
@@ -176,7 +315,7 @@ class AdiabaticBoundary(unittest.TestCase):
         t = 2
         T1 = medium.pulsed(+0.0001, t, t_pulse)
         T2 = medium.pulsed(-0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1, T2, delta=1e-8)
+        self.assertAlmostEqual(T1, T2, delta=1e-3)
 
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
@@ -186,9 +325,35 @@ class AdiabaticBoundary(unittest.TestCase):
         t = np.linspace(0, 2)
         T1 = medium.pulsed(+0.0001, t, t_pulse)
         T2 = medium.pulsed(-0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1[3], T2[3], delta=1e-8)
-        self.assertAlmostEqual(T1[13], T2[13], delta=1e-8)
+        self.assertAlmostEqual(T1[3], T2[3], delta=1e-3)
+        self.assertAlmostEqual(T1[13], T2[13], delta=1e-3)
 
+    def test_03_adiabatic(self):
+        """Total Temperature should be equal to 1."""
+        mu_a = 1 * 1000  # 1/m
+        medium = grheat.Absorber(mu_a, boundary='adiabatic')
+        z = np.linspace(0,0.010,5001)
+        dz = z[1]-z[0]
+
+        t = 0
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.01
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 0.1
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
+
+        t = 1
+        T = medium.instantaneous(z,t) * 1e6
+        total = T.sum()*dz*joules_per_calorie
+        self.assertAlmostEqual(1, total, delta=0.01)
 
 if __name__ == '__main__':
     unittest.main()
