@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.1
+-----
+* get zenodo and readthedocs working
+
 0.2.0
 -----
 * Initial version
