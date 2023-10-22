@@ -2,8 +2,9 @@
 # pylint: disable=too-many-arguments
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
+# pylint: disable=too-many-instance-attributes
 """
-Green's function heat transfer solutions for exponential line.
+Green's function heat transfer solutions for a vertical exponential line.
 
 This module provides solutions to heat transfer for point illumination
 of an absorbing semi-infinite medium. The solutions are
@@ -35,11 +36,12 @@ Each of these line sources can be analyzed under different boundary conditions a
 More documentation at <https://grheat.readthedocs.io>
 """
 
-import scipy.special
 import numpy as np
+import grheat
 
 water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+
 
 class ExpSource:
     """
@@ -51,7 +53,8 @@ class ExpSource:
                  xp, yp,
                  diffusivity=water_thermal_diffusivity,
                  capacity=water_heat_capacity,
-                 boundary='infinite'):
+                 boundary='infinite',
+                 n_quad=100):
         """
         Initialize ExpSource object.
 
@@ -59,9 +62,11 @@ class ExpSource:
             mu_a: attenuation coefficient                  [1/meter]
             xp: x location of source                     [meters]
             yp: y location of source                     [meters]
+            tp (scalar): Time at which the source impulse occurs [seconds].
             diffusivity: thermal diffusivity             [m**2/s]
             capacity: volumetric heat capacity           [J/degree/m**3]
             boundary: 'infinite', 'adiabatic', 'zero'
+            n_quad: number of quadrature points
         """
         self.mu_a = mu_a
         self.xp = xp
@@ -69,136 +74,69 @@ class ExpSource:
         self.diffusivity = diffusivity
         self.capacity = capacity
         self.boundary = boundary.lower()
-        self.point = grheat.Point(xp, yp, 0)
 
-    def _instantaneous(self, x, y, z, t, tp):
-        """
-        Calculate temperature rise due to a 1J instant exp source at time t.
+        # place source points for exponential quadrature
+        k = np.arange(1, n_quad + 1)
+        zz = (1 / mu_a) * np.log(2 * k)
+        self.point = grheat.Point(xp, yp, zz)
+        self.weights = (1 / mu_a) * (1 / (2 * k - 1) - 1 / (2 * k + 1))
 
-        T = mu_a int( exp(-mu_a * zp) * G(x - xp, y - yp, z - zp; t - tp) dzp
-
-        Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time of desired temperature [seconds]
-            tp: time of source impulse [seconds]
-
-        Returns:
-            Temperature
-        """
-        T = 0
-
-        # integrate from t to tp over all zp
-        for zp in np.linspace(0, 5):
-            self.point.zp = zp
-            T += self.point._instantaneous(x, y, z, t, tp) * exp(-mu_a * zp)
-        
-        T *= mu_a
-
-        return T
-
-    def instantaneous(self, x, y, z, t, tp):
+    def instantaneous(self, x, y, z, t):
         """
         Calculate temperature rise due to a 1J instant point source at time(s) t.
 
-        Parameters:
+        Args:
             x, y, z: location for desired temperature [meters]
             t: time(s) of desired temperature [seconds]
             tp: time(s) of source impulse [seconds]
 
         Returns:
-            Temperature Increase [°C]
+            temperature Increase [°C]
         """
-        T = 0
-        if np.isscalar(t):
-            if np.isscalar(tp):
-                T = self._instantaneous(x, y, z, t, tp)
-            else:
-                T = np.empty_like(tp)
-                for i, tt in enumerate(tp):
-                    T[i] = self._instantaneous(x, y, z, t, tt)
-        else:
-            if np.isscalar(tp):
-                T = np.empty_like(t)
-                for i, tt in enumerate(t):
-                    T[i] = self._instantaneous(x, y, z, tt, tp)
-            else:
-                raise ValueError('One of t or tp must be a scalar.')
-        return T
+        # the contribution from each point source self.zp
+        integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * self.zp)
 
-    def _continuous(self, x, y, z, t):
-        """
-        Calculate temperature rise of a 1W continuous point source at time t.
+        # Compute the weighted sum to approximate the integral
+        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
 
-        Carslaw and Jaeger page 261, 10.4(2)
-
-        Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time of desired temperature [seconds]
-
-        Returns:
-            Temperature Increase [°C]
-        """
-
-        # integrate from t to tp over all zp
-        for zp in np.linspace(0, 5):
-            self.point.zp = zp
-            T += self.point._continuous(x, y, z, t, tp) * exp(-self.mu_a * zp)
-
-        T *= mu_a
         return T
 
     def continuous(self, x, y, z, t):
         """
-        Calculate temperature rise of a 1W continuous point source.
+        Calculate temperature rise due to a 1W pulsed point illumination of surface.
 
         The point source turns on at t=0.
 
-        Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time(s) of desired temperature [seconds]
+        Args:
+            x (scalar or array): x-coord(s) for temperature calculation [meters].
+            y (scalar or array): y-coord(s) for temperature calculation [meters].
+            z (scalar or array): z-coord(s) for temperature calculation [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            Temperature Increase [°C]
+            temperature Increase [°C]
         """
-        if np.isscalar(t):
-            T = self._continuous(x, y, z, t)
+        # the contribution from each point source self.zp
+        integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * self.zp)
 
-        else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._continuous(x, y, z, tt)
+        # Compute the weighted sum to approximate the integral
+        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
+
         return T
-
-    def _pulsed(self, x, y, z, t, t_pulse):
-        """
-        Calculate temperature rise due to a 1J pulsed point source at time(s) t.
-
-        1J of heat deposited at (xp, yp, zp) from t=0 to t=t_pulse.
-
-        Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time of desired temperature [seconds]
-            t_pulse: duration of pulse [seconds]
-
-        Returns:
-            Temperature Increase [°C]
-        """
-        T = self._continuous(x, y, z, t)
-        if t > t_pulse:
-            T -= self._continuous(x, y, z, t - t_pulse)
-        return T / t_pulse
 
     def pulsed(self, x, y, z, t, t_pulse):
         """
-        Calculate temperature rise due to a 1J pulsed point source.
+        Calculate temperature rise due to a 1J pulsed point illumination of surface.
 
-        Parameters:
-            x, y, z: location for desired temperature [meters]
-            t: time(s) of desired temperature [seconds]
-            t_pulse: duration of pulse [seconds]
+        Args:
+            x (scalar or array): x-coord(s) for temperature calculation [meters].
+            y (scalar or array): y-coord(s) for temperature calculation [meters].
+            z (scalar or array): z-coord(s) for temperature calculation [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
+            t_pulse (scalar): Duration of the irradiance pulse [seconds].
 
         Returns
-            Temperature Increase [°C]
+            temperature Increase [°C]
 
         Typical usage::
 
@@ -217,15 +155,15 @@ class ExpSource:
 
             plt.plot(t * 1000, T, color='blue')
             plt.xlabel("Time (ms)")
-            plt.ylabel("Temperature Increase (°C)")
+            plt.ylabel("temperature Increase (°C)")
             plt.title("1J pulse lasting %.0f ms" % t_pulse)
             plt.show()
 
         """
-        if np.isscalar(t):
-            T = self._pulsed(x, y, z, t, t_pulse)
-        else:
-            T = np.empty_like(t)
-            for i, tt in enumerate(t):
-                T[i] = self._pulsed(x, y, z, tt, t_pulse)
+        # the contribution from each point source self.zp
+        integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * self.zp)
+
+        # Compute the weighted sum to approximate the integral
+        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
+
         return T
