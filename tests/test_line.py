@@ -6,9 +6,9 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=line-too-long
 
-import grheat
 import unittest
 import numpy as np
+import grheat
 
 
 class InstantaneousLine(unittest.TestCase):

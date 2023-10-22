@@ -1,22 +1,26 @@
 """
-Green's Functions for Heat Transfer.
+Green's Functions for Heat Transfer in grheat package.
 
-`grheat` is a library offering Green's function solutions for heat transfer
-problems in various geometries and boundary conditions. This module provides
-solutions for point sources, line sources, plane sources, and exponential heating
-in semi-infinite media.
+`grheat` is a Python module that utilizes the Green's function method to solve heat transfer
+problems within a semi-infinite medium. This method provides solutions for different types of
+heat sources including point sources, line sources, plane sources, and exponential heating.
+Additionally, the method of images is employed to handle boundary conditions at the surface (`z=0`)
+with the following constraints:
 
-Main Features
--------------
-- Green's function solutions for point, line, and plane sources in semi-infinite media.
-- Solutions for exponential heating of a semi-infinite absorbing medium.
-- Supports different boundary conditions at the surface (z=0): infinite, adiabatic, and zero.
-- Accurate and efficient calculations based on mathematical formulations provided in
-  recognized literature (e.g., Carslaw and Jaeger, Prahl's 1995 SPIE paper).
+- `infinite` (unconstrained),
+- `adiabatic` (no heat flow, dT/dz=0), and
+- `zero` (T=0).
 
-Documentation
--------------
-Complete documentation is available at <https://grheat.readthedocs.io>
+Classes
+-------
+- `Absorber` : Uniform surface illumination of an absorbing medium.
+- `Point` : A point source of heat in the medium.
+- `Line` : A line source of heat, parallel to the surface, in the medium.
+- `Plane` : A plane source of heat in the medium.
+- `AbsorberPoint`: Point illumination on surface of an absorbing medium.
+
+Complete documentation, including detailed descriptions of classes and methods, is available at
+<https://grheat.readthedocs.io>
 
 Example Usage
 -------------
@@ -25,10 +29,9 @@ Example Usage
     import grheat
     import numpy as np
 
-    # Define parameters
-    mu_a = 0.25 * 1000  # 1/m
-    z = 0  # meters
-    t = np.linspace(0, 500, 100) / 1000  # seconds
+    mu_a = 0.25 * 1000            # 1/m  (absorption coefficient)
+    z = 0                         # meters
+    t = np.linspace(0, 0.5, 100)  # seconds
 
     # Create an Absorber instance
     medium = grheat.Absorber(mu_a)

@@ -180,7 +180,7 @@ class Absorber:
         """
         if np.isscalar(z):
             T = self._instantaneous_scalar(z, t, tp)
-        else :
+        else:
             T = np.zeros_like(z)
             for i, zz in enumerate(z):
                 T[i] = self._instantaneous_scalar(zz, t, tp)
@@ -372,7 +372,7 @@ class Absorber:
         """
         if np.isscalar(z):
             T = self._continuous_scalar(z, t)
-        else :
+        else:
             T = np.zeros_like(z)
             for i, zz in enumerate(z):
                 T[i] = self._continuous_scalar(zz, t)
@@ -454,7 +454,7 @@ class Absorber:
         estimate temperature following laser irradiation".  The calculations of temperature
         should work for times before, during, and after the pulse.
 
-        Parameters:
+        Args:
             z (scalar or array): Depth(s) at which the temperature is desired [meters].
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
             t_pulse (scalar): Duration of the irradiance pulse [seconds].
