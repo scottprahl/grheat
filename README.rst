@@ -18,9 +18,7 @@ by Scott Prahl
 .. image:: https://zenodo.org/badge/533509810.svg
    :target: https://zenodo.org/badge/latestdoi/533509810
    :alt: zenodo
-
 |
-
 .. image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
    :target: https://github.com/scottprahl/grheat/blob/master/LICENSE.txt
    :alt: License
@@ -42,18 +40,15 @@ __________
 Green's Functions for Heat Transfer
 -----------------------------------
 
-`grheat` is a python module based on Green's function solutions for heat transfer
+``grheat`` is a python module based on Green's function method for heat transfer
 problems in a semi-infinite medium. There are
 solutions for point sources, line sources, plane sources, and exponential heating.
-Adiabatic, no boundary, and zero surface boundary conditions are supported.
+Finally, the method of images is used to constrain boundary conditions at the surface
+(`z=0`): 
 
-Main Features
--------------
-- Green's function solutions for point, line, and plane sources in semi-infinite media.
-- Solutions for exponential heating of a semi-infinite absorbing medium.
-- Supports different boundary conditions at the surface (z=0): infinite, adiabatic, and zero.
-- Accurate and efficient calculations based on mathematical formulations provided in 
-  recognized literature (e.g., Carslaw and Jaeger).
+-`infinite` (unconstrained), 
+-`adiabatic` (no heat flow, dT/dz=0), and 
+- `zero` (T=0).
 
 Installation
 ------------
@@ -62,7 +57,7 @@ Use ``pip``::
 
     pip install grheat
 
-or ``conda``  (will work soon)::
+or ``conda``::
 
     conda install -c conda-forge grheat
 
