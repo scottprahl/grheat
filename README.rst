@@ -42,10 +42,10 @@ __________
 Green's Functions for Heat Transfer
 -----------------------------------
 
-`grheat` is a library offering Green's function solutions for heat transfer
-problems in various geometries and boundary conditions. This module provides
-solutions for point sources, line sources, plane sources, and exponential heating 
-in semi-infinite media.
+`grheat` is a python module based on Green's function solutions for heat transfer
+problems in a semi-infinite medium. There are
+solutions for point sources, line sources, plane sources, and exponential heating.
+Adiabatic, no boundary, and zero surface boundary conditions are supported.
 
 Main Features
 -------------
@@ -58,13 +58,11 @@ Main Features
 Installation
 ------------
 
-**these don't work yet**
-
 Use ``pip``::
 
     pip install grheat
 
-or ``conda``::
+or ``conda``  (will work soon)::
 
     conda install -c conda-forge grheat
 
