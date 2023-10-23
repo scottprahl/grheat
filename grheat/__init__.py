@@ -51,3 +51,4 @@ from .point_source import *
 from .line_source import *
 from .plane_source import *
 from .absorber import *
+from .absorbing_point import *

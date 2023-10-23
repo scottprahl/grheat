@@ -10,7 +10,7 @@ This module provides solutions to heat transfer for point illumination
 of an absorbing semi-infinite medium. The solutions are
 based on the mathematical formulations provided in Carslaw and Jaeger's work.
 
-The `ExpSource` class represents a vertical linear heat source that extends
+The `AbsorbingPoint` class represents a vertical linear heat source that extends
 downward in the medium for coordinates (xp, yp) in the medium. The medium's surface
 is defined by z=0. The class provides methods to calculate the temperature rise
 at any position (x, y, z) at a specified time `t`, due to different types of
@@ -43,7 +43,7 @@ water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
-class ExpSource:
+class AbsorbingPoint:
     """
     Green's function heat transfer solutions for point source in infinite media.
     """
@@ -56,7 +56,7 @@ class ExpSource:
                  boundary='infinite',
                  n_quad=100):
         """
-        Initialize ExpSource object.
+        Initialize AbsorbingPoint object.
 
         Args:
             mu_a: attenuation coefficient                  [1/meter]
@@ -94,7 +94,7 @@ class ExpSource:
             temperature Increase [°C]
         """
         # the contribution from each point source self.zp
-        integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * self.zp)
+        integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * self.point.zp)
 
         # Compute the weighted sum to approximate the integral
         T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
@@ -117,7 +117,7 @@ class ExpSource:
             temperature Increase [°C]
         """
         # the contribution from each point source self.zp
-        integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * self.zp)
+        integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * self.point.zp)
 
         # Compute the weighted sum to approximate the integral
         T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
@@ -150,7 +150,7 @@ class ExpSource:
             xp,yp = 0, 0                           # meters
             t_pulse = 0.100                       # seconds
 
-            medium = grheat.ExpSource(mu_a, xp, yp)
+            medium = grheat.AbsorbingPoint(mu_a, xp, yp)
             T = medium.pulsed(x, y, z, t, t_pulse)
 
             plt.plot(t * 1000, T, color='blue')
@@ -161,7 +161,7 @@ class ExpSource:
 
         """
         # the contribution from each point source self.zp
-        integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * self.zp)
+        integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * self.point.zp)
 
         # Compute the weighted sum to approximate the integral
         T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
