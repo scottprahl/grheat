@@ -77,8 +77,8 @@ class AbsorbingPoint:
 
         # place source points for exponential quadrature
         k = np.arange(1, n_quad + 1)
-        zz = (1 / mu_a) * np.log(2 * k)
-        self.point = grheat.Point(xp, yp, zz)
+        self.zp = (1 / mu_a) * np.log(2 * k)
+        self.point = grheat.Point(xp, yp, self.zp)
         self.weights = (1 / mu_a) * (1 / (2 * k - 1) - 1 / (2 * k + 1))
 
     def instantaneous(self, x, y, z, t):
@@ -94,13 +94,16 @@ class AbsorbingPoint:
         Returns:
             temperature Increase [°C]
         """
-        # the contribution from each point source self.zp
-        integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * self.point.zp)
+        tt = np.asarray(t)
+        T = np.zeros_like(tt, dtype=float)
 
-        # Compute the weighted sum to approximate the integral
-        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
+        for w, zp in zip(self.weights, self.zp):
+            # the contribution from each point source self.zp
+            self.point.zp = zp
+            integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * zp)
+            T += w * integrand
 
-        return T
+        return T * self.mu_a / self.capacity
 
     def continuous(self, x, y, z, t):
         """
@@ -117,13 +120,16 @@ class AbsorbingPoint:
         Returns:
             temperature Increase [°C]
         """
-        # the contribution from each point source self.zp
-        integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * self.point.zp)
+        tt = np.asarray(t)
+        T = np.zeros_like(tt, dtype=float)
 
-        # Compute the weighted sum to approximate the integral
-        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
+        for w, zp in zip(self.weights, self.zp):
+            # the contribution from each point source self.zp
+            self.point.zp = zp
+            integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * zp)
+            T += w * integrand
 
-        return T
+        return T * self.mu_a / self.capacity
 
     def pulsed(self, x, y, z, t, t_pulse):
         """
@@ -161,10 +167,13 @@ class AbsorbingPoint:
             plt.show()
 
         """
-        # the contribution from each point source self.zp
-        integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * self.point.zp)
+        tt = np.asarray(t)
+        T = np.zeros_like(tt, dtype=float)
 
-        # Compute the weighted sum to approximate the integral
-        T = np.sum(self.weights * integrand) * self.mu_a / self.capacity
+        for w, zp in zip(self.weights, self.zp):
+            # the contribution from each point source self.zp
+            self.point.zp = zp
+            integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * zp)
+            T += w * integrand
 
-        return T
+        return T * self.mu_a / self.capacity

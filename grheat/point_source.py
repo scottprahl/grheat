@@ -174,7 +174,7 @@ class Point:
             plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0.0                # return a scalar
             if np.isscalar(self.tp):
                 T += self._instantaneous(x, y, z, t, self.tp)
             else:
@@ -182,7 +182,7 @@ class Point:
                     T += self._instantaneous(x, y, z, t, tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._instantaneous(x, y, z, tt, self.tp)
@@ -270,7 +270,7 @@ class Point:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0.0                # return a scalar
             if np.isscalar(self.tp):
                 T += self._continuous(x, y, z, t - self.tp)
             else:
@@ -278,7 +278,7 @@ class Point:
                     T += self._continuous(x, y, z, t - tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._continuous(x, y, z, tt - self.tp)
@@ -336,5 +336,6 @@ class Point:
             raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
 
         T = self.continuous(x, y, z, t)
-        T -= self.continuous(x, y, z, t - t_pulse)
+        tt = np.subtract(t, t_pulse, dtype=np.float64)
+        T -= self.continuous(x, y, z, tt)
         return T / t_pulse
