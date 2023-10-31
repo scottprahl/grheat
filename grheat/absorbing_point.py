@@ -86,9 +86,10 @@ class AbsorbingPoint:
         Calculate temperature rise due to a 1J instant point source at time(s) t.
 
         Args:
-            x, y, z: location for desired temperature [meters]
-            t: time(s) of desired temperature [seconds]
-            tp: time(s) of source impulse [seconds]
+            x (scalar): x-coord(s) for temperature calculation [meters].
+            y (scalar): y-coord(s) for temperature calculation [meters].
+            z (scalar): z-coord(s) for temperature calculation [meters].
+            t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
             temperature Increase [°C]
@@ -108,9 +109,9 @@ class AbsorbingPoint:
         The point source turns on at t=0.
 
         Args:
-            x (scalar or array): x-coord(s) for temperature calculation [meters].
-            y (scalar or array): y-coord(s) for temperature calculation [meters].
-            z (scalar or array): z-coord(s) for temperature calculation [meters].
+            x (scalar): x-coord(s) for temperature calculation [meters].
+            y (scalar): y-coord(s) for temperature calculation [meters].
+            z (scalar): z-coord(s) for temperature calculation [meters].
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
@@ -129,9 +130,9 @@ class AbsorbingPoint:
         Calculate temperature rise due to a 1J pulsed point illumination of surface.
 
         Args:
-            x (scalar or array): x-coord(s) for temperature calculation [meters].
-            y (scalar or array): y-coord(s) for temperature calculation [meters].
-            z (scalar or array): z-coord(s) for temperature calculation [meters].
+            x (scalar): x-coord(s) for temperature calculation [meters].
+            y (scalar): y-coord(s) for temperature calculation [meters].
+            z (scalar): z-coord(s) for temperature calculation [meters].
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
             t_pulse (scalar): Duration of the irradiance pulse [seconds].
 
