@@ -3,3 +3,5 @@ docs/.ipynb_checkpoints/
 grheat/__pycache__/
 docs/_build/
 docs/api/
+.DS_Store
+grheat/.DS_Store
