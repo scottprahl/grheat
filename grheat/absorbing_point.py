@@ -4,28 +4,30 @@
 # pylint: disable=no-member
 # pylint: disable=too-many-instance-attributes
 """
-Green's function heat transfer solutions for a vertical exponential line.
+Green's function solutions for point illumination of semi-infinite absorber.
 
-This module provides solutions to heat transfer for point illumination
-of an absorbing semi-infinite medium. The solutions are
-based on the mathematical formulations provided in Carslaw and Jaeger's work.
+This module provides solutions to heat transfer for point illumination of an
+absorbing semi-infinite medium. The solutions are based on the mathematical
+formulations provided in Carslaw and Jaeger's work.
 
-The `AbsorbingPoint` class represents a vertical linear heat source that extends
-downward in the medium for coordinates (xp, yp) in the medium. The medium's surface
-is defined by z=0. The class provides methods to calculate the temperature rise
-at any position (x, y, z) at a specified time `t`, due to different types of
-heat source behaviors.
+The `AbsorbingPoint` class represents a vertical linear exponentially-decaying,
+heat source that extends downward in the medium for coordinates (xp, yp) in the
+medium. The medium's surface is defined by z=0. The class provides methods to
+calculate the temperature rise at any position (x, y, z) at a specified time
+`t`, due to different types of heat source behaviors.
+
+Calculations are done using exponential quadrature along all source points.
 
 Three types of line sources are supported:
 
 - **Instantaneous**:
-  Represents a single, instantaneous illumination of a point on absorbing medium.
+  Instantaneous pulse of light at a point on semi-infinite absorber.
 
 - **Continuous**:
-  Represents a continuous point illumination of an absorbing medium from t=0.
+  Continuous illumination of a point on semi-infinite absorber.
 
 - **Pulsed**:
-  Represents a pulsed illumination of a point from t=0 to t=`t_pulse`.
+  Pulsed illumination of a point on semi-infinite absorber.
 
 Each of these line sources can be analyzed under different boundary conditions at z=0:
 
@@ -71,6 +73,7 @@ class AbsorbingPoint:
         self.mu_a = mu_a
         self.xp = xp
         self.yp = yp
+        self.tp = 0
         self.diffusivity = diffusivity
         self.capacity = capacity
         self.boundary = boundary.lower()
