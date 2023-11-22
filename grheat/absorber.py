@@ -3,7 +3,7 @@
 # pylint: disable=consider-using-f-string
 # pylint: disable=no-member
 """
-Heat transfer solutions for uniform illumination of an absorbing semi-infinite medium.
+Heat transfer solutions for uniform illumination of an absorbing semi-infinite absorber.
 
 Three types of illumination are supported:
 
@@ -188,12 +188,12 @@ class Absorber:
 
     def instantaneous(self, z, t):
         """
-        Calculate temperature rise due to an instant surface exposure.
+        Calculate temperature rise due to instantaneous pulse on semi-infinite absorber.
 
         This method computes the temperature increase at a specified depth `z` and time `t`
-        following an instantaneous radiant exposure of 1 J/m² on the medium's surface. The
-        computation is based on the formulations provided in Prahl's 1995 SPIE paper,
-        "Charts to rapidly estimate temperature following laser irradiation".
+        following an instantaneous radiant exposure of 1 J/m² on the medium's surface.
+        Multiply the result of this function by the radiant exposure in J/m² to get the
+        temperature increase.
 
         The method handles scalar or array-like inputs for `z` and `t`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
@@ -219,15 +219,16 @@ class Absorber:
                 z = 0                                 # meters
                 mu_a = 0.25 * 1000                    # 1/m
                 tp = 0.1                              # seconds
+                radiant_exposure = 1 / (0.01 * 0.01)  # 1 J/cm² = 10⁴ J/m²
                 t = np.linspace(0, 500, 100) / 1000   # seconds
 
                 medium = grheat.Absorber(mua, tp)
-                T = medium.continuous(z, t)
+                T = medium.instantaneous(z, t) * radiant_exposure
 
                 plt.plot(t * 1000, T, color='blue')
                 plt.xlabel("Time (ms)")
                 plt.ylabel("Surface Temperature Increase (°C)")
-                plt.title("1 J/m² Instant Radiant Exposure at %.1f seconds" % tp)
+                plt.title("1 J/cm² Instant Radiant Exposure at %.1f seconds" % tp)
                 plt.show()
         """
         if np.isscalar(t):
@@ -356,9 +357,7 @@ class Absorber:
 
         The method computes the temperature increase at a specified depth `z` and time `t`
         following a continuous radiant exposure of 1 W/m² on the medium's surface. The
-        volumetric heating within the medium decreases as self.mu_a * exp(-self.mu * z) [W/m³],
-        The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
-        estimate temperature following laser irradiation".
+        volumetric heating within the medium decreases as mu_a * exp(-mu_a * z) [W/m³],
 
         The method handles scalar or array-like inputs for `z`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
@@ -380,16 +379,15 @@ class Absorber:
 
     def continuous(self, z, t):
         """
-        Calculate temperature rise due to continuous surface irradiance on an absorber.
+        Calculate temperature rise due to steady irradiance of semi-infinite absorber.
 
         The method computes the temperature increase at a specified depth `z` and time `t`
-        due to a continuous irradiance of 1 W/m² on the absorber's surface. The
-        volumetric heating within the medium decreases exponentially with depth, following
-        the expression: mu_a * exp(-mu * z) [W/m³]. The heating starts at t=0 and continues
-        up to the specified time `t`.
+        due to a continuous irradiance of 1 W/m² on the absorber's surface. The heating
+        starts at t=self.tp and continues to the specified time `t`.
 
-        The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
-        estimate temperature following laser irradiation".
+        The volumetric heating within the medium decreases exponentially with depth,
+        following the expression: mu_a * exp(-mu_a * z) [W/m³]. Multiply the result
+        of this function by the irradiance in W/m² to get the temperature increase.
 
         The method handles scalar or array-like inputs for `z` and `t`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
@@ -411,15 +409,16 @@ class Absorber:
 
                 z = 0                                 # meters
                 mu_a = 0.25 * 1000                    # 1/m
+                irradiance = 1 / (0.01 * 0.01)        # 1 W/cm² = 10⁴ W/m²
                 t = np.linspace(0, 500, 100) / 1000   # seconds
 
                 medium = grheat.Absorber(mua)
-                T = medium.continuous(z, t)
+                T = medium.continuous(z, t) * irradiance
 
                 plt.plot(t * 1000, T, color='blue')
                 plt.xlabel("Time (ms)")
                 plt.ylabel("Surface Temperature Increase (°C)")
-                plt.title("1 W/m² Surface Irradiance")
+                plt.title("1 W/cm² Surface Irradiance")
                 plt.show()
         """
         if np.isscalar(t):
@@ -442,13 +441,16 @@ class Absorber:
 
     def pulsed(self, z, t, t_pulse):
         """
-        Calculate temperature rise due to pulsed radiant exposure on absorber surface.
+        Calculate temperature rise due to pulsed irradiance of semi-infinite absorber.
 
         The method computes the temperature increase at a specified depth `z` and time `t`
         due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance
-        starts at t=0 and continues up to time `t_pulse`. The volumetric heating within
+        starts at t=self.tp and continues up to time `t_pulse`. The volumetric heating within
         the medium decreases exponentially with depth, following the expression:
-        mu_a * exp(-mu * z) [W/m³].
+        mu_a * exp(-mu * z) [J/m³].
+
+        Multiply the result of this function by the radiant exposure of the pulse
+        in J/m² to get the temperature increase.
 
         The temperatures are calculated as in Prahl's 1995 SPIE paper, "Charts to rapidly
         estimate temperature following laser irradiation".  The calculations of temperature
@@ -472,16 +474,17 @@ class Absorber:
 
                 z = 0                                 # meters
                 mu_a = 0.25 * 1000                    # 1/m
-                t = np.linspace(0, 500, 100) / 1000   # seconds
                 t_pulse = 0.100                       # seconds
+                radiant_exposure = 1 / (0.01 * 0.01)  # 1 J/cm²
+                t = np.linspace(0, 500, 100) / 1000   # seconds
 
                 medium = grheat.Absorber(mua)
-                T = medium.pulsed(z, t, t_pulse)
+                T = medium.pulsed(z, t, t_pulse) * radiant_exposure
 
                 plt.plot(t * 1000, T, color='blue')
                 plt.xlabel("Time (ms)")
                 plt.ylabel("Surface Temperature Increase (°C)")
-                plt.title("1 J/m² pulse lasting %.0f ms" % t_pulse)
+                plt.title("1 J/cm² pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
         T = self.continuous(z, t)
