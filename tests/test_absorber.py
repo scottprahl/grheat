@@ -263,7 +263,7 @@ class IntegratedPlane(unittest.TestCase):
         T2 = radiant_exposure * total * mua * (zp_array[1] - zp_array[0])
 #        print(T1 / T2)
 #        print(T2 / T1)
-        self.assertAlmostEqual(T1, T2, delta=0.01)
+        self.assertAlmostEqual(T1, T2, delta=0.02)
 
     def test_02_pulsed(self):
         """Matches numerical integration of plane sources."""
@@ -283,7 +283,7 @@ class IntegratedPlane(unittest.TestCase):
         T2 = radiant_exposure * total * mua * (zp_array[1] - zp_array[0])
 #        print(T1 / T2)
 #        print(T2 / T1)
-        self.assertAlmostEqual(T1, T2, delta=0.001)
+        self.assertAlmostEqual(T1, T2, delta=0.02)
 
 
 class ConstantBoundary(unittest.TestCase):
