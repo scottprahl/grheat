@@ -108,6 +108,15 @@ class Line:
         if self.boundary not in ['infinite', 'adiabatic', 'zero']:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
+    def __str__(self):
+        return (f"Line Properties:\n"
+                f"yp: {self.yp} meters\n"
+                f"zp: {self.zp} meters\n"
+                f"tp: {self.tp} seconds\n"
+                f"diffusivity: {self.diffusivity} m^2/s\n"
+                f"capacity: {self.capacity} J/degree/m^3\n"
+                f"boundary: {self.boundary}\n")
+
     def _instantaneous(self, y, z, t, tp):
         """
         Calculate temperature rise due to a 1 J/m instantaneous x-line source at time t.

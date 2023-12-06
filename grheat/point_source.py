@@ -90,6 +90,16 @@ class Point:
         if self.boundary not in ['infinite', 'adiabatic', 'zero']:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
+    def __str__(self):
+        return (f"Point Properties:\n"
+                f"xp: {self.xp} meters\n"
+                f"yp: {self.yp} meters\n"
+                f"zp: {self.zp} meters\n"
+                f"tp: {self.tp} seconds\n"
+                f"diffusivity: {self.diffusivity} m^2/s\n"
+                f"capacity: {self.capacity} J/degree/m^3\n"
+                f"boundary: {self.boundary}\n")
+
     def _instantaneous(self, x, y, z, t, tp):
         """
         Calculate temperature rise due to a 1J instant point source at a specific time `t`.
@@ -191,6 +201,15 @@ class Point:
                         T[i] += self._instantaneous(x, y, z, tt, tp)
         return T
 
+    def distance(self, x, y, z):
+        """Calculate distance to the source --- avoid returning zero."""
+        r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
+        rr = np.asarray(r)
+        rr[rr == 0] = 1e-6  # 1 micron
+        if rr.shape == ():
+            return rr.item()
+        return rr
+
     def _continuous(self, x, y, z, t):
         """
         Calculate temperature rise of a 1W continuous point source at time t.
@@ -206,7 +225,7 @@ class Point:
         Returns:
             Temperature Increase [°C]
         """
-        r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
+        r = self.distance(x, y, z)
         if t <= 0:
             return r * 0
 
@@ -214,7 +233,7 @@ class Point:
         T = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 
         if self.boundary != 'infinite':
-            r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z + self.zp)**2)
+            r = self.distance(x, y, -z)
             factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
             T1 = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 

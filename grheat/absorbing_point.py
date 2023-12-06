@@ -41,8 +41,8 @@ More documentation at <https://grheat.readthedocs.io>
 import numpy as np
 import grheat
 
-water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
-water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+water_heat_capacity = 4.184 * 1e6           # J/(m³ °C)
+water_thermal_diffusivity = 0.14558 * 1e-6  # m²/s
 
 
 class AbsorbingPoint:

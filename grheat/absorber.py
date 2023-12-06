@@ -33,8 +33,8 @@ More documentation can be found at <https://grheat.readthedocs.io>
 import scipy.special
 import numpy as np
 
-water_heat_capacity = 4.184 * 1e6          # J/degree / m**3
-water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+water_heat_capacity = 4.186 * 1e6           # J/degree / m**3
+water_thermal_diffusivity = 0.145 * 1e-6    # m**2/s
 
 
 class Absorber:
@@ -77,7 +77,7 @@ class Absorber:
                 instantaneous at tp [seconds]. Defaults to 0.
             diffusivity (scalar, optional): Thermal diffusivity of the medium [m**2/s].
                 Defaults to water_thermal_diffusivity.
-            capacity (scalar, optional): Volumetric heat capacity of the medium
+            capacity (scalar, optional): Volumetric heat capacity of the medium (𝜌c)
                 [J/degree/m**3]. Defaults to water_heat_capacity.
             boundary (str, optional): Boundary condition at z=0.
                 Can be 'infinite', 'adiabatic', or 'zero'. Defaults to 'infinite'.
@@ -93,6 +93,14 @@ class Absorber:
         self.boundary = boundary.lower()   # infinite, adiabatic, zero
         if self.boundary not in ['infinite', 'adiabatic', 'zero']:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
+
+    def __str__(self):
+        return (f"Absorber Properties:\n"
+                f"mu_a: {self.mu_a} 1/meters\n"
+                f"tp: {self.tp} seconds\n"
+                f"diffusivity: {self.diffusivity} m^2/s\n"
+                f"capacity: {self.capacity} J/degree/m^3\n"
+                f"boundary: {self.boundary}\n")
 
     def _instantaneous_scalar_no_bndry(self, z, t, tp):
         """

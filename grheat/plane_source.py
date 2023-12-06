@@ -94,6 +94,14 @@ class Plane:
         if self.boundary not in ['infinite', 'adiabatic', 'zero']:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
+    def __str__(self):
+        return (f"Plane Properties:\n"
+                f"zp: {self.zp} meters\n"
+                f"tp: {self.tp} seconds\n"
+                f"diffusivity: {self.diffusivity} m^2/s\n"
+                f"capacity: {self.capacity} J/degree/m^3\n"
+                f"boundary: {self.boundary}\n")
+
     def _instantaneous(self, z, t, tp):
         """
         Calculate the temperature rise due to a 1 J/m² instantaneous xy-planar source at time `t`.
