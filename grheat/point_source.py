@@ -91,6 +91,7 @@ class Point:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
+        """Create string for object."""
         return (f"Point Properties:\n"
                 f"xp: {self.xp} meters\n"
                 f"yp: {self.yp} meters\n"

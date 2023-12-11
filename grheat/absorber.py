@@ -95,6 +95,7 @@ class Absorber:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
+        """Create string for object."""
         return (f"Absorber Properties:\n"
                 f"mu_a: {self.mu_a} 1/meters\n"
                 f"tp: {self.tp} seconds\n"

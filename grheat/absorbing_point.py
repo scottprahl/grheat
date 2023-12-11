@@ -46,9 +46,7 @@ water_thermal_diffusivity = 0.14558 * 1e-6  # m²/s
 
 
 class AbsorbingPoint:
-    """
-    Green's function heat transfer solutions for point source in infinite media.
-    """
+    """Green's function heat transfer solutions for point source in infinite media."""
 
     def __init__(self,
                  mu_a,

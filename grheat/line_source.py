@@ -109,6 +109,7 @@ class Line:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
+        """Create string for object."""
         return (f"Line Properties:\n"
                 f"yp: {self.yp} meters\n"
                 f"zp: {self.zp} meters\n"
