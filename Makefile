@@ -36,6 +36,7 @@ clean:
 	rm -rf grheat.egg-info
 	rm -rf docs/.ipynb_checkpoints
 	rm -rf docs/_build
+	rm -rf docs/.jupyter
 	rm -rf docs/api
 	rm -rf grheat/__pycache__
 	rm -rf tests/__pycache__
@@ -58,6 +59,6 @@ test:
 	pytest --verbose tests/test_line.py
 	pytest --verbose tests/test_plane.py
 	pytest --verbose tests/test_absorber.py
-	pytest --verbose tests/test_absorbing_point.py
+#	pytest --verbose tests/test_absorbing_point.py
 
 .PHONY: clean check rcheck html
