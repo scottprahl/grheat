@@ -1,41 +1,43 @@
+.. |pypi-badge| image:: https://img.shields.io/pypi/v/grheat?color=68CA66
+   :target: https://pypi.org/project/grheat/
+   :alt: pypi
+
+.. |github-badge| image:: https://img.shields.io/github/v/tag/scottprahl/grheat?label=github&color=68CA66
+   :target: https://github.com/scottprahl/grheat
+   :alt: github
+
+.. |conda-badge| image:: https://img.shields.io/conda/vn/conda-forge/grheat?label=conda&color=68CA66
+   :target: https://github.com/conda-forge/grheat-feedstock
+   :alt: conda
+
+.. |zenodo-badge| image:: https://zenodo.org/badge/533509810.svg
+   :target: https://zenodo.org/badge/latestdoi/533509810
+   :alt: zenodo
+
+.. |license| image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
+   :target: https://github.com/scottprahl/grheat/blob/main/LICENSE.txt
+   :alt: License
+
+.. |test-badge| image:: https://github.com/scottprahl/grheat/actions/workflows/test.yaml/badge.svg
+   :target: https://github.com/scottprahl/grheat/actions/workflows/test.yaml
+   :alt: testing
+
+.. |docs-badge| image:: https://readthedocs.org/projects/grheat/badge?color=68CA66
+   :target: https://grheat.readthedocs.io
+   :alt: docs
+
+.. |downloads| image:: https://img.shields.io/pypi/dm/grheat?color=68CA66
+   :target: https://pypi.org/project/grheat/
+   :alt: Downloads
+
 grheat
 ======
 
 by Scott Prahl
 
-.. image:: https://img.shields.io/pypi/v/grheat?color=68CA66
-   :target: https://pypi.org/project/grheat/
-   :alt: pypi
+|pypi-badge| |github-badge| |conda-badge| |zenodo-badge|
 
-.. image:: https://img.shields.io/github/v/tag/scottprahl/grheat?label=github&color=68CA66
-   :target: https://github.com/scottprahl/grheat
-   :alt: github
-
-.. image:: https://img.shields.io/conda/vn/conda-forge/grheat?label=conda&color=68CA66
-   :target: https://github.com/conda-forge/grheat-feedstock
-   :alt: conda
-
-.. image:: https://zenodo.org/badge/533509810.svg
-   :target: https://zenodo.org/badge/latestdoi/533509810
-   :alt: zenodo
-|
-.. image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
-   :target: https://github.com/scottprahl/grheat/blob/main/LICENSE.txt
-   :alt: License
-
-.. image:: https://github.com/scottprahl/grheat/actions/workflows/test.yaml/badge.svg
-   :target: https://github.com/scottprahl/grheat/actions/workflows/test.yaml
-   :alt: testing
-
-.. image:: https://readthedocs.org/projects/grheat/badge?color=68CA66
-  :target: https://grheat.readthedocs.io
-  :alt: docs
-
-.. image:: https://img.shields.io/pypi/dm/grheat?color=68CA66
-   :target: https://pypi.org/project/grheat/
-   :alt: Downloads
-
-__________
+|license| |test-badge| |docs-badge| |downloads|
 
 Green's Functions for Heat Transfer
 -----------------------------------
