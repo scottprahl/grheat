@@ -1,9 +1,4 @@
-#! /usr/bin/env python3
-# pylint: disable=invalid-name
-# pylint: disable=unused-variable
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-module-docstring
+"""Tests for the Absorber class."""
 
 import unittest
 import numpy as np
@@ -12,37 +7,43 @@ joules_per_calorie = 4.184
 
 
 class InstantaneousAbsorber(unittest.TestCase):
+    """Instant absorber tests."""
 
     def test_01_scalar(self):
+        """Does it work for scalar values."""
         mua = 1000  # 1/meter
         tp = 0
         t = 1
         medium = grheat.Absorber(mua, tp)
-        T = medium.instantaneous(0, t)
+        _T = medium.instantaneous(0, t)
 
     def test_02_time_array(self):
+        """Does it work for a time array."""
         mua = 1000  # 1/meter
         tp = 0
         t = np.linspace(0, 10)
         medium = grheat.Absorber(mua, tp)
-        T = medium.instantaneous(0, t)
+        _T = medium.instantaneous(0, t)
 
     def test_03_tp_array(self):
+        """Does it work for a pulse time array."""
         mua = 1000  # 1/meter
         t = 1
         tp = np.linspace(0, 10, 11)
         medium = grheat.Absorber(mua, tp)
-        T = medium.instantaneous(0, t)
+        _T = medium.instantaneous(0, t)
 
     def test_04_z_array(self):
+        """Does it work for a z array."""
         mua = 1000  # 1/meter
         t = 1
         tp = 0
         z = np.linspace(0, 10, 11)
         medium = grheat.Absorber(mua, tp)
-        T = medium.instantaneous(z, t)
+        _T = medium.instantaneous(z, t)
 
     def test_05_total_energy(self):
+        """Test for total energy."""
         mu_a = 1 * 1000  # 1 / m
         medium = grheat.Absorber(mu_a)
         z = np.linspace(-0.0015, 0.006, 4001)
@@ -70,19 +71,21 @@ class InstantaneousAbsorber(unittest.TestCase):
 
 
 class ContinuousAbsorber(unittest.TestCase):
+    """Continuous absorber tests."""
 
     def test_01_scalar(self):
+        """Does it work for scalar values."""
         mua = 1000  # 1/meter
         t = 1
         medium = grheat.Absorber(mua)
-        T = medium.continuous(0, t)
+        _T = medium.continuous(0, t)
 
     def test_02_time_array(self):
         """Ensure works with arrays of time."""
         mua = 1000  # 1/meter
         t = np.linspace(0, 10)
         medium = grheat.Absorber(mua)
-        T = medium.continuous(0, t)
+        _T = medium.continuous(0, t)
 
     def test_03_tp_array(self):
         """Ensure works with arrays of pulses."""
@@ -90,7 +93,7 @@ class ContinuousAbsorber(unittest.TestCase):
         t = 1
         tp = np.linspace(0, 10, 11)
         medium = grheat.Absorber(mua, tp)
-        T = medium.continuous(0, t)
+        _T = medium.continuous(0, t)
 
     def test_04_z_array(self):
         """Ensure works with arrays of depths."""
@@ -98,7 +101,7 @@ class ContinuousAbsorber(unittest.TestCase):
         t = 1
         z = np.linspace(0, 10, 11)
         medium = grheat.Absorber(mua)
-        T = medium.continuous(z, t)
+        _T = medium.continuous(z, t)
 
     def test_05_energy(self):
         """Ensure total energy delivered is correct."""
@@ -131,20 +134,23 @@ class ContinuousAbsorber(unittest.TestCase):
 
 
 class PulsedAbsorber(unittest.TestCase):
+    """Pulsed absorber tests."""
 
     def test_01_scalar(self):
+        """Test with all scalar inputs."""
         mua = 1000  # 1/meter
         t_pulse = 0.5
         t = 1
         medium = grheat.Absorber(mua)
-        T = medium.pulsed(0, t, t_pulse)
+        _T = medium.pulsed(0, t, t_pulse)
 
     def test_02_time_array(self):
+        """Test with an array of time."""
         mua = 1000  # 1/meter
         t_pulse = 0.5
         t = np.linspace(0, 10)
         medium = grheat.Absorber(mua)
-        T = medium.pulsed(0, t, t_pulse)
+        _T = medium.pulsed(0, t, t_pulse)
 
     def test_03_total_energy(self):
         """Total energy at end of pulse."""
@@ -202,6 +208,7 @@ class PulsedAbsorber(unittest.TestCase):
 
 
 class InstantVsPulsed(unittest.TestCase):
+    """Instant and Pulsed absorber tests."""
 
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
@@ -244,6 +251,7 @@ class InstantVsPulsed(unittest.TestCase):
 
 
 class IntegratedPlane(unittest.TestCase):
+    """Integrated plane absorber tests."""
 
     def test_01_instant(self):
         """Matches numerical integration of plane sources."""
@@ -287,6 +295,7 @@ class IntegratedPlane(unittest.TestCase):
 
 
 class ConstantBoundary(unittest.TestCase):
+    """Constant Boundary tests."""
 
     def test_01_zero(self):
         """Surface temperature should be zero."""
@@ -309,6 +318,7 @@ class ConstantBoundary(unittest.TestCase):
 
 
 class AdiabaticBoundary(unittest.TestCase):
+    """Adiabatic Boundary tests."""
 
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""

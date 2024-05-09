@@ -136,6 +136,7 @@ class Line:
             z (scalar or array): The z-coordinate(s) for the temperature location. [meters]
             t (scalar): The time of the temperature. [seconds]
             tp (scalar): The time of the line source impulse. [seconds]
+
         Returns:
             scalar: Normalized temperature rise.
         """

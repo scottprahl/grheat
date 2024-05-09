@@ -52,7 +52,7 @@ class Absorber:
         - 'adiabatic': No heat flow across the boundary.
         - 'zero': Boundary is fixed at T=0.
 
-    Attributes
+    Attributes:
     ----------
         mu_a (scalar): Exponential attenuation coefficient [1/meters].
         tp (scalar): Time of source impulse [seconds].
@@ -218,7 +218,6 @@ class Absorber:
             scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
-
             .. code-block:: python
 
                 import grheat
@@ -409,7 +408,6 @@ class Absorber:
             scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
-
             .. code-block:: python
 
                 import grheat
@@ -474,7 +472,6 @@ class Absorber:
             scalar or array: Temperature increase at the specified depth(s) and time(s) [°C].
 
         Example:
-
             .. code-block:: python
 
                 import grheat

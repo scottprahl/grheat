@@ -114,6 +114,7 @@ class Point:
             y (array): y-coordinate(s) of the location(s) for desired temperature [meters].
             z (array): z-coordinate(s) of the location(s) for desired temperature [meters].
             t (scalar): Time at which the desired temperature is computed [seconds].
+            tp (scalar): Time at which the source impulse occurs [seconds].
 
         Returns:
             array: Normalized temperature rise at the specified location(s) and time.
@@ -158,7 +159,6 @@ class Point:
             scalar or array: Temperature increase in °C at the specified location(s) and time(s).
 
         Example:
-
         .. code-block:: python
 
             import grheat
@@ -264,7 +264,6 @@ class Point:
             scalar or array: Temperature increase (°C) at the specified location(s) and time(s).
 
         Example:
-
             .. code-block:: python
 
                 import grheat
@@ -326,7 +325,6 @@ class Point:
             scalar or array: Temperature increase (°C) at the location(s) and time(s).
 
         Example:
-
             .. code-block:: python
 
                 import grheat

@@ -168,7 +168,6 @@ class Plane:
             scalar or array: Temp increase in degrees Celsius at the depth(s) and time(s).
 
         Example:
-
         .. code-block:: python
 
             import grheat
@@ -264,7 +263,6 @@ class Plane:
             for scalar input, array for array input).
 
         Example:
-
             .. code-block:: python
 
                 import grheat
@@ -320,7 +318,6 @@ class Plane:
             for scalar input, array for array input).
 
         Example:
-
             .. code-block:: python
 
                 import grheat

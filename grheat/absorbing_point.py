@@ -143,7 +143,7 @@ class AbsorbingPoint:
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
             t_pulse (scalar): Duration of the irradiance pulse [seconds].
 
-        Returns
+        Returns:
             temperature Increase [°C]
 
         Typical usage::
