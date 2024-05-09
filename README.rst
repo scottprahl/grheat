@@ -20,7 +20,7 @@ by Scott Prahl
    :alt: zenodo
 |
 .. image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
-   :target: https://github.com/scottprahl/grheat/blob/master/LICENSE.txt
+   :target: https://github.com/scottprahl/grheat/blob/main/LICENSE.txt
    :alt: License
 
 .. image:: https://github.com/scottprahl/grheat/actions/workflows/test.yaml/badge.svg
@@ -64,7 +64,7 @@ or ``conda``::
 or use a Jupyter notebook immediately by clicking the Google Colaboratory button below
 
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
-  :target: https://colab.research.google.com/github/scottprahl/grheat/blob/master
+  :target: https://colab.research.google.com/github/scottprahl/grheat/blob/main
   :alt: Colab
 
 
