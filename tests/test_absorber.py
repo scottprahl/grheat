@@ -3,6 +3,7 @@
 import unittest
 import numpy as np
 import grheat
+
 joules_per_calorie = 4.184
 
 
@@ -110,8 +111,8 @@ class ContinuousAbsorber(unittest.TestCase):
         z = np.linspace(-0.0015, 0.006, 401)
         dz = z[1] - z[0]
 
-        print('No surface boundary condition, instantaneous pulse')
-        print('time   total')
+        print("No surface boundary condition, instantaneous pulse")
+        print("time   total")
         t = 0
         T = medium.continuous(z, t) * 1e6
         total = T.sum() * dz * joules_per_calorie
@@ -217,7 +218,7 @@ class InstantVsPulsed(unittest.TestCase):
         tp = 0
         t = 0.5
         z = 0.001
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         medium = grheat.Absorber(mua, tp)
         T1 = radiant_exposure * medium.instantaneous(z, t)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
@@ -230,7 +231,7 @@ class InstantVsPulsed(unittest.TestCase):
         tp = 0
         t = 2
         z = 0.001
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         medium = grheat.Absorber(mua, tp)
         T1 = radiant_exposure * medium.instantaneous(z, t)
         T2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
@@ -242,7 +243,7 @@ class InstantVsPulsed(unittest.TestCase):
         t_pulse = 0.0001
         tp = 0
         t = np.linspace(0, 10)
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         medium = grheat.Absorber(mua, tp)
         T1 = radiant_exposure * medium.instantaneous(0, t)
         T2 = radiant_exposure * medium.pulsed(0, t, t_pulse)
@@ -259,7 +260,7 @@ class IntegratedPlane(unittest.TestCase):
         tp = 0
         t = 0.5
         z = 0.001
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         medium = grheat.Absorber(mua, tp)
         T1 = radiant_exposure * medium.instantaneous(z, t)
         zp_array = np.linspace(0, 20 * z, 1000)
@@ -269,8 +270,8 @@ class IntegratedPlane(unittest.TestCase):
             plane.zp = zp
             total += np.exp(-mua * zp) * plane.instantaneous(z, t)
         T2 = radiant_exposure * total * mua * (zp_array[1] - zp_array[0])
-#        print(T1 / T2)
-#        print(T2 / T1)
+        #        print(T1 / T2)
+        #        print(T2 / T1)
         self.assertAlmostEqual(T1, T2, delta=0.02)
 
     def test_02_pulsed(self):
@@ -279,7 +280,7 @@ class IntegratedPlane(unittest.TestCase):
         tpulse = 0.1
         t = 0.2
         z = 0.001
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         medium = grheat.Absorber(mua)
         T1 = radiant_exposure * medium.pulsed(z, t, tpulse)
         zp_array = np.linspace(0, 20 * z, 1000)
@@ -289,8 +290,8 @@ class IntegratedPlane(unittest.TestCase):
             plane.zp = zp
             total += np.exp(-mua * zp) * plane.pulsed(z, t, tpulse)
         T2 = radiant_exposure * total * mua * (zp_array[1] - zp_array[0])
-#        print(T1 / T2)
-#        print(T2 / T1)
+        #        print(T1 / T2)
+        #        print(T2 / T1)
         self.assertAlmostEqual(T1, T2, delta=0.02)
 
 
@@ -300,7 +301,7 @@ class ConstantBoundary(unittest.TestCase):
     def test_01_zero(self):
         """Surface temperature should be zero."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary='zero')
+        medium = grheat.Absorber(mua, boundary="zero")
         t_pulse = 1
         t = 2
         T = medium.pulsed(0, t, t_pulse)
@@ -309,7 +310,7 @@ class ConstantBoundary(unittest.TestCase):
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary='zero')
+        medium = grheat.Absorber(mua, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
         T = medium.pulsed(0, t, t_pulse)
@@ -323,7 +324,7 @@ class AdiabaticBoundary(unittest.TestCase):
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary='adiabatic')
+        medium = grheat.Absorber(mua, boundary="adiabatic")
         t_pulse = 1
         t = 2
         T1 = medium.pulsed(+0.0001, t, t_pulse)
@@ -333,7 +334,7 @@ class AdiabaticBoundary(unittest.TestCase):
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary='adiabatic')
+        medium = grheat.Absorber(mua, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
         T1 = medium.pulsed(+0.0001, t, t_pulse)
@@ -344,7 +345,7 @@ class AdiabaticBoundary(unittest.TestCase):
     def test_03_adiabatic(self):
         """Total Temperature should be equal to 1."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a, boundary='adiabatic')
+        medium = grheat.Absorber(mu_a, boundary="adiabatic")
         z = np.linspace(0, 0.010, 5001)
         dz = z[1] - z[0]
 
@@ -369,5 +370,5 @@ class AdiabaticBoundary(unittest.TestCase):
         self.assertAlmostEqual(1, total, delta=0.01)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

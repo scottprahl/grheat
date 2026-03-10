@@ -32,10 +32,11 @@ Jaeger's work.
 
 More documentation can be found at <https://grheat.readthedocs.io>
 """
+
 import scipy.special
 import numpy as np
 
-water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
+water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
@@ -52,11 +53,16 @@ class Point:
     adiabatic (for z=0), and zero (again for z=0).
     """
 
-    def __init__(self,
-                 xp, yp, zp, tp=0,
-                 diffusivity=water_thermal_diffusivity,
-                 capacity=water_heat_capacity,
-                 boundary='infinite'):
+    def __init__(
+        self,
+        xp,
+        yp,
+        zp,
+        tp=0,
+        diffusivity=water_thermal_diffusivity,
+        capacity=water_heat_capacity,
+        boundary="infinite",
+    ):
         """
         Initialize a Point object representing a point heat source in a medium.
 
@@ -87,19 +93,21 @@ class Point:
         self.diffusivity = diffusivity
         self.capacity = capacity
         self.boundary = boundary.lower()
-        if self.boundary not in ['infinite', 'adiabatic', 'zero']:
+        if self.boundary not in ["infinite", "adiabatic", "zero"]:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
         """Create string for object."""
-        return (f"Point Properties:\n"
-                f"xp: {self.xp} meters\n"
-                f"yp: {self.yp} meters\n"
-                f"zp: {self.zp} meters\n"
-                f"tp: {self.tp} seconds\n"
-                f"diffusivity: {self.diffusivity} m^2/s\n"
-                f"capacity: {self.capacity} J/degree/m^3\n"
-                f"boundary: {self.boundary}\n")
+        return (
+            f"Point Properties:\n"
+            f"xp: {self.xp} meters\n"
+            f"yp: {self.yp} meters\n"
+            f"zp: {self.zp} meters\n"
+            f"tp: {self.tp} seconds\n"
+            f"diffusivity: {self.diffusivity} m^2/s\n"
+            f"capacity: {self.capacity} J/degree/m^3\n"
+            f"boundary: {self.boundary}\n"
+        )
 
     def _instantaneous(self, x, y, z, t, tp):
         """
@@ -119,23 +127,23 @@ class Point:
         Returns:
             array: Normalized temperature rise at the specified location(s) and time.
         """
-        r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
+        r = np.sqrt((x - self.xp) ** 2 + (y - self.yp) ** 2 + (z - self.zp) ** 2)
         if t <= tp:
             return r * 0
 
         dt = self.diffusivity * (t - tp)
-        factor = self.capacity * 8 * (np.pi * dt)**1.5
-        T = 1 / factor * np.exp(-r**2 / (4 * dt))
+        factor = self.capacity * 8 * (np.pi * dt) ** 1.5
+        T = 1 / factor * np.exp(-(r**2) / (4 * dt))
 
-        if self.boundary != 'infinite':
-            r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z + self.zp)**2)
-            factor = self.capacity * 8 * (np.pi * dt)**1.5
-            T1 = 1 / factor * np.exp(-r**2 / (4 * dt))
+        if self.boundary != "infinite":
+            r = np.sqrt((x - self.xp) ** 2 + (y - self.yp) ** 2 + (z + self.zp) ** 2)
+            factor = self.capacity * 8 * (np.pi * dt) ** 1.5
+            T1 = 1 / factor * np.exp(-(r**2) / (4 * dt))
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -185,7 +193,7 @@ class Point:
             plt.show()
         """
         if np.isscalar(t):
-            T = 0.0                # return a scalar
+            T = 0.0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._instantaneous(x, y, z, t, self.tp)
             else:
@@ -204,7 +212,7 @@ class Point:
 
     def distance(self, x, y, z):
         """Calculate distance to the source --- avoid returning zero."""
-        r = np.sqrt((x - self.xp)**2 + (y - self.yp)**2 + (z - self.zp)**2)
+        r = np.sqrt((x - self.xp) ** 2 + (y - self.yp) ** 2 + (z - self.zp) ** 2)
         rr = np.asarray(r)
         rr[rr == 0] = 1e-6  # 1 micron
         if rr.shape == ():
@@ -233,15 +241,15 @@ class Point:
         factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
         T = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 
-        if self.boundary != 'infinite':
+        if self.boundary != "infinite":
             r = self.distance(x, y, -z)
             factor = 1 / self.capacity / (4 * np.pi * self.diffusivity * r)
             T1 = factor * scipy.special.erfc(r / np.sqrt(4 * self.diffusivity * t))
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -289,7 +297,7 @@ class Point:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0.0                # return a scalar
+            T = 0.0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._continuous(x, y, z, t - self.tp)
             else:

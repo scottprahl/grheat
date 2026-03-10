@@ -67,7 +67,7 @@ class InstantVsPulsed(unittest.TestCase):
         tp = 0
         t_pulse = 0.00001
         t = 1
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         plane = grheat.Plane(zp, tp)
         T1 = radiant_exposure * plane.instantaneous(0, t)
         T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
@@ -79,7 +79,7 @@ class InstantVsPulsed(unittest.TestCase):
         t_pulse = 0.00001
         tp = 0
         t = np.linspace(0, 10)
-        radiant_exposure = 1e6    # 1 J/mm² in J/m²
+        radiant_exposure = 1e6  # 1 J/mm² in J/m²
         plane = grheat.Plane(zp, tp)
         T1 = radiant_exposure * plane.instantaneous(0, t)
         T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
@@ -91,8 +91,8 @@ class ConstantBoundary(unittest.TestCase):
 
     def test_01_zero(self):
         """Surface temperature should be zero."""
-        zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='zero')
+        zp = 0.001  # meters
+        plane = grheat.Plane(zp, boundary="zero")
         t_pulse = 1
         t = 2
         T = plane.pulsed(0, t, t_pulse)
@@ -100,8 +100,8 @@ class ConstantBoundary(unittest.TestCase):
 
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
-        zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='zero')
+        zp = 0.001  # meters
+        plane = grheat.Plane(zp, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
         T = plane.pulsed(0, t, t_pulse)
@@ -113,8 +113,8 @@ class AdiabaticBoundary(unittest.TestCase):
 
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
-        zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='adiabatic')
+        zp = 0.001  # meters
+        plane = grheat.Plane(zp, boundary="adiabatic")
         t_pulse = 1
         t = 2
         T1 = plane.pulsed(+0.0001, t, t_pulse)
@@ -123,8 +123,8 @@ class AdiabaticBoundary(unittest.TestCase):
 
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
-        zp = 0.001                          # meters
-        plane = grheat.Plane(zp, boundary='adiabatic')
+        zp = 0.001  # meters
+        plane = grheat.Plane(zp, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
         T1 = plane.pulsed(+0.0001, t, t_pulse)
@@ -133,5 +133,5 @@ class AdiabaticBoundary(unittest.TestCase):
         self.assertAlmostEqual(T1[13], T2[13], delta=1e-8)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

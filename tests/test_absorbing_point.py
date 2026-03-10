@@ -8,6 +8,7 @@
 import unittest
 import numpy as np
 import grheat
+
 joules_per_calorie = 4.184
 
 
@@ -15,12 +16,7 @@ class TestAbsorbingPointInstant(unittest.TestCase):
 
     def setUp(self):
         # Create an AbsorbingPoints instance to use in tests
-        self.source = grheat.AbsorbingPoint(
-            mu_a=1 * 1000,
-            xp=0, yp=0,
-            boundary='infinite',
-            n_quad=100
-        )
+        self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_instantaneous_scalar(self):
         x, y, z, t = 0.0001, 0, 0, 1
@@ -41,12 +37,7 @@ class TestAbsorbingPointContinuous(unittest.TestCase):
 
     def setUp(self):
         # Create an AbsorbingPoints instance to use in tests
-        self.source = grheat.AbsorbingPoint(
-            mu_a=1 * 1000,
-            xp=0, yp=0,
-            boundary='infinite',
-            n_quad=100
-        )
+        self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_continuous_scalar(self):
         x, y, z, t = 0.0001, 0, 0, 3
@@ -67,12 +58,7 @@ class TestAbsorbingPointPulsed(unittest.TestCase):
 
     def setUp(self):
         # Create an AbsorbingPoints instance to use in tests
-        self.source = grheat.AbsorbingPoint(
-            mu_a=1 * 1000,
-            xp=0, yp=0,
-            boundary='infinite',
-            n_quad=100
-        )
+        self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_pulsed_scalar(self):
         x, y, z, t, t_pulse = 0.0001, 0, 0, 1, 0.5
@@ -89,5 +75,5 @@ class TestAbsorbingPointPulsed(unittest.TestCase):
         np.testing.assert_allclose(temperature, expected_temperature, rtol=1e-5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

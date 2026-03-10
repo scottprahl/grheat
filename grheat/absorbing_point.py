@@ -41,20 +41,23 @@ More documentation at <https://grheat.readthedocs.io>
 import numpy as np
 import grheat
 
-water_heat_capacity = 4.184 * 1e6           # J/(m³ °C)
+water_heat_capacity = 4.184 * 1e6  # J/(m³ °C)
 water_thermal_diffusivity = 0.14558 * 1e-6  # m²/s
 
 
 class AbsorbingPoint:
     """Green's function heat transfer solutions for point source in infinite media."""
 
-    def __init__(self,
-                 mu_a,
-                 xp, yp,
-                 diffusivity=water_thermal_diffusivity,
-                 capacity=water_heat_capacity,
-                 boundary='infinite',
-                 n_quad=100):
+    def __init__(
+        self,
+        mu_a,
+        xp,
+        yp,
+        diffusivity=water_thermal_diffusivity,
+        capacity=water_heat_capacity,
+        boundary="infinite",
+        n_quad=100,
+    ):
         """
         Initialize AbsorbingPoint object.
 

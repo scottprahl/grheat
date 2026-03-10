@@ -40,12 +40,12 @@ Example Usage
     T = medium.continuous(z, t)
 """
 
-__version__ = '0.2.1'
-__author__ = 'Scott Prahl'
-__email__ = 'scott.prahl@oit.edu'
-__copyright__ = '2022-23, Scott Prahl'
-__license__ = 'MIT'
-__url__ = 'https://github.com/scottprahl/grheat'
+__version__ = "0.2.1"
+__author__ = "Scott Prahl"
+__email__ = "scott.prahl@oit.edu"
+__copyright__ = "2022-23, Scott Prahl"
+__license__ = "MIT"
+__url__ = "https://github.com/scottprahl/grheat"
 
 from .point_source import *
 from .line_source import *

@@ -33,8 +33,8 @@ More documentation can be found at <https://grheat.readthedocs.io>
 import scipy.special
 import numpy as np
 
-water_heat_capacity = 4.186 * 1e6           # J/degree / m**3
-water_thermal_diffusivity = 0.145 * 1e-6    # m**2/s
+water_heat_capacity = 4.186 * 1e6  # J/degree / m**3
+water_thermal_diffusivity = 0.145 * 1e-6  # m**2/s
 
 
 class Absorber:
@@ -53,7 +53,7 @@ class Absorber:
         - 'zero': Boundary is fixed at T=0.
 
     Attributes:
-    ----------
+    -----------
         mu_a (scalar): Exponential attenuation coefficient [1/meters].
         tp (scalar): Time of source impulse [seconds].
         diffusivity (scalar): Thermal diffusivity [m**2/s].
@@ -61,12 +61,14 @@ class Absorber:
         boundary (str): Boundary condition at z=0 ('infinite', 'adiabatic', or 'zero').
     """
 
-    def __init__(self,
-                 mu_a,
-                 tp=0,
-                 diffusivity=water_thermal_diffusivity,
-                 capacity=water_heat_capacity,
-                 boundary='infinite'):
+    def __init__(
+        self,
+        mu_a,
+        tp=0,
+        diffusivity=water_thermal_diffusivity,
+        capacity=water_heat_capacity,
+        boundary="infinite",
+    ):
         """
         Initialize an exponential heating object.
 
@@ -86,22 +88,24 @@ class Absorber:
             ValueError: If the specified boundary condition is not one of the
                 recognized types ('infinite', 'adiabatic', 'zero').
         """
-        self.mu_a = mu_a                   # 1/meter
-        self.tp = tp                       # seconds
-        self.diffusivity = diffusivity     # m**2/s
-        self.capacity = capacity           # J/degree/m**3
-        self.boundary = boundary.lower()   # infinite, adiabatic, zero
-        if self.boundary not in ['infinite', 'adiabatic', 'zero']:
+        self.mu_a = mu_a  # 1/meter
+        self.tp = tp  # seconds
+        self.diffusivity = diffusivity  # m**2/s
+        self.capacity = capacity  # J/degree/m**3
+        self.boundary = boundary.lower()  # infinite, adiabatic, zero
+        if self.boundary not in ["infinite", "adiabatic", "zero"]:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
         """Create string for object."""
-        return (f"Absorber Properties:\n"
-                f"mu_a: {self.mu_a} 1/meters\n"
-                f"tp: {self.tp} seconds\n"
-                f"diffusivity: {self.diffusivity} m^2/s\n"
-                f"capacity: {self.capacity} J/degree/m^3\n"
-                f"boundary: {self.boundary}\n")
+        return (
+            f"Absorber Properties:\n"
+            f"mu_a: {self.mu_a} 1/meters\n"
+            f"tp: {self.tp} seconds\n"
+            f"diffusivity: {self.diffusivity} m^2/s\n"
+            f"capacity: {self.capacity} J/degree/m^3\n"
+            f"boundary: {self.boundary}\n"
+        )
 
     def _instantaneous_scalar_no_bndry(self, z, t, tp):
         """
@@ -138,7 +142,7 @@ class Absorber:
 
         # stable calculations require erfcx() for positive arg
         if arg >= 0:
-            T = 0.5 * scale * np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T = 0.5 * scale * np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T = 0.5 * scale * np.exp(tau - zeta) * scipy.special.erfc(arg)
         return T
@@ -160,14 +164,14 @@ class Absorber:
         """
         T = self._instantaneous_scalar_no_bndry(z, t, tp)
 
-        if self.boundary != 'infinite':
+        if self.boundary != "infinite":
             T1 = self._instantaneous_scalar_no_bndry(-z, t, tp)
 
-            if t > 0:   # only use method of images after pulse
-                if self.boundary == 'adiabatic':
+            if t > 0:  # only use method of images after pulse
+                if self.boundary == "adiabatic":
                     T += T1
 
-                if self.boundary == 'zero':
+                if self.boundary == "zero":
                     T -= T1
 
         return T
@@ -240,7 +244,7 @@ class Absorber:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._instantaneous(z, t, self.tp)
             else:
@@ -275,13 +279,13 @@ class Absorber:
         # stable calculations require erfcx() for positive arg
         arg = sqrt_tau - zz
         if arg >= 0:
-            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T += np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T += np.exp(tau - zeta) * scipy.special.erfc(arg)
 
         arg = sqrt_tau + zz
         if arg >= 0:
-            T -= np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T -= np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T -= np.exp(tau + zeta) * scipy.special.erfc(arg)
 
@@ -300,20 +304,20 @@ class Absorber:
         sqrt_tau = np.sqrt(tau)
         zz = zeta / 2 / sqrt_tau
 
-        T = 4 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+        T = 4 * np.sqrt(tau / np.pi) * np.exp(-(zz**2))
         T -= 2 * zeta * scipy.special.erfc(zz)
         T -= 2 * np.exp(-zeta)
 
         # stable calculations require erfcx() for positive arg
         arg = sqrt_tau - zz
         if arg >= 0:
-            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T += np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T += np.exp(tau - zeta) * scipy.special.erfc(arg)
 
         arg = sqrt_tau + zz
         if arg >= 0:
-            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T += np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T += np.exp(tau + zeta) * scipy.special.erfc(arg)
 
@@ -332,11 +336,11 @@ class Absorber:
         sqrt_tau = np.sqrt(tau)
         zz = zeta / 2 / sqrt_tau
 
-        T = 2 * np.sqrt(tau / np.pi) * np.exp(-zz**2)
+        T = 2 * np.sqrt(tau / np.pi) * np.exp(-(zz**2))
 
         arg = sqrt_tau - zz
         if arg >= 0:
-            T += np.exp(-zz**2) * scipy.special.erfcx(arg)
+            T += np.exp(-(zz**2)) * scipy.special.erfcx(arg)
         else:
             T += np.exp(tau - zeta) * scipy.special.erfc(arg)
 
@@ -351,10 +355,10 @@ class Absorber:
 
     def _continuous_scalar(self, z, t):
         """Calculate temperature rise due to a continuous 1 W/m² surface exposure."""
-        if self.boundary == 'adiabatic':
+        if self.boundary == "adiabatic":
             return self._continuous_scalar_adiabatic(z, t)
 
-        if self.boundary == 'zero':
+        if self.boundary == "zero":
             return self._continuous_scalar_zero(z, t)
 
         return self._continuous_scalar_infinite(z, t)
@@ -429,7 +433,7 @@ class Absorber:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._continuous(z, t - self.tp)
             else:

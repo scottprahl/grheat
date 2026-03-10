@@ -35,11 +35,12 @@ Jaeger's work.
 More documentation at <https://grheat.readthedocs.io>
 
 """
+
 import scipy.special
 import numpy as np
 
 # Constants for water properties
-water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
+water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
@@ -65,12 +66,15 @@ class Line:
 
     """
 
-    def __init__(self,
-                 yp, zp,
-                 tp=0,
-                 diffusivity=water_thermal_diffusivity,
-                 capacity=water_heat_capacity,
-                 boundary='infinite'):
+    def __init__(
+        self,
+        yp,
+        zp,
+        tp=0,
+        diffusivity=water_thermal_diffusivity,
+        capacity=water_heat_capacity,
+        boundary="infinite",
+    ):
         """
         Initialize a Line object representing a line source in a medium.
 
@@ -101,22 +105,24 @@ class Line:
         self.yp = yp
         self.zp = zp
         self.tp = tp
-        self.diffusivity = diffusivity     # m^2/s
-        self.capacity = capacity           # J/degree/m^3
-        self.boundary = boundary.lower()   # infinite, adiabatic, zero
+        self.diffusivity = diffusivity  # m^2/s
+        self.capacity = capacity  # J/degree/m^3
+        self.boundary = boundary.lower()  # infinite, adiabatic, zero
 
-        if self.boundary not in ['infinite', 'adiabatic', 'zero']:
+        if self.boundary not in ["infinite", "adiabatic", "zero"]:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
         """Create string for object."""
-        return (f"Line Properties:\n"
-                f"yp: {self.yp} meters\n"
-                f"zp: {self.zp} meters\n"
-                f"tp: {self.tp} seconds\n"
-                f"diffusivity: {self.diffusivity} m^2/s\n"
-                f"capacity: {self.capacity} J/degree/m^3\n"
-                f"boundary: {self.boundary}\n")
+        return (
+            f"Line Properties:\n"
+            f"yp: {self.yp} meters\n"
+            f"zp: {self.zp} meters\n"
+            f"tp: {self.tp} seconds\n"
+            f"diffusivity: {self.diffusivity} m^2/s\n"
+            f"capacity: {self.capacity} J/degree/m^3\n"
+            f"boundary: {self.boundary}\n"
+        )
 
     def _instantaneous(self, y, z, t, tp):
         """
@@ -140,7 +146,7 @@ class Line:
         Returns:
             scalar: Normalized temperature rise.
         """
-        r2 = (y - self.yp)**2 + (z - self.zp)**2
+        r2 = (y - self.yp) ** 2 + (z - self.zp) ** 2
 
         if t <= tp:
             return 0 * r2
@@ -148,14 +154,14 @@ class Line:
         factor = self.capacity * 4 * np.pi * self.diffusivity * (t - tp)
         T = 1 / factor * np.exp(-r2 / (4 * self.diffusivity * (t - tp)))
 
-        if self.boundary != 'infinite':
-            r2 = (y - self.yp)**2 + (z + self.zp)**2
+        if self.boundary != "infinite":
+            r2 = (y - self.yp) ** 2 + (z + self.zp) ** 2
             T1 = 1 / factor * np.exp(-r2 / (4 * self.diffusivity * (t - tp)))
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -200,7 +206,7 @@ class Line:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._instantaneous(y, z, t, self.tp)
             else:
@@ -231,7 +237,7 @@ class Line:
         Returns:
             Temperature Increase [°C]
         """
-        r2 = (y - self.yp)**2 + (z - self.zp)**2
+        r2 = (y - self.yp) ** 2 + (z - self.zp) ** 2
 
         if t <= 0:
             return 0 * r2
@@ -239,14 +245,14 @@ class Line:
         factor = -self.capacity * 4 * np.pi * self.diffusivity
         T = 1 / factor * scipy.special.expi(-r2 / (4 * self.diffusivity * t))
 
-        if self.boundary != 'infinite':
-            r2 = (y - self.yp)**2 + (z + self.zp)**2
+        if self.boundary != "infinite":
+            r2 = (y - self.yp) ** 2 + (z + self.zp) ** 2
             T1 = 1 / factor * scipy.special.expi(-r2 / (4 * self.diffusivity * t))
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -292,7 +298,7 @@ class Line:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._continuous(y, z, t - self.tp)
             else:

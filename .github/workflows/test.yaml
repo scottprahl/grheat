@@ -1,39 +1,49 @@
+# yamllint disable rule:truthy
 ---
-name: test
+name: CI
 
-on:    # yamllint disable-line rule:truthy
+on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:  # allow manual triggering
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    name: Build and test
+  tests:
+    name: Python ${{ matrix.python-version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.7', '3.12']
+        os: [ubuntu-latest]
+        python-version: ["3.10", "3.14"]
 
     steps:
-      - name: Checkout code
+      - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
 
-      - name: Install package and dependencies
+      - name: Install package (+tests)
         run: |
-          pip install -r requirements.txt
-          pip install -e .  # current package in editable mode
+          python -m pip install --upgrade pip setuptools
+          python -m pip install -e .
+          python -m pip install pytest
 
-      - name: Test with pytest
+      - name: Run pytest
         run: |
-          pytest tests/test_absorber.py
-          pytest tests/test_point.py
-          pytest tests/test_plane.py
-          pytest tests/test_line.py
+          python -m pytest tests \
+            --ignore=tests/test_all_notebooks.py \
+            --ignore=tests/test_absorbing_point.py

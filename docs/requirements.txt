@@ -1,8 +1,0 @@
-.
-matplotlib
-numpy
-pytest
-scipy
-nbsphinx
-sphinx-automodapi
-sphinx-rtd-theme

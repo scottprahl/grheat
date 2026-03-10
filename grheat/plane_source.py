@@ -34,7 +34,7 @@ More documentation at <https://grheat.readthedocs.io>
 import scipy.special
 import numpy as np
 
-water_heat_capacity = 4.184 * 1e6           # J/degree / m**3
+water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
 water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
 
 
@@ -59,11 +59,14 @@ class Plane:
         boundary (str): Boundary condition, one of 'infinite', 'adiabatic', or 'zero'.
     """
 
-    def __init__(self,
-                 zp, tp=0,
-                 diffusivity=water_thermal_diffusivity,
-                 capacity=water_heat_capacity,
-                 boundary='infinite'):
+    def __init__(
+        self,
+        zp,
+        tp=0,
+        diffusivity=water_thermal_diffusivity,
+        capacity=water_heat_capacity,
+        boundary="infinite",
+    ):
         """
         Initialize a Plane object for a planar heat source in an semi-infinite medium.
 
@@ -88,20 +91,22 @@ class Plane:
         self.zp = zp
 
         self.tp = tp
-        self.diffusivity = diffusivity     # m**2/s
-        self.capacity = capacity           # J/degree/kg
+        self.diffusivity = diffusivity  # m**2/s
+        self.capacity = capacity  # J/degree/kg
         self.boundary = boundary.lower()
-        if self.boundary not in ['infinite', 'adiabatic', 'zero']:
+        if self.boundary not in ["infinite", "adiabatic", "zero"]:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
         """Create string for object."""
-        return (f"Plane Properties:\n"
-                f"zp: {self.zp} meters\n"
-                f"tp: {self.tp} seconds\n"
-                f"diffusivity: {self.diffusivity} m^2/s\n"
-                f"capacity: {self.capacity} J/degree/m^3\n"
-                f"boundary: {self.boundary}\n")
+        return (
+            f"Plane Properties:\n"
+            f"zp: {self.zp} meters\n"
+            f"tp: {self.tp} seconds\n"
+            f"diffusivity: {self.diffusivity} m^2/s\n"
+            f"capacity: {self.capacity} J/degree/m^3\n"
+            f"boundary: {self.boundary}\n"
+        )
 
     def _instantaneous(self, z, t, tp):
         """
@@ -124,21 +129,21 @@ class Plane:
         Returns:
             scalar or array: Temperature increase in °C at the specified depth(s) and time.
         """
-        z2 = (z - self.zp)**2
+        z2 = (z - self.zp) ** 2
         if t <= tp:
             return 0 * z2
 
         factor = self.capacity * 2 * np.sqrt(np.pi * self.diffusivity * (t - tp))
         T = 1 / factor * np.exp(-z2 / (4 * self.diffusivity * (t - tp)))
 
-        if self.boundary != 'infinite':
-            z2 = (z + self.zp)**2
+        if self.boundary != "infinite":
+            z2 = (z + self.zp) ** 2
             T1 = 1 / factor * np.exp(-z2 / (4 * self.diffusivity * (t - tp)))
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -189,7 +194,7 @@ class Plane:
 
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._instantaneous(z, t, self.tp)
             else:
@@ -228,18 +233,18 @@ class Plane:
             return 0 * dz
 
         alpha = np.sqrt(dz**2 / (4 * self.diffusivity * t))
-        T = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
+        T = np.exp(-(alpha**2)) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
         T *= np.sqrt(t / self.diffusivity) / self.capacity
 
-        if self.boundary != 'infinite':
-            alpha = np.sqrt((z + self.zp)**2 / (4 * self.diffusivity * t))
-            T1 = np.exp(-alpha**2) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
+        if self.boundary != "infinite":
+            alpha = np.sqrt((z + self.zp) ** 2 / (4 * self.diffusivity * t))
+            T1 = np.exp(-(alpha**2)) / np.sqrt(np.pi) - alpha * scipy.special.erfc(alpha)
             T1 *= np.sqrt(t / self.diffusivity) / self.capacity
 
-            if self.boundary == 'adiabatic':
+            if self.boundary == "adiabatic":
                 T += T1
 
-            if self.boundary == 'zero':
+            if self.boundary == "zero":
                 T -= T1
 
         return T
@@ -283,7 +288,7 @@ class Plane:
                 plt.show()
         """
         if np.isscalar(t):
-            T = 0                # return a scalar
+            T = 0  # return a scalar
             if np.isscalar(self.tp):
                 T += self._continuous(z, t - self.tp)
             else:

@@ -14,21 +14,21 @@ import grheat
 class InstantaneousLine(unittest.TestCase):
 
     def test_01_scalar(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t = 1
         T = line.instantaneous(0, 0, t)
 
     def test_02_time_array(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t = np.linspace(0, 10)
         T = line.instantaneous(0, 0, t)
 
     def test_03_surface(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t = 1
@@ -39,19 +39,19 @@ class InstantaneousLine(unittest.TestCase):
 class ContinuousLine(unittest.TestCase):
 
     def test_01_scalar(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t = 1
         T = line.continuous(0, 0, t)
 
     def test_02_time_array(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t = np.linspace(0, 10)
         T = line.continuous(0, 0, t)
 
     def test_03_surface(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         tp = 0
         t = 1
@@ -62,21 +62,21 @@ class ContinuousLine(unittest.TestCase):
 class PulsedLine(unittest.TestCase):
 
     def test_01_scalar(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5
         t = 1
         T = line.pulsed(0, 0, t, t_pulse)
 
     def test_02_time_array(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5
         t = np.linspace(0, 10)
         T = line.pulsed(0, 0, t, t_pulse)
 
     def test_03_surface(self):
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5
         t = 1
@@ -88,7 +88,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t_pulse = 0.00001
@@ -99,7 +99,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source."""
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t_pulse = 0.00001
@@ -111,7 +111,7 @@ class InstantVsPulsed(unittest.TestCase):
 
     def test_03_instant(self):
         """Short pulse result should be same as instantaneous source."""
-        yp, zp = 0, 0.001         # meters
+        yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
         t_pulse = 0.00001
@@ -128,8 +128,8 @@ class ConstantBoundary(unittest.TestCase):
 
     def test_01_zero(self):
         """Surface temperature should be zero."""
-        yp, zp = 0.0001, 0.0001     # meters
-        line = grheat.Line(yp, zp, boundary='zero')
+        yp, zp = 0.0001, 0.0001  # meters
+        line = grheat.Line(yp, zp, boundary="zero")
         t_pulse = 1
         t = 2
         T = line.pulsed(0.0001, 0, t, t_pulse)
@@ -137,8 +137,8 @@ class ConstantBoundary(unittest.TestCase):
 
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
-        yp, zp = 0.0001, 0.0001     # meters
-        line = grheat.Line(yp, zp, boundary='zero')
+        yp, zp = 0.0001, 0.0001  # meters
+        line = grheat.Line(yp, zp, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
         T = line.pulsed(0.0001, 0, t, t_pulse)
@@ -150,8 +150,8 @@ class AdiabaticBoundary(unittest.TestCase):
 
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
-        yp, zp = 0.0001, 0.0001     # meters
-        line = grheat.Line(yp, zp, boundary='adiabatic')
+        yp, zp = 0.0001, 0.0001  # meters
+        line = grheat.Line(yp, zp, boundary="adiabatic")
         t_pulse = 1
         t = 2
         T1 = line.pulsed(0, +0.0001, t, t_pulse)
@@ -160,8 +160,8 @@ class AdiabaticBoundary(unittest.TestCase):
 
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
-        yp, zp = 0.0001, 0.0001     # meters
-        line = grheat.Line(yp, zp, boundary='adiabatic')
+        yp, zp = 0.0001, 0.0001  # meters
+        line = grheat.Line(yp, zp, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
         T1 = line.pulsed(0, +0.0001, t, t_pulse)
@@ -170,5 +170,5 @@ class AdiabaticBoundary(unittest.TestCase):
         self.assertAlmostEqual(T1[13], T2[13], delta=1e-8)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
