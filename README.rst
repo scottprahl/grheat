@@ -229,8 +229,8 @@ References
 
 The implementations are based on standard heat-conduction results, especially:
 
-- H. S. Carslaw and J. C. Jaeger, *Conduction of Heat in Solids*
-- Scott A. Prahl, "Charts to rapidly estimate temperature following laser irradiation,"
+- Carslaw, H. S., and Jaeger, J. C., *Conduction of Heat in Solids*
+- Prahl, Scott A., "Charts to rapidly estimate temperature following laser irradiation,"
   Proc. SPIE 2391 (1995)
 
 

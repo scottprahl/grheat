@@ -29,8 +29,8 @@ PYTEST_OPTS     :=
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
 PYLINT_TARGETS  := $(PACKAGE)/*.py tests/*.py .github/scripts/update_citation.py docs/conf.py
 YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml .readthedocs.yaml
-RST_TARGETS     := README.rst CHANGELOG.rst $(DOCS_DIR)/*.rst
 RST_API_TARGETS := $(DOCS_DIR)/absorber.rst $(DOCS_DIR)/line.rst $(DOCS_DIR)/plane.rst $(DOCS_DIR)/point.rst
+RST_TARGETS     := README.rst CHANGELOG.rst $(RST_DOC_TARGETS)
 
 .PHONY: help
 help:
