@@ -6,13 +6,13 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=line-too-long
 
-import unittest
 import numpy as np
+import pytest
+
 import grheat
 
 
-class InstantaneousPoint(unittest.TestCase):
-
+class TestInstantaneousPoint:
     def test_01_scalar(self):
         """
         Test if the method `instantaneous` can handle scalar input and
@@ -22,7 +22,7 @@ class InstantaneousPoint(unittest.TestCase):
         tp = 0
         point = grheat.Point(xp, yp, zp, tp)
         t = 1
-        T = point.instantaneous(0, 0, 0, t)
+        point.instantaneous(0, 0, 0, t)
 
     def test_02_time_array(self):
         """
@@ -33,7 +33,7 @@ class InstantaneousPoint(unittest.TestCase):
         tp = 0
         point = grheat.Point(xp, yp, zp, tp)
         t = np.linspace(0, 10)
-        T = point.instantaneous(0, 0, 0, t)
+        point.instantaneous(0, 0, 0, t)
 
     def test_03_surface(self):
         """
@@ -44,14 +44,14 @@ class InstantaneousPoint(unittest.TestCase):
         tp = 0
         point = grheat.Point(xp, yp, zp, tp)
         t = 1
-        X, Y = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
-        T = point.instantaneous(X, Y, 0, t)
+        xx, yy = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
+        point.instantaneous(xx, yy, 0, t)
 
     def test_invalid_boundary_01(self):
         """
         Test if passing an invalid boundary value 'bad_value' raises a ValueError.
         """
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             grheat.Point(0, 0, 0.001, boundary="bad_value")
 
     def test_04_surface(self):
@@ -64,13 +64,12 @@ class InstantaneousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = np.linspace(0, 0.002, 101)  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, tp, boundary="zero")
-        T = point.instantaneous(x, y, z, t)
-        self.assertIsInstance(T, np.ndarray)  # is an array
-        self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
-        self.assertEqual(T.shape, z.shape)  # same shape
+        temperature = point.instantaneous(x, y, z, t)
+        assert isinstance(temperature, np.ndarray)
+        assert np.all(np.equal(temperature, 0))
+        assert temperature.shape == z.shape
 
     def test_05_surface(self):
         """
@@ -82,13 +81,12 @@ class InstantaneousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = np.linspace(0, 0.002, 101)  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, tp, boundary="zero")
-        T = point.instantaneous(x, y, z, t)
-        self.assertIsInstance(T, np.ndarray)  # is an array
-        self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
-        self.assertEqual(T.shape, z.shape)  # same shape
+        temperature = point.instantaneous(x, y, z, t)
+        assert isinstance(temperature, np.ndarray)
+        assert np.all(np.equal(temperature, 0))
+        assert temperature.shape == z.shape
 
     def test_06_surface(self):
         """
@@ -100,15 +98,13 @@ class InstantaneousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = 0.001  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, tp)
-        T = point.instantaneous(x, y, z, t)
-        self.assertEqual(T, 0)
+        temperature = point.instantaneous(x, y, z, t)
+        assert temperature == 0
 
 
-class ContinuousPoint(unittest.TestCase):
-
+class TestContinuousPoint:
     def test_01_scalar(self):
         """
         Test if the method `continuous` can handle scalar input and
@@ -117,7 +113,7 @@ class ContinuousPoint(unittest.TestCase):
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp)
         t = 1
-        T = point.continuous(0, 0, 0, t)
+        point.continuous(0, 0, 0, t)
 
     def test_02_time_array(self):
         """
@@ -127,7 +123,7 @@ class ContinuousPoint(unittest.TestCase):
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp)
         t = np.linspace(0, 10)
-        T = point.continuous(0, 0, 0, t)
+        point.continuous(0, 0, 0, t)
 
     def test_03_surface(self):
         """
@@ -136,10 +132,9 @@ class ContinuousPoint(unittest.TestCase):
         """
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp)
-        tp = 0
         t = 1
-        X, Y = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
-        T = point.continuous(X, Y, 0, t)
+        xx, yy = np.meshgrid(np.arange(-5, 5, 1), np.arange(-5, 5, 1))
+        point.continuous(xx, yy, 0, t)
 
     def test_04_scalar(self):
         """
@@ -147,17 +142,16 @@ class ContinuousPoint(unittest.TestCase):
         consistent with the averaged output of method `instantaneous`
         over a range of time points.
         """
-        N = 50
+        n_pulses = 50
         xp, yp, zp = 0, 0, 0.001  # meters
         t = 1
         point = grheat.Point(xp, yp, zp)
-        T1 = point.continuous(0, 0, 0, t)
+        temperature1 = point.continuous(0, 0, 0, t)
 
-        # create N pulses evenly spaced from 0 to t
-        point.tp = np.linspace(0, t, N)
-        T = point.instantaneous(0, 0, 0, t)
-        T2 = T.sum() / N
-        self.assertAlmostEqual(T1, T2, delta=0.01)
+        point.tp = np.linspace(0, t, n_pulses)
+        temperature = point.instantaneous(0, 0, 0, t)
+        temperature2 = temperature.sum() / n_pulses
+        assert temperature1 == pytest.approx(temperature2, abs=0.01)
 
     def test_05_surface(self):
         """
@@ -168,13 +162,12 @@ class ContinuousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = np.linspace(0, 0.002, 101)  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, boundary="zero")
-        T = point.continuous(x, y, z, t)
-        self.assertIsInstance(T, np.ndarray)  # is an array
-        self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
-        self.assertEqual(T.shape, z.shape)  # same shape
+        temperature = point.continuous(x, y, z, t)
+        assert isinstance(temperature, np.ndarray)
+        assert np.all(np.equal(temperature, 0))
+        assert temperature.shape == z.shape
 
     def test_06_surface(self):
         """
@@ -185,13 +178,12 @@ class ContinuousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = np.linspace(0, 0.002, 101)  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, boundary="zero")
-        T = point.continuous(x, y, z, t)
-        self.assertIsInstance(T, np.ndarray)  # is an array
-        self.assertTrue(np.all(np.equal(T, 0)))  # are all zeros
-        self.assertEqual(T.shape, z.shape)  # same shape
+        temperature = point.continuous(x, y, z, t)
+        assert isinstance(temperature, np.ndarray)
+        assert np.all(np.equal(temperature, 0))
+        assert temperature.shape == z.shape
 
     def test_07_surface(self):
         """
@@ -202,15 +194,13 @@ class ContinuousPoint(unittest.TestCase):
         x = 0  # m
         y = 0  # m
         z = 0.001  # m
-        zz = 1000 * z  # mm
 
         point = grheat.Point(xp, yp, zp, boundary="zero")
-        T = point.continuous(x, y, z, t)
-        self.assertEqual(T, 0)
+        temperature = point.continuous(x, y, z, t)
+        assert temperature == 0
 
 
-class PulsedPoint(unittest.TestCase):
-
+class TestPulsedPoint:
     def test_01_scalar(self):
         """
         Test if the method `pulsed` can handle scalar input and
@@ -221,7 +211,7 @@ class PulsedPoint(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.5
         t = 1
-        T = point.pulsed(0, 0, 0, t, t_pulse)
+        point.pulsed(0, 0, 0, t, t_pulse)
 
     def test_02_time_array(self):
         """
@@ -233,7 +223,7 @@ class PulsedPoint(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.5
         t = np.linspace(0, 10)
-        T = point.pulsed(0, 0, 0, t, t_pulse)
+        point.pulsed(0, 0, 0, t, t_pulse)
 
     def test_03_surface(self):
         """
@@ -245,21 +235,20 @@ class PulsedPoint(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.5
         t = 1
-        X, Y = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
-        T = point.pulsed(X, Y, 0, t, t_pulse)
+        xx, yy = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
+        point.pulsed(xx, yy, 0, t, t_pulse)
 
 
-class InstantVsPulsed(unittest.TestCase):
-
+class TestInstantVsPulsed:
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source for scalars."""
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
         t = 1
-        T1 = point.instantaneous(0, 0, 0, t)
-        T2 = point.pulsed(0, 0, 0, t, t_pulse)
-        self.assertAlmostEqual(T1, T2, delta=0.001)
+        t1 = point.instantaneous(0, 0, 0, t)
+        t2 = point.pulsed(0, 0, 0, t, t_pulse)
+        assert t1 == pytest.approx(t2, abs=0.001)
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source for arrays."""
@@ -267,10 +256,10 @@ class InstantVsPulsed(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
         t = np.linspace(0, 10)
-        T1 = point.instantaneous(0, 0, 0, t)
-        T2 = point.pulsed(0, 0, 0, t, t_pulse)
-        self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
-        self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
+        t1 = point.instantaneous(0, 0, 0, t)
+        t2 = point.pulsed(0, 0, 0, t, t_pulse)
+        assert t1[3] == pytest.approx(t2[3], abs=0.001)
+        assert t1[13] == pytest.approx(t2[13], abs=0.001)
 
     def test_03_instant(self):
         """Short pulse result should be same as instantaneous source for mesh."""
@@ -278,24 +267,23 @@ class InstantVsPulsed(unittest.TestCase):
         point = grheat.Point(xp, yp, zp)
         t_pulse = 0.00001
         t = 1
-        X, Y = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
+        xx, yy = np.meshgrid(np.arange(-0.005, 0.005, 0.001), np.arange(-0.005, 0.005, 0.001))
 
-        T1 = point.instantaneous(X, Y, 0, t)
-        T2 = point.pulsed(X, Y, 0, t, t_pulse)
-        self.assertAlmostEqual(T1[0, 3], T2[0, 3], delta=0.001)
-        self.assertAlmostEqual(T1[3, 1], T2[3, 1], delta=0.001)
+        t1 = point.instantaneous(xx, yy, 0, t)
+        t2 = point.pulsed(xx, yy, 0, t, t_pulse)
+        assert t1[0, 3] == pytest.approx(t2[0, 3], abs=0.001)
+        assert t1[3, 1] == pytest.approx(t2[3, 1], abs=0.001)
 
 
-class ConstantBoundary(unittest.TestCase):
-
+class TestConstantBoundary:
     def test_01_zero(self):
         """Surface temperature should be zero."""
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp, boundary="zero")
         t_pulse = 1
         t = 2
-        T = point.pulsed(0, 0, 0, t, t_pulse)
-        self.assertEqual(T, 0)
+        temperature = point.pulsed(0, 0, 0, t, t_pulse)
+        assert temperature == 0
 
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
@@ -303,9 +291,9 @@ class ConstantBoundary(unittest.TestCase):
         point = grheat.Point(xp, yp, zp, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
-        T = point.pulsed(0, 0, 0, t, t_pulse)
-        self.assertEqual(T[3], 0)
-        self.assertEqual(T[13], 0)
+        temperature = point.pulsed(0, 0, 0, t, t_pulse)
+        assert temperature[3] == 0
+        assert temperature[13] == 0
 
     def test_03_zero(self):
         """Surface temperature should be zero at all locations."""
@@ -313,23 +301,22 @@ class ConstantBoundary(unittest.TestCase):
         point = grheat.Point(xp, yp, zp, boundary="zero")
         t_pulse = 1
         t = 1.1
-        X, Y = np.meshgrid(np.arange(-0.0005, 0.0005, 0.0001), np.arange(-0.0005, 0.0005, 0.0001))
-        T = point.pulsed(X, Y, 0, t, t_pulse)
-        self.assertEqual(T[0, 3], 0)
-        self.assertEqual(T[3, 1], 0)
+        xx, yy = np.meshgrid(np.arange(-0.0005, 0.0005, 0.0001), np.arange(-0.0005, 0.0005, 0.0001))
+        temperature = point.pulsed(xx, yy, 0, t, t_pulse)
+        assert temperature[0, 3] == 0
+        assert temperature[3, 1] == 0
 
 
-class AdiabaticBoundary(unittest.TestCase):
-
+class TestAdiabaticBoundary:
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         xp, yp, zp = 0, 0, 0.001  # meters
         point = grheat.Point(xp, yp, zp, boundary="adiabatic")
         t_pulse = 1
         t = 2
-        T1 = point.pulsed(0, 0, +0.0001, t, t_pulse)
-        T2 = point.pulsed(0, 0, -0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1, T2, delta=1e-8)
+        t1 = point.pulsed(0, 0, +0.0001, t, t_pulse)
+        t2 = point.pulsed(0, 0, -0.0001, t, t_pulse)
+        assert t1 == pytest.approx(t2, abs=1e-8)
 
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
@@ -337,10 +324,10 @@ class AdiabaticBoundary(unittest.TestCase):
         point = grheat.Point(xp, yp, zp, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
-        T1 = point.pulsed(0, 0, +0.0001, t, t_pulse)
-        T2 = point.pulsed(0, 0, -0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1[3], T2[3], delta=1e-8)
-        self.assertAlmostEqual(T1[13], T2[13], delta=1e-8)
+        t1 = point.pulsed(0, 0, +0.0001, t, t_pulse)
+        t2 = point.pulsed(0, 0, -0.0001, t, t_pulse)
+        assert t1[3] == pytest.approx(t2[3], abs=1e-8)
+        assert t1[13] == pytest.approx(t2[13], abs=1e-8)
 
     def test_03_adiabatic(self):
         """Temperature should be equal above and below."""
@@ -348,12 +335,8 @@ class AdiabaticBoundary(unittest.TestCase):
         point = grheat.Point(xp, yp, zp, boundary="adiabatic")
         t_pulse = 1
         t = 1.1
-        X, Y = np.meshgrid(np.arange(-0.0005, 0.0005, 0.0001), np.arange(-0.0005, 0.0005, 0.0001))
-        T1 = point.pulsed(X, Y, +0.0001, t, t_pulse)
-        T2 = point.pulsed(X, Y, -0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1[0, 3], T2[0, 3], delta=1e-8)
-        self.assertAlmostEqual(T1[3, 1], T2[3, 1], delta=1e-8)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        xx, yy = np.meshgrid(np.arange(-0.0005, 0.0005, 0.0001), np.arange(-0.0005, 0.0005, 0.0001))
+        t1 = point.pulsed(xx, yy, +0.0001, t, t_pulse)
+        t2 = point.pulsed(xx, yy, -0.0001, t, t_pulse)
+        assert t1[0, 3] == pytest.approx(t2[0, 3], abs=1e-8)
+        assert t1[3, 1] == pytest.approx(t2[3, 1], abs=1e-8)

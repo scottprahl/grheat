@@ -30,7 +30,6 @@ SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
 PYLINT_TARGETS  := $(PACKAGE)/*.py tests/*.py .github/scripts/update_citation.py docs/conf.py
 YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml .readthedocs.yaml
 RST_TARGETS     := README.rst CHANGELOG.rst $(DOCS_DIR)/*.rst
-RST_GUIDE_TARGETS := README.rst CHANGELOG.rst $(DOCS_DIR)/index.rst $(DOCS_DIR)/changelog.rst
 RST_API_TARGETS := $(DOCS_DIR)/absorber.rst $(DOCS_DIR)/line.rst $(DOCS_DIR)/plane.rst $(DOCS_DIR)/point.rst
 
 .PHONY: help
@@ -81,7 +80,7 @@ readme_images readme:
 
 .PHONY: test
 test:
-	$(RUN) pytest $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py --ignore=tests/test_absorbing_point.py
+	$(RUN) pytest $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py
 
 .PHONY: note-test
 note-test:
@@ -103,7 +102,7 @@ yaml-check:
 
 .PHONY: rst-check
 rst-check:
-	@$(RUN) rstcheck --ignore-directives include,toctree $(RST_GUIDE_TARGETS)
+	@$(RUN) rstcheck $(RST_TARGETS)
 	@$(RUN) rstcheck --ignore-directives automodapi $(RST_API_TARGETS)
 
 .PHONY: ruff-check

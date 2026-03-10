@@ -85,11 +85,6 @@ version = {attr = "grheat.__version__"}
 [tool.black]
 line-length = 110
 target-version = ["py310", "py311", "py312", "py313", "py314"]
-extend-exclude = '''
-(
-  ^/miepython/
-)
-'''
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

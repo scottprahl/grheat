@@ -5,19 +5,20 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-module-docstring
 
-import unittest
 import numpy as np
+import pytest
+
 import grheat
 
 
-class InstantaneousPlane(unittest.TestCase):
+class TestInstantaneousPlane:
     def test_01_scalar(self):
         """Exercise scalar evaluation for an instantaneous planar source."""
         zp = 0.001  # meters
         tp = 0
         t = 1
         plane = grheat.Plane(zp, tp)
-        T = plane.instantaneous(0, t)
+        plane.instantaneous(0, t)
 
     def test_02_time_array(self):
         """Exercise vectorized time evaluation for an instantaneous planar source."""
@@ -25,33 +26,33 @@ class InstantaneousPlane(unittest.TestCase):
         tp = 0
         t = np.linspace(0, 10)
         plane = grheat.Plane(zp, tp)
-        T = plane.instantaneous(0, t)
+        plane.instantaneous(0, t)
 
 
-class ContinuousPlane(unittest.TestCase):
+class TestContinuousPlane:
     def test_01_scalar(self):
         """Exercise scalar evaluation for a continuous planar source."""
         zp = 0.001  # meters
         t = 1
         plane = grheat.Plane(zp)
-        T = plane.continuous(0, t)
+        plane.continuous(0, t)
 
     def test_02_time_array(self):
         """Exercise vectorized time evaluation for a continuous planar source."""
         zp = 0.001  # meters
         t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
-        T = plane.continuous(0, t)
+        plane.continuous(0, t)
 
 
-class PulsedPlane(unittest.TestCase):
+class TestPulsedPlane:
     def test_01_scalar(self):
         """Exercise scalar evaluation for a pulsed planar source."""
         zp = 0.001  # meters
         t_pulse = 0.5
         t = 1
         plane = grheat.Plane(zp)
-        T = plane.pulsed(0, t, t_pulse)
+        plane.pulsed(0, t, t_pulse)
 
     def test_02_time_array(self):
         """Exercise vectorized time evaluation for a pulsed planar source."""
@@ -59,11 +60,10 @@ class PulsedPlane(unittest.TestCase):
         t_pulse = 0.5
         t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
-        T = plane.pulsed(0, t, t_pulse)
+        plane.pulsed(0, t, t_pulse)
 
 
-class InstantVsPulsed(unittest.TestCase):
-
+class TestInstantVsPulsed:
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
         zp = 0.001  # meters
@@ -72,9 +72,9 @@ class InstantVsPulsed(unittest.TestCase):
         t = 1
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
         plane = grheat.Plane(zp, tp)
-        T1 = radiant_exposure * plane.instantaneous(0, t)
-        T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
-        self.assertAlmostEqual(T1, T2, delta=0.001)
+        t1 = radiant_exposure * plane.instantaneous(0, t)
+        t2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
+        assert t1 == pytest.approx(t2, abs=0.001)
 
     def test_02_instant(self):
         """Short pulse result should be same as instantaneous source."""
@@ -84,22 +84,21 @@ class InstantVsPulsed(unittest.TestCase):
         t = np.linspace(0, 10)
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
         plane = grheat.Plane(zp, tp)
-        T1 = radiant_exposure * plane.instantaneous(0, t)
-        T2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
-        self.assertAlmostEqual(T1[3], T2[3], delta=0.001)
-        self.assertAlmostEqual(T1[13], T2[13], delta=0.001)
+        t1 = radiant_exposure * plane.instantaneous(0, t)
+        t2 = radiant_exposure * plane.pulsed(0, t, t_pulse)
+        assert t1[3] == pytest.approx(t2[3], abs=0.001)
+        assert t1[13] == pytest.approx(t2[13], abs=0.001)
 
 
-class ConstantBoundary(unittest.TestCase):
-
+class TestConstantBoundary:
     def test_01_zero(self):
         """Surface temperature should be zero."""
         zp = 0.001  # meters
         plane = grheat.Plane(zp, boundary="zero")
         t_pulse = 1
         t = 2
-        T = plane.pulsed(0, t, t_pulse)
-        self.assertEqual(T, 0)
+        temperature = plane.pulsed(0, t, t_pulse)
+        assert temperature == 0
 
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
@@ -107,22 +106,21 @@ class ConstantBoundary(unittest.TestCase):
         plane = grheat.Plane(zp, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
-        T = plane.pulsed(0, t, t_pulse)
-        self.assertEqual(T[3], 0)
-        self.assertEqual(T[13], 0)
+        temperature = plane.pulsed(0, t, t_pulse)
+        assert temperature[3] == 0
+        assert temperature[13] == 0
 
 
-class AdiabaticBoundary(unittest.TestCase):
-
+class TestAdiabaticBoundary:
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         zp = 0.001  # meters
         plane = grheat.Plane(zp, boundary="adiabatic")
         t_pulse = 1
         t = 2
-        T1 = plane.pulsed(+0.0001, t, t_pulse)
-        T2 = plane.pulsed(-0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1, T2, delta=1e-8)
+        t1 = plane.pulsed(+0.0001, t, t_pulse)
+        t2 = plane.pulsed(-0.0001, t, t_pulse)
+        assert t1 == pytest.approx(t2, abs=1e-8)
 
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
@@ -130,11 +128,7 @@ class AdiabaticBoundary(unittest.TestCase):
         plane = grheat.Plane(zp, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
-        T1 = plane.pulsed(+0.0001, t, t_pulse)
-        T2 = plane.pulsed(-0.0001, t, t_pulse)
-        self.assertAlmostEqual(T1[3], T2[3], delta=1e-8)
-        self.assertAlmostEqual(T1[13], T2[13], delta=1e-8)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        t1 = plane.pulsed(+0.0001, t, t_pulse)
+        t2 = plane.pulsed(-0.0001, t, t_pulse)
+        assert t1[3] == pytest.approx(t2[3], abs=1e-8)
+        assert t1[13] == pytest.approx(t2[13], abs=1e-8)
