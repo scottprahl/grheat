@@ -58,18 +58,20 @@ class AbsorbingPoint:
         boundary="infinite",
         n_quad=100,
     ):
-        """
-        Initialize AbsorbingPoint object.
+        """Initialize an exponentially absorbed point-illumination source.
 
         Args:
-            mu_a: attenuation coefficient                  [1/meter]
-            xp: x location of source                     [meters]
-            yp: y location of source                     [meters]
-            tp (scalar): Time at which the source impulse occurs [seconds].
-            diffusivity: thermal diffusivity             [m**2/s]
-            capacity: volumetric heat capacity           [J/degree/m**3]
-            boundary: 'infinite', 'adiabatic', 'zero'
-            n_quad: number of quadrature points
+            mu_a (scalar): Exponential attenuation coefficient of the absorber [1/meters].
+            xp (scalar): x-coordinate of the illumination point [meters].
+            yp (scalar): y-coordinate of the illumination point [meters].
+            diffusivity (scalar, optional): Thermal diffusivity of the medium [m^2/s].
+                Defaults to ``water_thermal_diffusivity``.
+            capacity (scalar, optional): Volumetric heat capacity of the medium
+                [J/degree/m^3]. Defaults to ``water_heat_capacity``.
+            boundary (str, optional): Boundary condition label stored on the instance.
+                Defaults to ``"infinite"``.
+            n_quad (int, optional): Number of quadrature points used to approximate the
+                exponentially distributed source depth. Defaults to ``100``.
         """
         self.mu_a = mu_a
         self.xp = xp
@@ -96,7 +98,7 @@ class AbsorbingPoint:
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            temperature Increase [°C]
+            scalar or array: Temperature increase at the requested point(s) [°C].
         """
         tt = np.asarray(t)
         T = np.zeros_like(tt, dtype=float)
@@ -122,7 +124,7 @@ class AbsorbingPoint:
             t (scalar or array): Time(s) at which the temperature is desired [seconds].
 
         Returns:
-            temperature Increase [°C]
+            scalar or array: Temperature increase at the requested point(s) [°C].
         """
         tt = np.asarray(t)
         T = np.zeros_like(tt, dtype=float)
@@ -147,7 +149,7 @@ class AbsorbingPoint:
             t_pulse (scalar): Duration of the irradiance pulse [seconds].
 
         Returns:
-            temperature Increase [°C]
+            scalar or array: Temperature increase at the requested point(s) [°C].
 
         Typical usage::
 

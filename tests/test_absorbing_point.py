@@ -13,18 +13,20 @@ joules_per_calorie = 4.184
 
 
 class TestAbsorbingPointInstant(unittest.TestCase):
-
     def setUp(self):
+        """Create a reusable absorbing-point source for instantaneous tests."""
         # Create an AbsorbingPoints instance to use in tests
         self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_instantaneous_scalar(self):
+        """Verify scalar instantaneous temperatures for an absorbing point source."""
         x, y, z, t = 0.0001, 0, 0, 1
         expected_temperature = 3.343552
         temperature = self.source.instantaneous(x, y, z, t) * 1e6
         self.assertAlmostEqual(temperature, expected_temperature, places=5)
 
     def test_instantaneous_array_time(self):
+        """Verify vectorized instantaneous temperatures for an absorbing point source."""
         x, y, z = 0.0001, 0, 0
         t = np.array([1, 2, 3, 4, 5])
         # Assume an expected temperature array for these parameters
@@ -34,18 +36,20 @@ class TestAbsorbingPointInstant(unittest.TestCase):
 
 
 class TestAbsorbingPointContinuous(unittest.TestCase):
-
     def setUp(self):
+        """Create a reusable absorbing-point source for continuous tests."""
         # Create an AbsorbingPoints instance to use in tests
         self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_continuous_scalar(self):
+        """Verify scalar continuous temperatures for an absorbing point source."""
         x, y, z, t = 0.0001, 0, 0, 3
         expected_temperature = 2.895831
         temperature = self.source.continuous(x, y, z, t) * 1e6
         self.assertAlmostEqual(temperature, expected_temperature, places=5)
 
     def test_continuous_array_time(self):
+        """Verify vectorized continuous temperatures for an absorbing point source."""
         x, y, z = 0.0001, 0, 0
         t = np.array([1, 2, 3, 4, 5])
         # Assume an expected temperature array for these parameters
@@ -55,18 +59,20 @@ class TestAbsorbingPointContinuous(unittest.TestCase):
 
 
 class TestAbsorbingPointPulsed(unittest.TestCase):
-
     def setUp(self):
+        """Create a reusable absorbing-point source for pulsed tests."""
         # Create an AbsorbingPoints instance to use in tests
         self.source = grheat.AbsorbingPoint(mu_a=1 * 1000, xp=0, yp=0, boundary="infinite", n_quad=100)
 
     def test_pulsed_scalar(self):
+        """Verify scalar pulsed temperatures for an absorbing point source."""
         x, y, z, t, t_pulse = 0.0001, 0, 0, 1, 0.5
         expected_temperature = 3.816487
         temperature = self.source.pulsed(x, y, z, t, t_pulse) * 1e6
         self.assertAlmostEqual(temperature, expected_temperature, places=5)
 
     def test_pulsed_array_time(self):
+        """Verify vectorized pulsed temperatures for an absorbing point source."""
         x, y, z, t_pulse = 0.0001, 0, 0, 0.5
         t = np.array([1, 2, 3, 4, 5])
         # Assume an expected temperature array for these parameters

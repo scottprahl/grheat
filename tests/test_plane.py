@@ -11,8 +11,8 @@ import grheat
 
 
 class InstantaneousPlane(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for an instantaneous planar source."""
         zp = 0.001  # meters
         tp = 0
         t = 1
@@ -20,6 +20,7 @@ class InstantaneousPlane(unittest.TestCase):
         T = plane.instantaneous(0, t)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for an instantaneous planar source."""
         zp = 0.001  # meters
         tp = 0
         t = np.linspace(0, 10)
@@ -28,14 +29,15 @@ class InstantaneousPlane(unittest.TestCase):
 
 
 class ContinuousPlane(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for a continuous planar source."""
         zp = 0.001  # meters
         t = 1
         plane = grheat.Plane(zp)
         T = plane.continuous(0, t)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for a continuous planar source."""
         zp = 0.001  # meters
         t = np.linspace(0, 10)
         plane = grheat.Plane(zp)
@@ -43,8 +45,8 @@ class ContinuousPlane(unittest.TestCase):
 
 
 class PulsedPlane(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for a pulsed planar source."""
         zp = 0.001  # meters
         t_pulse = 0.5
         t = 1
@@ -52,6 +54,7 @@ class PulsedPlane(unittest.TestCase):
         T = plane.pulsed(0, t, t_pulse)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for a pulsed planar source."""
         zp = 0.001  # meters
         t_pulse = 0.5
         t = np.linspace(0, 10)

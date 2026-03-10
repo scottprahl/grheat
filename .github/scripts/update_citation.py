@@ -19,7 +19,11 @@ HEADERS = {
 
 
 def get_release_date() -> tuple[str, str]:
-    """Return the release date and year from the latest GitHub release."""
+    """Return the latest GitHub release date and year.
+
+    Returns:
+        tuple[str, str]: The ISO release date and four-digit release year.
+    """
     response = requests.get(GITHUB_API_URL, timeout=10, headers=HEADERS)
     response.raise_for_status()
     release_info = response.json()
@@ -35,7 +39,11 @@ def get_release_date() -> tuple[str, str]:
 
 
 def get_code_version() -> str:
-    """Extract __version__ from the package __init__.py."""
+    """Extract the package version from ``__init__.py``.
+
+    Returns:
+        str: The package version string.
+    """
     init_path = Path(REPO) / "__init__.py"
     if not init_path.exists():
         raise FileNotFoundError(f"{init_path} not found; cannot read __version__")
@@ -51,7 +59,16 @@ def get_code_version() -> str:
 
 
 def update_citation(version: str, release_date: str, year: str) -> None:
-    """Update citation metadata in CITATION.cff."""
+    """Update citation metadata in ``CITATION.cff``.
+
+    Args:
+        version (str): Package version to write into the citation file.
+        release_date (str): Release date in ISO ``YYYY-MM-DD`` format.
+        year (str): Four-digit year associated with the release.
+
+    Returns:
+        None: This function updates the citation file in place when needed.
+    """
     citation_path = Path("CITATION.cff")
     if not citation_path.exists():
         print("CITATION.cff not found; skipping citation update.")
@@ -94,7 +111,15 @@ def update_citation(version: str, release_date: str, year: str) -> None:
 
 
 def update_readme(version: str, year: str) -> None:
-    """Update citation references in README.rst when the expected patterns exist."""
+    """Update citation references in ``README.rst`` when expected patterns exist.
+
+    Args:
+        version (str): Package version to inject into citation text.
+        year (str): Four-digit release year to inject into citation text.
+
+    Returns:
+        None: This function updates the README in place when needed.
+    """
     readme_path = Path("README.rst")
     if not readme_path.exists():
         print("README.rst not found; skipping README update.")
@@ -133,7 +158,11 @@ def update_readme(version: str, year: str) -> None:
 
 
 def main() -> None:
-    """Update citation metadata files from the latest GitHub release."""
+    """Update citation metadata files from the latest GitHub release.
+
+    Returns:
+        None: This function orchestrates the citation metadata update workflow.
+    """
     release_date, year = get_release_date()
     version = get_code_version()
     update_citation(version, release_date, year)

@@ -113,7 +113,11 @@ class Line:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
-        """Create string for object."""
+        """Return a human-readable summary of line-source properties.
+
+        Returns:
+            str: Formatted line-source configuration details.
+        """
         return (
             f"Line Properties:\n"
             f"yp: {self.yp} meters\n"
@@ -265,7 +269,7 @@ class Line:
 
         Reference: Carslaw and Jaeger (1959), page 261, Equation 10.4(5).
 
-        Parameters:
+        Args:
             y (scalar): The y-coordinate for the desired temperature location. [meters]
             z (scalar): The z-coordinate for the desired temperature location. [meters]
             t (scalar or array): Time(s) of desired temperature. [seconds]
@@ -323,7 +327,7 @@ class Line:
         to a pulsed x-line source. 1 J/m of heat is deposited along the x-line passing
         through the coordinates (yp, zp) from t=0 to t=t_pulse.
 
-        Parameters:
+        Args:
             y (scalar or array): The y-coordinate for the desired temperature location. [meters]
             z (scalar or array): The z-coordinate for the desired temperature location. [meters]
             t (scalar or array): Time(s) of desired temperature. [seconds]

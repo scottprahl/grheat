@@ -97,7 +97,11 @@ class Absorber:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
-        """Create string for object."""
+        """Return a human-readable summary of absorber properties.
+
+        Returns:
+            str: Formatted absorber configuration details.
+        """
         return (
             f"Absorber Properties:\n"
             f"mu_a: {self.mu_a} 1/meters\n"
@@ -262,7 +266,15 @@ class Absorber:
         return T
 
     def _continuous_scalar_zero(self, z, t):
-        """Calculate the temperature assuming z=0 has T=0."""
+        """Calculate the continuous solution for a fixed-temperature boundary.
+
+        Args:
+            z (scalar): Depth at which the temperature is evaluated [meters].
+            t (scalar): Time at which the temperature is evaluated [seconds].
+
+        Returns:
+            scalar: Temperature rise at ``z`` and ``t`` for the ``zero`` boundary [°C].
+        """
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -293,7 +305,15 @@ class Absorber:
         return T
 
     def _continuous_scalar_adiabatic(self, z, t):
-        """Calculate the temperature assuming z=0 has dT/dz=0."""
+        """Calculate the continuous solution for an adiabatic boundary.
+
+        Args:
+            z (scalar): Depth at which the temperature is evaluated [meters].
+            t (scalar): Time at which the temperature is evaluated [seconds].
+
+        Returns:
+            scalar: Temperature rise at ``z`` and ``t`` for the adiabatic boundary [°C].
+        """
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -325,7 +345,15 @@ class Absorber:
         return T
 
     def _continuous_scalar_infinite(self, z, t):
-        """Calculate the temperature assuming no boundary at z=0."""
+        """Calculate the continuous solution for an infinite medium.
+
+        Args:
+            z (scalar): Depth at which the temperature is evaluated [meters].
+            t (scalar): Time at which the temperature is evaluated [seconds].
+
+        Returns:
+            scalar: Temperature rise at ``z`` and ``t`` with no surface boundary [°C].
+        """
         tau = self.mu_a**2 * self.diffusivity * t
         zeta = self.mu_a * z
         scale = 1 / (2 * self.diffusivity * self.capacity * self.mu_a)
@@ -354,7 +382,15 @@ class Absorber:
         return T
 
     def _continuous_scalar(self, z, t):
-        """Calculate temperature rise due to a continuous 1 W/m² surface exposure."""
+        """Dispatch the continuous scalar solution for the configured boundary.
+
+        Args:
+            z (scalar): Depth at which the temperature is evaluated [meters].
+            t (scalar): Time at which the temperature is evaluated [seconds].
+
+        Returns:
+            scalar: Temperature rise at ``z`` and ``t`` for the configured boundary [°C].
+        """
         if self.boundary == "adiabatic":
             return self._continuous_scalar_adiabatic(z, t)
 

@@ -56,7 +56,10 @@ def test_run_notebook(notebook):
 
     The method here is directly from the nbconvert docs
 
-    There is no error handling as any errors will be caught by pytest
+    There is no error handling as any errors will be caught by pytest.
+
+    Args:
+        notebook (pathlib.Path): Notebook path to execute.
     """
     with open(notebook, encoding="utf-8") as f:
         nb = nbformat.read(f, as_version=4)

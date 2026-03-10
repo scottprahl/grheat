@@ -21,7 +21,14 @@ master_doc = "index"
 
 
 def get_init_property(prop):
-    """Return property from __init__.py."""
+    """Return a metadata property from ``__init__.py``.
+
+    Args:
+        prop (str): Name of the module-level attribute to extract.
+
+    Returns:
+        str: The attribute value stored in ``grheat.__init__``.
+    """
     here = os.path.abspath(os.path.dirname(__file__))
     file_name = os.path.join(here, "..", project, "__init__.py")
     regex = r'{}\s*=\s*[\'"]([^\'"]*)[\'"]'.format(prop)

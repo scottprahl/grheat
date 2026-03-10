@@ -12,8 +12,8 @@ import grheat
 
 
 class InstantaneousLine(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for an instantaneous line source."""
         yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
@@ -21,6 +21,7 @@ class InstantaneousLine(unittest.TestCase):
         T = line.instantaneous(0, 0, t)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for an instantaneous line source."""
         yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
@@ -28,6 +29,7 @@ class InstantaneousLine(unittest.TestCase):
         T = line.instantaneous(0, 0, t)
 
     def test_03_surface(self):
+        """Exercise surface-grid evaluation for an instantaneous line source."""
         yp, zp = 0, 0.001  # meters
         tp = 0
         line = grheat.Line(yp, zp, tp)
@@ -37,20 +39,22 @@ class InstantaneousLine(unittest.TestCase):
 
 
 class ContinuousLine(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for a continuous line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t = 1
         T = line.continuous(0, 0, t)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for a continuous line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t = np.linspace(0, 10)
         T = line.continuous(0, 0, t)
 
     def test_03_surface(self):
+        """Exercise surface-grid evaluation for a continuous line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         tp = 0
@@ -60,8 +64,8 @@ class ContinuousLine(unittest.TestCase):
 
 
 class PulsedLine(unittest.TestCase):
-
     def test_01_scalar(self):
+        """Exercise scalar evaluation for a pulsed line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5
@@ -69,6 +73,7 @@ class PulsedLine(unittest.TestCase):
         T = line.pulsed(0, 0, t, t_pulse)
 
     def test_02_time_array(self):
+        """Exercise vectorized time evaluation for a pulsed line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5
@@ -76,6 +81,7 @@ class PulsedLine(unittest.TestCase):
         T = line.pulsed(0, 0, t, t_pulse)
 
     def test_03_surface(self):
+        """Exercise surface-grid evaluation for a pulsed line source."""
         yp, zp = 0, 0.001  # meters
         line = grheat.Line(yp, zp)
         t_pulse = 0.5

@@ -97,7 +97,11 @@ class Point:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
-        """Create string for object."""
+        """Return a human-readable summary of point-source properties.
+
+        Returns:
+            str: Formatted point-source configuration details.
+        """
         return (
             f"Point Properties:\n"
             f"xp: {self.xp} meters\n"
@@ -211,7 +215,16 @@ class Point:
         return T
 
     def distance(self, x, y, z):
-        """Calculate distance to the source --- avoid returning zero."""
+        """Calculate the distance from a field point to the source.
+
+        Args:
+            x (scalar or array): x-coordinate(s) of the evaluation point [meters].
+            y (scalar or array): y-coordinate(s) of the evaluation point [meters].
+            z (scalar or array): z-coordinate(s) of the evaluation point [meters].
+
+        Returns:
+            scalar or array: Distance to the source, clipped away from zero [meters].
+        """
         r = np.sqrt((x - self.xp) ** 2 + (y - self.yp) ** 2 + (z - self.zp) ** 2)
         rr = np.asarray(r)
         rr[rr == 0] = 1e-6  # 1 micron
@@ -225,7 +238,7 @@ class Point:
 
         Carslaw and Jaeger page 261, 10.4(2)
 
-        Parameters:
+        Args:
             x (scalar or array): x-coord(s) of desired temperature [meters].
             y (scalar or array): y-coord(s) of desired temperature [meters].
             z (scalar or array): z-coord(s) of desired temperature [meters].

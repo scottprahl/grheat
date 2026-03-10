@@ -98,7 +98,11 @@ class Plane:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
-        """Create string for object."""
+        """Return a human-readable summary of planar-source properties.
+
+        Returns:
+            str: Formatted planar-source configuration details.
+        """
         return (
             f"Plane Properties:\n"
             f"zp: {self.zp} meters\n"
