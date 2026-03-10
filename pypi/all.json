@@ -1,0 +1,28 @@
+{
+  "grheat": {
+    "releases": {
+      "0.2.1": [
+        {
+          "comment_text": "",
+          "digests": {
+            "md5": "f5814048d23faaddafeefcfde4b0d312",
+            "sha256": "0e397d849d2cc650926c34671f9d5e62050ac6bc6671eefa1c3693f8922ebae9"
+          },
+          "downloads": -1,
+          "filename": "grheat-0.2.1-py3-none-any.whl",
+          "has_sig": false,
+          "md5_digest": "f5814048d23faaddafeefcfde4b0d312",
+          "packagetype": "bdist_wheel",
+          "python_version": "py3",
+          "requires_python": ">=3.10",
+          "size": 22386,
+          "upload_time": "2026-03-10T21:48:48.747085Z",
+          "upload_time_iso_8601": "2026-03-10T21:48:48.747085Z",
+          "url": "./grheat-0.2.1-py3-none-any.whl",
+          "yanked": false,
+          "yanked_reason": null
+        }
+      ]
+    }
+  }
+}
