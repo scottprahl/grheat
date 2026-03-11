@@ -8,6 +8,21 @@ import grheat
 joules_per_calorie = 4.184
 
 
+class TestAbsorberRepresentation:
+    """Check absorber string representations."""
+
+    def test_str_includes_core_properties(self):
+        """Verify ``str(absorber)`` includes the key configuration fields."""
+        absorber = grheat.Absorber(mu_a=250, tp=0.25, boundary="adiabatic")
+
+        description = str(absorber)
+
+        assert "Absorber Properties:" in description
+        assert "mu_a: 250 1/meters" in description
+        assert "tp: 0.25 seconds" in description
+        assert "boundary: adiabatic" in description
+
+
 class TestInstantaneousAbsorber:
     """Instant absorber tests."""
 

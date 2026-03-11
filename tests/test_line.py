@@ -7,6 +7,22 @@ import pytest
 import grheat
 
 
+class TestLineRepresentation:
+    """Check line-source string representations."""
+
+    def test_str_includes_core_properties(self):
+        """Verify ``str(line)`` includes the key configuration fields."""
+        line = grheat.Line(yp=0.002, zp=0.003, tp=0.25, boundary="zero")
+
+        description = str(line)
+
+        assert "Line Properties:" in description
+        assert "yp: 0.002 meters" in description
+        assert "zp: 0.003 meters" in description
+        assert "tp: 0.25 seconds" in description
+        assert "boundary: zero" in description
+
+
 class TestInstantaneousLine:
     """Check instantaneous line-source solutions."""
 
