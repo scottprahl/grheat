@@ -1,34 +1,28 @@
-"""
-Green's function solutions for point illumination of semi-infinite absorber.
+"""Green's function solutions for exponentially decaying vertical source columns.
 
-This module provides solutions to heat transfer for point illumination of an
+This module provides solutions for heat transfer from point illumination of an
 absorbing semi-infinite medium. The solutions are based on the mathematical
-formulations provided in Carslaw and Jaeger's work.
+formulations provided in Carslaw and Jaeger.
 
-The `AbsorbingPoint` class represents a vertical linear exponentially-decaying,
-heat source that extends downward in the medium for coordinates (xp, yp) in the
-medium. The medium's surface is defined by z=0. The class provides methods to
-calculate the temperature rise at any position (x, y, z) at a specified time
-`t`, due to different types of heat source behaviors.
+The ``ExponentialColumnSource`` class represents a vertical column of point
+sources beneath ``(xp, yp)`` whose strength decays exponentially with depth. The
+medium's surface is defined by ``z = 0``. The class provides methods to
+calculate the temperature rise at any position ``(x, y, z)`` at a specified
+time ``t`` for several temporal source profiles.
 
-Calculations are done using exponential quadrature along all source points.
+Calculations are done using exponential quadrature along the source depth.
 
-Three types of line sources are supported:
+Supported source profiles:
 
-- **Instantaneous**:
-  Instantaneous pulse of light at a point on semi-infinite absorber.
+- **Instantaneous**: Instantaneous pulse of light at a surface point.
+- **Continuous**: Continuous illumination of a surface point.
+- **Pulsed**: Finite-duration illumination of a surface point.
 
-- **Continuous**:
-  Continuous illumination of a point on semi-infinite absorber.
+Each profile can be analyzed under different boundary conditions at ``z = 0``:
 
-- **Pulsed**:
-  Pulsed illumination of a point on semi-infinite absorber.
-
-Each of these line sources can be analyzed under different boundary conditions at z=0:
-
-- `'infinite'`: No boundary (infinite medium).
-- `'adiabatic'`: No heat flow across the boundary.
-- `'zero'`: Boundary is fixed at T=0.
+- ``'infinite'``: No boundary (infinite medium).
+- ``'adiabatic'``: No heat flow across the boundary.
+- ``'zero'``: Boundary is fixed at ``T = 0``.
 
 More documentation at <https://grheat.readthedocs.io>
 """
@@ -40,8 +34,8 @@ water_heat_capacity = 4.184 * 1e6  # J/(m³ °C)
 water_thermal_diffusivity = 0.14558 * 1e-6  # m²/s
 
 
-class AbsorbingPoint:
-    """Green's function heat transfer solutions for point source in infinite media."""
+class ExponentialColumnSource:
+    """Green's function solutions for an exponentially weighted vertical source column."""
 
     def __init__(
         self,
@@ -53,12 +47,12 @@ class AbsorbingPoint:
         boundary="infinite",
         n_quad=100,
     ):
-        """Initialize an exponentially absorbed point-illumination source.
+        """Initialize an exponentially weighted vertical source column.
 
         Args:
             mu_a (scalar): Exponential attenuation coefficient of the absorber [1/meters].
-            xp (scalar): x-coordinate of the illumination point [meters].
-            yp (scalar): y-coordinate of the illumination point [meters].
+            xp (scalar): x-coordinate of the source-column origin [meters].
+            yp (scalar): y-coordinate of the source-column origin [meters].
             diffusivity (scalar, optional): Thermal diffusivity of the medium [m^2/s].
                 Defaults to ``water_thermal_diffusivity``.
             capacity (scalar, optional): Volumetric heat capacity of the medium
@@ -79,7 +73,7 @@ class AbsorbingPoint:
         # place source points for exponential quadrature
         k = np.arange(1, n_quad + 1)
         self.zp = (1 / mu_a) * np.log(2 * k)
-        self.point = grheat.Point(xp, yp, self.zp)
+        self.point = grheat.Point(xp, yp, self.zp, boundary=self.boundary)
         self.weights = (1 / mu_a) * (1 / (2 * k - 1) - 1 / (2 * k + 1))
 
     def instantaneous(self, x, y, z, t):
@@ -95,20 +89,19 @@ class AbsorbingPoint:
         Returns:
             scalar or array: Temperature increase at the requested point(s) [°C].
         """
-        tt = np.asarray(t)
-        T = np.zeros_like(tt, dtype=float)
+        T = 0.0
 
         for w, zp in zip(self.weights, self.zp):
             # the contribution from each point source self.zp
             self.point.zp = zp
             integrand = self.point.instantaneous(x, y, z, t) * np.exp(-self.mu_a * zp)
-            T += w * integrand
+            T = T + w * integrand
 
         return T * self.mu_a / self.capacity
 
     def continuous(self, x, y, z, t):
         """
-        Calculate temperature rise due to a 1W pulsed point illumination of surface.
+        Calculate temperature rise due to 1 W of continuous surface point illumination.
 
         The point source turns on at t=0.
 
@@ -121,20 +114,19 @@ class AbsorbingPoint:
         Returns:
             scalar or array: Temperature increase at the requested point(s) [°C].
         """
-        tt = np.asarray(t)
-        T = np.zeros_like(tt, dtype=float)
+        T = 0.0
 
         for w, zp in zip(self.weights, self.zp):
             # the contribution from each point source self.zp
             self.point.zp = zp
             integrand = self.point.continuous(x, y, z, t) * np.exp(-self.mu_a * zp)
-            T += w * integrand
+            T = T + w * integrand
 
         return T * self.mu_a / self.capacity
 
     def pulsed(self, x, y, z, t, t_pulse):
         """
-        Calculate temperature rise due to a 1J pulsed point illumination of surface.
+        Calculate temperature rise due to a finite pulse of surface point illumination.
 
         Args:
             x (scalar): x-coord(s) for temperature calculation [meters].
@@ -158,7 +150,7 @@ class AbsorbingPoint:
             xp,yp = 0, 0                           # meters
             t_pulse = 0.100                       # seconds
 
-            medium = grheat.AbsorbingPoint(mu_a, xp, yp)
+            medium = grheat.ExponentialColumnSource(mu_a, xp, yp)
             T = medium.pulsed(x, y, z, t, t_pulse)
 
             plt.plot(t * 1000, T, color='blue')
@@ -168,13 +160,12 @@ class AbsorbingPoint:
             plt.show()
 
         """
-        tt = np.asarray(t)
-        T = np.zeros_like(tt, dtype=float)
+        T = 0.0
 
         for w, zp in zip(self.weights, self.zp):
             # the contribution from each point source self.zp
             self.point.zp = zp
             integrand = self.point.pulsed(x, y, z, t, t_pulse) * np.exp(-self.mu_a * zp)
-            T += w * integrand
+            T = T + w * integrand
 
         return T * self.mu_a / self.capacity

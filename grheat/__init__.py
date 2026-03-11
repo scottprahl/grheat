@@ -13,11 +13,13 @@ with the following constraints:
 
 Classes
 -------
-- `Absorber` : Uniform surface illumination of an absorbing medium.
+- `ExponentialVolumeSource` : Uniform surface illumination producing an
+  exponentially depth-weighted volume source.
 - `Point` : A point source of heat in the medium.
 - `Line` : A line source of heat, parallel to the surface, in the medium.
 - `Plane` : A plane source of heat in the medium.
-- `AbsorberPoint`: Point illumination on surface of an absorbing medium.
+- `ExponentialColumnSource`: Exponentially depth-weighted heating from point
+  illumination on the surface.
 
 Complete documentation, including detailed descriptions of classes and methods, is available at
 <https://grheat.readthedocs.io>
@@ -33,8 +35,8 @@ Example Usage
     z = 0                         # meters
     t = np.linspace(0, 0.5, 100)  # seconds
 
-    # Create an Absorber instance
-    medium = grheat.Absorber(mu_a)
+    # Create an ExponentialVolumeSource instance
+    medium = grheat.ExponentialVolumeSource(mu_a)
 
     # Compute temperature rise due to continuous irradiance
     T = medium.continuous(z, t)
@@ -50,5 +52,5 @@ __url__ = "https://github.com/scottprahl/grheat"
 from .point_source import *
 from .line_source import *
 from .plane_source import *
-from .absorber import *
-from .absorbing_point import *
+from .exponential_volume_source import *
+from .exponential_column_source import *

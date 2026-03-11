@@ -1,4 +1,4 @@
-"""Tests for the Absorber class."""
+"""Regression tests for the ExponentialVolumeSource class."""
 
 import numpy as np
 import pytest
@@ -8,30 +8,27 @@ import grheat
 joules_per_calorie = 4.184
 
 
-class TestAbsorberRepresentation:
-    """Check absorber string representations."""
+def test_exponential_volume_source_str_includes_core_properties():
+    """Verify ``str(source)`` includes the key configuration fields."""
+    source = grheat.ExponentialVolumeSource(mu_a=250, tp=0.25, boundary="adiabatic")
 
-    def test_str_includes_core_properties(self):
-        """Verify ``str(absorber)`` includes the key configuration fields."""
-        absorber = grheat.Absorber(mu_a=250, tp=0.25, boundary="adiabatic")
+    description = str(source)
 
-        description = str(absorber)
-
-        assert "Absorber Properties:" in description
-        assert "mu_a: 250 1/meters" in description
-        assert "tp: 0.25 seconds" in description
-        assert "boundary: adiabatic" in description
+    assert "ExponentialVolumeSource Properties:" in description
+    assert "mu_a: 250 1/meters" in description
+    assert "tp: 0.25 seconds" in description
+    assert "boundary: adiabatic" in description
 
 
-class TestInstantaneousAbsorber:
-    """Instant absorber tests."""
+class TestInstantaneousExponentialVolumeSource:
+    """Check instantaneous exponential-volume-source solutions."""
 
     def test_01_scalar(self):
         """Does it work for scalar values."""
         mua = 1000  # 1/meter
         tp = 0
         t = 1
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         medium.instantaneous(0, t)
 
     def test_02_time_array(self):
@@ -39,7 +36,7 @@ class TestInstantaneousAbsorber:
         mua = 1000  # 1/meter
         tp = 0
         t = np.linspace(0, 10)
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         medium.instantaneous(0, t)
 
     def test_03_tp_array(self):
@@ -47,7 +44,7 @@ class TestInstantaneousAbsorber:
         mua = 1000  # 1/meter
         t = 1
         tp = np.linspace(0, 10, 11)
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         medium.instantaneous(0, t)
 
     def test_04_z_array(self):
@@ -56,13 +53,13 @@ class TestInstantaneousAbsorber:
         t = 1
         tp = 0
         z = np.linspace(0, 10, 11)
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         medium.instantaneous(z, t)
 
     def test_05_total_energy(self):
         """Test for total energy."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a)
+        medium = grheat.ExponentialVolumeSource(mu_a)
         z = np.linspace(-0.0015, 0.006, 4001)
         dz = z[1] - z[0]
 
@@ -72,21 +69,21 @@ class TestInstantaneousAbsorber:
             assert total == pytest.approx(1, abs=0.01)
 
 
-class TestContinuousAbsorber:
-    """Continuous absorber tests."""
+class TestContinuousExponentialVolumeSource:
+    """Check continuous exponential-volume-source solutions."""
 
     def test_01_scalar(self):
         """Does it work for scalar values."""
         mua = 1000  # 1/meter
         t = 1
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         medium.continuous(0, t)
 
     def test_02_time_array(self):
         """Ensure works with arrays of time."""
         mua = 1000  # 1/meter
         t = np.linspace(0, 10)
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         medium.continuous(0, t)
 
     def test_03_tp_array(self):
@@ -94,7 +91,7 @@ class TestContinuousAbsorber:
         mua = 1000  # 1/meter
         t = 1
         tp = np.linspace(0, 10, 11)
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         medium.continuous(0, t)
 
     def test_04_z_array(self):
@@ -102,13 +99,13 @@ class TestContinuousAbsorber:
         mua = 1000  # 1/meter
         t = 1
         z = np.linspace(0, 10, 11)
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         medium.continuous(z, t)
 
     def test_05_energy(self):
         """Ensure total energy delivered is correct."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a)
+        medium = grheat.ExponentialVolumeSource(mu_a)
         z = np.linspace(-0.0015, 0.006, 401)
         dz = z[1] - z[0]
 
@@ -118,15 +115,15 @@ class TestContinuousAbsorber:
             assert total == pytest.approx(t, abs=0.01)
 
 
-class TestPulsedAbsorber:
-    """Pulsed absorber tests."""
+class TestPulsedExponentialVolumeSource:
+    """Check pulsed exponential-volume-source solutions."""
 
     def test_01_scalar(self):
         """Test with all scalar inputs."""
         mua = 1000  # 1/meter
         t_pulse = 0.5
         t = 1
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         medium.pulsed(0, t, t_pulse)
 
     def test_02_time_array(self):
@@ -134,13 +131,13 @@ class TestPulsedAbsorber:
         mua = 1000  # 1/meter
         t_pulse = 0.5
         t = np.linspace(0, 10)
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         medium.pulsed(0, t, t_pulse)
 
     def test_03_total_energy(self):
         """Total energy at end of pulse."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a)
+        medium = grheat.ExponentialVolumeSource(mu_a)
         z = np.linspace(-0.0015, 0.006, 401)
         dz = z[1] - z[0]
 
@@ -152,7 +149,7 @@ class TestPulsedAbsorber:
     def test_04_total_energy(self):
         """Total energy during and after pulse."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a)
+        medium = grheat.ExponentialVolumeSource(mu_a)
         z = np.linspace(-0.003, 0.008, 4001)
         dz = z[1] - z[0]
         t_pulse = 0.1
@@ -164,7 +161,7 @@ class TestPulsedAbsorber:
 
 
 class TestInstantVsPulsed:
-    """Instant and Pulsed absorber tests."""
+    """Compare instantaneous and pulsed exponential-volume-source solutions."""
 
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
@@ -174,7 +171,7 @@ class TestInstantVsPulsed:
         t = 0.5
         z = 0.001
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         t1 = radiant_exposure * medium.instantaneous(z, t)
         t2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
         assert t1 == pytest.approx(t2, abs=0.001)
@@ -187,7 +184,7 @@ class TestInstantVsPulsed:
         t = 2
         z = 0.001
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         t1 = radiant_exposure * medium.instantaneous(z, t)
         t2 = radiant_exposure * medium.pulsed(z, t, t_pulse)
         assert t1 == pytest.approx(t2, abs=0.001)
@@ -199,7 +196,7 @@ class TestInstantVsPulsed:
         tp = 0
         t = np.linspace(0, 10)
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         t1 = radiant_exposure * medium.instantaneous(0, t)
         t2 = radiant_exposure * medium.pulsed(0, t, t_pulse)
         assert t1[3] == pytest.approx(t2[3], abs=0.001)
@@ -207,7 +204,7 @@ class TestInstantVsPulsed:
 
 
 class TestIntegratedPlane:
-    """Integrated plane absorber tests."""
+    """Compare the volume source against integrated plane-source solutions."""
 
     def test_01_instant(self):
         """Matches numerical integration of plane sources."""
@@ -216,7 +213,7 @@ class TestIntegratedPlane:
         t = 0.5
         z = 0.001
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua, tp)
+        medium = grheat.ExponentialVolumeSource(mua, tp)
         t1 = radiant_exposure * medium.instantaneous(z, t)
         zp_array = np.linspace(0, 20 * z, 1000)
         total = 0
@@ -234,7 +231,7 @@ class TestIntegratedPlane:
         t = 0.2
         z = 0.001
         radiant_exposure = 1e6  # 1 J/mm² in J/m²
-        medium = grheat.Absorber(mua)
+        medium = grheat.ExponentialVolumeSource(mua)
         t1 = radiant_exposure * medium.pulsed(z, t, tpulse)
         zp_array = np.linspace(0, 20 * z, 1000)
         total = 0
@@ -252,7 +249,7 @@ class TestConstantBoundary:
     def test_01_zero(self):
         """Surface temperature should be zero."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary="zero")
+        medium = grheat.ExponentialVolumeSource(mua, boundary="zero")
         t_pulse = 1
         t = 2
         temperature = medium.pulsed(0, t, t_pulse)
@@ -261,7 +258,7 @@ class TestConstantBoundary:
     def test_02_zero(self):
         """Surface temperature should be zero at all times."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary="zero")
+        medium = grheat.ExponentialVolumeSource(mua, boundary="zero")
         t_pulse = 1
         t = np.linspace(0, 10)
         temperature = medium.pulsed(0, t, t_pulse)
@@ -275,7 +272,7 @@ class TestAdiabaticBoundary:
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary="adiabatic")
+        medium = grheat.ExponentialVolumeSource(mua, boundary="adiabatic")
         t_pulse = 1
         t = 2
         t1 = medium.pulsed(+0.0001, t, t_pulse)
@@ -285,7 +282,7 @@ class TestAdiabaticBoundary:
     def test_02_adiabatic(self):
         """Temperature should be equal above and below at all times."""
         mua = 1000  # 1/meter
-        medium = grheat.Absorber(mua, boundary="adiabatic")
+        medium = grheat.ExponentialVolumeSource(mua, boundary="adiabatic")
         t_pulse = 1
         t = np.linspace(0, 2)
         t1 = medium.pulsed(+0.0001, t, t_pulse)
@@ -296,7 +293,7 @@ class TestAdiabaticBoundary:
     def test_03_adiabatic(self):
         """Total Temperature should be equal to 1."""
         mu_a = 1 * 1000  # 1 / m
-        medium = grheat.Absorber(mu_a, boundary="adiabatic")
+        medium = grheat.ExponentialVolumeSource(mu_a, boundary="adiabatic")
         z = np.linspace(0, 0.010, 5001)
         dz = z[1] - z[0]
 

@@ -93,9 +93,9 @@ The core classes correspond to canonical Green's-function source geometries:
 - ``Point``: a point heat source at ``(xp, yp, zp)`` inside the medium
 - ``Line``: an infinite x-directed line source passing through ``(yp, zp)``
 - ``Plane``: an infinite xy-planar source at depth ``zp``
-- ``Absorber``: exponentially decaying volumetric heating caused by uniform surface
-  illumination of an absorbing medium
-- ``AbsorbingPoint``: exponentially decaying volumetric heating caused by point
+- ``ExponentialVolumeSource``: exponentially decaying volumetric heating caused by
+  uniform surface illumination
+- ``ExponentialColumnSource``: exponentially decaying volumetric heating caused by point
   illumination on the surface
 
 Each class provides methods for common temporal source profiles:
@@ -135,8 +135,9 @@ you will generally want a numerical PDE solver instead.
 Quick Start
 -----------
 
-The example below computes the surface temperature rise caused by uniform illumination of
-an absorbing medium. The ``Absorber`` class is an analytic Green's-function solution for
+The example below computes the surface temperature rise caused by uniform illumination
+that creates an exponentially decaying volume source. The
+``ExponentialVolumeSource`` class is an analytic Green's-function solution for
 volumetric heating proportional to ``mu_a exp(-mu_a z)``.
 
 .. code-block:: python
@@ -148,7 +149,7 @@ volumetric heating proportional to ``mu_a exp(-mu_a z)``.
     z = 0                         # depth [m]
     t = np.linspace(0, 0.5, 100)  # time [s]
 
-    medium = grheat.Absorber(mu_a, boundary="adiabatic")
+    medium = grheat.ExponentialVolumeSource(mu_a, boundary="adiabatic")
 
     # Temperature rise for unit irradiance; scale by your actual irradiance as needed.
     dT = medium.continuous(z, t)

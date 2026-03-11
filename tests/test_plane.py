@@ -7,19 +7,16 @@ import pytest
 import grheat
 
 
-class TestPlaneRepresentation:
-    """Check plane-source string representations."""
+def test_plane_str_includes_core_properties():
+    """Verify ``str(plane)`` includes the key configuration fields."""
+    plane = grheat.Plane(zp=0.003, tp=0.25, boundary="adiabatic")
 
-    def test_str_includes_core_properties(self):
-        """Verify ``str(plane)`` includes the key configuration fields."""
-        plane = grheat.Plane(zp=0.003, tp=0.25, boundary="adiabatic")
+    description = str(plane)
 
-        description = str(plane)
-
-        assert "Plane Properties:" in description
-        assert "zp: 0.003 meters" in description
-        assert "tp: 0.25 seconds" in description
-        assert "boundary: adiabatic" in description
+    assert "Plane Properties:" in description
+    assert "zp: 0.003 meters" in description
+    assert "tp: 0.25 seconds" in description
+    assert "boundary: adiabatic" in description
 
 
 class TestInstantaneousPlane:

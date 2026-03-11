@@ -7,21 +7,18 @@ import pytest
 import grheat
 
 
-class TestPointRepresentation:
-    """Check point-source string representations."""
+def test_point_str_includes_core_properties():
+    """Verify ``str(point)`` includes the key configuration fields."""
+    point = grheat.Point(xp=0.001, yp=0.002, zp=0.003, tp=0.25, boundary="zero")
 
-    def test_str_includes_core_properties(self):
-        """Verify ``str(point)`` includes the key configuration fields."""
-        point = grheat.Point(xp=0.001, yp=0.002, zp=0.003, tp=0.25, boundary="zero")
+    description = str(point)
 
-        description = str(point)
-
-        assert "Point Properties:" in description
-        assert "xp: 0.001 meters" in description
-        assert "yp: 0.002 meters" in description
-        assert "zp: 0.003 meters" in description
-        assert "tp: 0.25 seconds" in description
-        assert "boundary: zero" in description
+    assert "Point Properties:" in description
+    assert "xp: 0.001 meters" in description
+    assert "yp: 0.002 meters" in description
+    assert "zp: 0.003 meters" in description
+    assert "tp: 0.25 seconds" in description
+    assert "boundary: zero" in description
 
 
 class TestInstantaneousPoint:

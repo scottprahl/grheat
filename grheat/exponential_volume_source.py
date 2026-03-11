@@ -1,5 +1,5 @@
 """
-Heat transfer solutions for uniform illumination of an absorbing semi-infinite absorber.
+Heat transfer solutions for a depth-decaying volume source in a semi-infinite medium.
 
 Three types of illumination are supported:
 
@@ -33,15 +33,16 @@ water_heat_capacity = 4.186 * 1e6  # J/degree / m**3
 water_thermal_diffusivity = 0.145 * 1e-6  # m**2/s
 
 
-class Absorber:
+class ExponentialVolumeSource:
     """
-    Heat transfer solutions for exponential heating of semi-infinite absorbing-only media.
+    Heat transfer solutions for a uniform surface-driven exponential volume source.
 
-    This class provides solutions for the temperature rise in a semi-infinite medium due to
-    uniform illumination over its surface. The illumination is exponentially absorbed within
-    the medium, with the volumetric heating being proportional to mu_a * exp(-mu_a * z).
+    This class provides solutions for the temperature rise in a semi-infinite medium due
+    to uniform illumination over its surface. The illumination is exponentially absorbed
+    within the medium, so the volumetric heating is proportional to
+    ``mu_a * exp(-mu_a * z)``.
 
-    This is a one-dimensional solution in the depth z.
+    This is a one-dimensional solution in depth ``z``.
 
     The solutions are applicable under three different boundary conditions at z=0:
         - 'infinite': No boundary (infinite medium).
@@ -93,13 +94,13 @@ class Absorber:
             raise ValueError("boundary must be 'infinite', 'adiabatic', or 'zero'")
 
     def __str__(self):
-        """Return a human-readable summary of absorber properties.
+        """Return a human-readable summary of volume-source properties.
 
         Returns:
-            str: Formatted absorber configuration details.
+            str: Formatted volume-source configuration details.
         """
         return (
-            f"Absorber Properties:\n"
+            f"ExponentialVolumeSource Properties:\n"
             f"mu_a: {self.mu_a} 1/meters\n"
             f"tp: {self.tp} seconds\n"
             f"diffusivity: {self.diffusivity} m^2/s\n"
@@ -201,7 +202,7 @@ class Absorber:
 
     def instantaneous(self, z, t):
         """
-        Calculate temperature rise due to instantaneous pulse on semi-infinite absorber.
+        Calculate temperature rise due to an instantaneous exponential volume source.
 
         This method computes the temperature increase at a specified depth `z` and time `t`
         following an instantaneous radiant exposure of 1 J/m² on the medium's surface.
@@ -211,7 +212,7 @@ class Absorber:
         The method handles scalar or array-like inputs for `z` and `t`, allowing for
         the calculation of temperature increases at multiple depths and/or times.
 
-        The `self.tp` attribute of the Absorber object specifies the time of the source
+        The `self.tp` attribute of the ExponentialVolumeSource object specifies the time of the source
         impulse, which is used in the underlying `_instantaneous` method call.
 
         Args:
@@ -234,7 +235,7 @@ class Absorber:
                 radiant_exposure = 1 / (0.01 * 0.01)  # 1 J/cm² = 10⁴ J/m²
                 t = np.linspace(0, 500, 100) / 1000   # seconds
 
-                medium = grheat.Absorber(mua, tp)
+                medium = grheat.ExponentialVolumeSource(mua, tp)
                 T = medium.instantaneous(z, t) * radiant_exposure
 
                 plt.plot(t * 1000, T, color='blue')
@@ -423,10 +424,10 @@ class Absorber:
 
     def continuous(self, z, t):
         """
-        Calculate temperature rise due to steady irradiance of semi-infinite absorber.
+        Calculate temperature rise due to steady irradiance driving the volume source.
 
         The method computes the temperature increase at a specified depth `z` and time `t`
-        due to a continuous irradiance of 1 W/m² on the absorber's surface. The heating
+        due to a continuous irradiance of 1 W/m² on the surface. The heating
         starts at t=self.tp and continues to the specified time `t`.
 
         The volumetric heating within the medium decreases exponentially with depth,
@@ -455,7 +456,7 @@ class Absorber:
                 irradiance = 1 / (0.01 * 0.01)        # 1 W/cm² = 10⁴ W/m²
                 t = np.linspace(0, 500, 100) / 1000   # seconds
 
-                medium = grheat.Absorber(mua)
+                medium = grheat.ExponentialVolumeSource(mua)
                 T = medium.continuous(z, t) * irradiance
 
                 plt.plot(t * 1000, T, color='blue')
@@ -484,10 +485,10 @@ class Absorber:
 
     def pulsed(self, z, t, t_pulse):
         """
-        Calculate temperature rise due to pulsed irradiance of semi-infinite absorber.
+        Calculate temperature rise due to pulsed irradiance driving the volume source.
 
         The method computes the temperature increase at a specified depth `z` and time `t`
-        due to a pulsed irradiance of 1 J/m² on the absorber's surface. The irradiance
+        due to a pulsed irradiance of 1 J/m² on the surface. The irradiance
         starts at t=self.tp and continues up to time `t_pulse`. The volumetric heating within
         the medium decreases exponentially with depth, following the expression:
         mu_a * exp(-mu * z) [J/m³].
@@ -520,7 +521,7 @@ class Absorber:
                 radiant_exposure = 1 / (0.01 * 0.01)  # 1 J/cm²
                 t = np.linspace(0, 500, 100) / 1000   # seconds
 
-                medium = grheat.Absorber(mua)
+                medium = grheat.ExponentialVolumeSource(mua)
                 T = medium.pulsed(z, t, t_pulse) * radiant_exposure
 
                 plt.plot(t * 1000, T, color='blue')
