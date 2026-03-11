@@ -1,7 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=too-many-arguments
-# pylint: disable=consider-using-f-string
-# pylint: disable=no-member
 """
 Heat transfer Green's function for planar Source in semi-infinite media.
 

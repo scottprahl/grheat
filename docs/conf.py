@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=consider-using-f-string
 """
 Configuration file for building documentation.
 

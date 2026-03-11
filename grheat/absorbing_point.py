@@ -1,8 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=too-many-arguments
-# pylint: disable=consider-using-f-string
-# pylint: disable=no-member
-# pylint: disable=too-many-instance-attributes
 """
 Green's function solutions for point illumination of semi-infinite absorber.
 

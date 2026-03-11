@@ -1,10 +1,5 @@
 #! /usr/bin/env python3
-# pylint: disable=invalid-name
-# pylint: disable=unused-variable
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-module-docstring
-# pylint: disable=line-too-long
+"""Regression tests for point-source Green's function solutions."""
 
 import numpy as np
 import pytest
@@ -13,6 +8,8 @@ import grheat
 
 
 class TestInstantaneousPoint:
+    """Check instantaneous point-source solutions."""
+
     def test_01_scalar(self):
         """
         Test if the method `instantaneous` can handle scalar input and
@@ -105,6 +102,8 @@ class TestInstantaneousPoint:
 
 
 class TestContinuousPoint:
+    """Check continuous point-source solutions."""
+
     def test_01_scalar(self):
         """
         Test if the method `continuous` can handle scalar input and
@@ -201,6 +200,8 @@ class TestContinuousPoint:
 
 
 class TestPulsedPoint:
+    """Check pulsed point-source solutions."""
+
     def test_01_scalar(self):
         """
         Test if the method `pulsed` can handle scalar input and
@@ -240,6 +241,8 @@ class TestPulsedPoint:
 
 
 class TestInstantVsPulsed:
+    """Compare short pulses against instantaneous point-source results."""
+
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source for scalars."""
         xp, yp, zp = 0, 0, 0.001  # meters
@@ -276,6 +279,8 @@ class TestInstantVsPulsed:
 
 
 class TestConstantBoundary:
+    """Check zero-temperature boundary behavior for point sources."""
+
     def test_01_zero(self):
         """Surface temperature should be zero."""
         xp, yp, zp = 0, 0, 0.001  # meters
@@ -308,6 +313,8 @@ class TestConstantBoundary:
 
 
 class TestAdiabaticBoundary:
+    """Check adiabatic boundary symmetry for point sources."""
+
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         xp, yp, zp = 0, 0, 0.001  # meters

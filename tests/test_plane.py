@@ -1,9 +1,5 @@
 #! /usr/bin/env python3
-# pylint: disable=invalid-name
-# pylint: disable=unused-variable
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-module-docstring
+"""Regression tests for plane-source Green's function solutions."""
 
 import numpy as np
 import pytest
@@ -12,6 +8,8 @@ import grheat
 
 
 class TestInstantaneousPlane:
+    """Check instantaneous plane-source solutions."""
+
     def test_01_scalar(self):
         """Exercise scalar evaluation for an instantaneous planar source."""
         zp = 0.001  # meters
@@ -30,6 +28,8 @@ class TestInstantaneousPlane:
 
 
 class TestContinuousPlane:
+    """Check continuous plane-source solutions."""
+
     def test_01_scalar(self):
         """Exercise scalar evaluation for a continuous planar source."""
         zp = 0.001  # meters
@@ -46,6 +46,8 @@ class TestContinuousPlane:
 
 
 class TestPulsedPlane:
+    """Check pulsed plane-source solutions."""
+
     def test_01_scalar(self):
         """Exercise scalar evaluation for a pulsed planar source."""
         zp = 0.001  # meters
@@ -64,6 +66,8 @@ class TestPulsedPlane:
 
 
 class TestInstantVsPulsed:
+    """Compare short pulses against instantaneous plane-source results."""
+
     def test_01_instant(self):
         """Short pulse result should be same as instantaneous source."""
         zp = 0.001  # meters
@@ -91,6 +95,8 @@ class TestInstantVsPulsed:
 
 
 class TestConstantBoundary:
+    """Check zero-temperature boundary behavior for plane sources."""
+
     def test_01_zero(self):
         """Surface temperature should be zero."""
         zp = 0.001  # meters
@@ -112,6 +118,8 @@ class TestConstantBoundary:
 
 
 class TestAdiabaticBoundary:
+    """Check adiabatic boundary symmetry for plane sources."""
+
     def test_01_adiabatic(self):
         """Temperature should be equal above and below."""
         zp = 0.001  # meters

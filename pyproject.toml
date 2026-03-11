@@ -92,13 +92,18 @@ addopts = [
     "--ignore=tests/test_all_notebooks.py",
 ]
 
-[tool.pylint]
+[tool.pylint.format]
+max-line-length = 110
+
+[tool.pylint."messages control"]
 disable = [
     "cyclic-import",
     "duplicate-code",
     "invalid-name",
     "line-too-long",
+    "no-member",
     "too-many-arguments",
+    "too-many-instance-attributes",
     "too-many-locals",
     "too-many-positional-arguments",
     "consider-using-f-string",
@@ -106,7 +111,6 @@ disable = [
     "unused-variable",
     "redefined-builtin",
 ]
-max-line-length = 110
 
 [tool.ruff]
 line-length = 110

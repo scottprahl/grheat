@@ -1,7 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=too-many-arguments
-# pylint: disable=consider-using-f-string
-# pylint: disable=no-member
 """
 Heat transfer Green's function solutions due to an x-line in a semi-infinite medium.
 
