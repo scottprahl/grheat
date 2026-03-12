@@ -32,12 +32,10 @@ More documentation at <https://grheat.readthedocs.io>
 
 """
 
-import scipy.special
 import numpy as np
+import scipy.special
 
-# Constants for water properties
-water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
-water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+from ._common import validate_pulse_duration, water_heat_capacity, water_thermal_diffusivity
 
 
 class Line:
@@ -214,7 +212,7 @@ class Line:
                     T += self._instantaneous(y, z, t, tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._instantaneous(y, z, tt, self.tp)
@@ -306,7 +304,7 @@ class Line:
                     T += self._continuous(y, z, t - tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._continuous(y, z, tt - self.tp)
@@ -356,8 +354,7 @@ class Line:
                 plt.title("Pulsed Line Source at 1mm depth")
                 plt.show()
         """
-        if t_pulse < 0:
-            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+        validate_pulse_duration(t_pulse)
 
         T = self.continuous(y, z, t)
         T -= self.continuous(y, z, t - t_pulse)

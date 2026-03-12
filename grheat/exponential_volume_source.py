@@ -26,11 +26,15 @@ Scott A. Prahl "Charts to rapidly estimate temperature following laser irradiati
 More documentation can be found at <https://grheat.readthedocs.io>
 """
 
-import scipy.special
 import numpy as np
+import scipy.special
 
-water_heat_capacity = 4.186 * 1e6  # J/degree / m**3
-water_thermal_diffusivity = 0.145 * 1e-6  # m**2/s
+from ._common import (
+    validate_positive,
+    validate_pulse_duration,
+    water_heat_capacity,
+    water_thermal_diffusivity,
+)
 
 
 class ExponentialVolumeSource:
@@ -85,7 +89,7 @@ class ExponentialVolumeSource:
             ValueError: If the specified boundary condition is not one of the
                 recognized types ('infinite', 'adiabatic', 'zero').
         """
-        self.mu_a = mu_a  # 1/meter
+        self.mu_a = validate_positive("mu_a", mu_a)  # 1/meter
         self.tp = tp  # seconds
         self.diffusivity = diffusivity  # m**2/s
         self.capacity = capacity  # J/degree/m**3
@@ -195,7 +199,7 @@ class ExponentialVolumeSource:
         if np.isscalar(z):
             T = self._instantaneous_scalar(z, t, tp)
         else:
-            T = np.zeros_like(z)
+            T = np.zeros_like(z, dtype=float)
             for i, zz in enumerate(z):
                 T[i] = self._instantaneous_scalar(zz, t, tp)
         return T
@@ -253,7 +257,7 @@ class ExponentialVolumeSource:
                     T += self._instantaneous(z, t, tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._instantaneous(z, tt, self.tp)
@@ -417,7 +421,7 @@ class ExponentialVolumeSource:
         if np.isscalar(z):
             T = self._continuous_scalar(z, t)
         else:
-            T = np.zeros_like(z)
+            T = np.zeros_like(z, dtype=float)
             for i, zz in enumerate(z):
                 T[i] = self._continuous_scalar(zz, t)
         return T
@@ -474,7 +478,7 @@ class ExponentialVolumeSource:
                     T += self._continuous(z, t - tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._continuous(z, tt - self.tp)
@@ -530,6 +534,8 @@ class ExponentialVolumeSource:
                 plt.title("1 J/cm² pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
+        validate_pulse_duration(t_pulse)
+
         T = self.continuous(z, t)
         T -= self.continuous(z, t - t_pulse)
         return T / t_pulse

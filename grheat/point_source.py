@@ -29,11 +29,10 @@ Jaeger's work.
 More documentation can be found at <https://grheat.readthedocs.io>
 """
 
-import scipy.special
 import numpy as np
+import scipy.special
 
-water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
-water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+from ._common import validate_pulse_duration, water_heat_capacity, water_thermal_diffusivity
 
 
 class Point:
@@ -367,8 +366,7 @@ class Point:
                 plt.title("1J pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if t_pulse < 0:
-            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+        validate_pulse_duration(t_pulse)
 
         T = self.continuous(x, y, z, t)
         tt = np.subtract(t, t_pulse, dtype=np.float64)

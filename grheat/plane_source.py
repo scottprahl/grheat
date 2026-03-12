@@ -27,11 +27,10 @@ based on the mathematical formulations provided in Carslaw and Jaeger's work.
 More documentation at <https://grheat.readthedocs.io>
 """
 
-import scipy.special
 import numpy as np
+import scipy.special
 
-water_heat_capacity = 4.184 * 1e6  # J/degree / m**3
-water_thermal_diffusivity = 0.14558 * 1e-6  # m**2/s
+from ._common import validate_pulse_duration, water_heat_capacity, water_thermal_diffusivity
 
 
 class Plane:
@@ -202,7 +201,7 @@ class Plane:
                     T += self._instantaneous(z, t, tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._instantaneous(z, tt, self.tp)
@@ -296,7 +295,7 @@ class Plane:
                     T += self._continuous(z, t - tp)
 
         else:
-            T = np.zeros_like(t)  # return an array
+            T = np.zeros_like(t, dtype=float)  # return an array
             for i, tt in enumerate(t):
                 if np.isscalar(self.tp):
                     T[i] += self._continuous(z, tt - self.tp)
@@ -343,8 +342,7 @@ class Plane:
                 plt.title("1J pulse lasting %.0f ms" % t_pulse)
                 plt.show()
         """
-        if t_pulse < 0:
-            raise ValueError("Pulse duration (%f) must be positive" % t_pulse)
+        validate_pulse_duration(t_pulse)
 
         T = self.continuous(z, t)
         T -= self.continuous(z, t - t_pulse)

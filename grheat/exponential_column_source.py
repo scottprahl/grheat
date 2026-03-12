@@ -28,10 +28,14 @@ More documentation at <https://grheat.readthedocs.io>
 """
 
 import numpy as np
-import grheat
 
-water_heat_capacity = 4.184 * 1e6  # J/(m³ °C)
-water_thermal_diffusivity = 0.14558 * 1e-6  # m²/s
+from ._common import (
+    validate_positive,
+    validate_positive_int,
+    water_heat_capacity,
+    water_thermal_diffusivity,
+)
+from .point_source import Point
 
 
 class ExponentialColumnSource:
@@ -62,19 +66,20 @@ class ExponentialColumnSource:
             n_quad (int, optional): Number of quadrature points used to approximate the
                 exponentially distributed source depth. Defaults to ``100``.
         """
-        self.mu_a = mu_a
+        self.mu_a = validate_positive("mu_a", mu_a)
         self.xp = xp
         self.yp = yp
         self.tp = 0
         self.diffusivity = diffusivity
         self.capacity = capacity
         self.boundary = boundary.lower()
+        n_quad = validate_positive_int("n_quad", n_quad)
 
         # place source points for exponential quadrature
         k = np.arange(1, n_quad + 1)
-        self.zp = (1 / mu_a) * np.log(2 * k)
-        self.point = grheat.Point(xp, yp, self.zp, boundary=self.boundary)
-        self.weights = (1 / mu_a) * (1 / (2 * k - 1) - 1 / (2 * k + 1))
+        self.zp = (1 / self.mu_a) * np.log(2 * k)
+        self.point = Point(xp, yp, self.zp, boundary=self.boundary)
+        self.weights = (1 / self.mu_a) * (1 / (2 * k - 1) - 1 / (2 * k + 1))
 
     def instantaneous(self, x, y, z, t):
         """
