@@ -10,8 +10,8 @@
    :target: https://github.com/conda-forge/grheat-feedstock
    :alt: conda
 
-.. |zenodo-badge| image:: https://zenodo.org/badge/10030670.svg
-   :target: https://zenodo.org/badge/latestdoi/10030670
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10030670.svg
+   :target: https://doi.org/10.5281/zenodo.10030670
    :alt: zenodo
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
