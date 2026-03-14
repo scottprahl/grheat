@@ -42,10 +42,10 @@ Example Usage
     T = medium.continuous(z, t)
 """
 
-__version__ = "0.2.1"
+__version__ = "0.5.0"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
-__copyright__ = "2022-23, Scott Prahl"
+__copyright__ = "2022-2026, Scott Prahl"
 __license__ = "MIT"
 __url__ = "https://github.com/scottprahl/grheat"
 
