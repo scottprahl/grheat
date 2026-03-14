@@ -10,7 +10,7 @@
    :target: https://github.com/conda-forge/grheat-feedstock
    :alt: conda
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10030670.svg
+.. |zenodo-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10030670.svg
    :target: https://doi.org/10.5281/zenodo.10030670
    :alt: zenodo
 
