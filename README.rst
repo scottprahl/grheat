@@ -54,15 +54,11 @@ grid-based PDE solver.
 
 The package is built around the linear heat equation
 
-::
+:math:`\rho c \frac{\partial T}{\partial t} = k \nabla^2 T + q`
 
-    rho c (dT/dt) = k nabla^2 T + q
+or
 
-or, equivalently,
-
-::
-
-    dT/dt = alpha nabla^2 T + q / (rho c)
+:math:`\frac{\partial T}{\partial t} = \alpha \nabla^2 T + \frac{q}{\rho c}`
 
 where ``T`` is temperature rise, ``alpha`` is thermal diffusivity, and ``rho c`` is the
 volumetric heat capacity of the medium.
