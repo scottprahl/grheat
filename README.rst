@@ -48,11 +48,7 @@ by Scott Prahl
 Green's Functions for the Heat Equation
 ---------------------------------------
 
-``grheat`` implements analytic Green's function solutions of the heat equation for a
-semi-infinite medium. It is a library of closed-form temperature-rise solutions, not a
-grid-based PDE solver.
-
-Heat equation::
+``grheat`` implements analytic Green's function solutions of the heat equation::
 
    ρ c ∂T/∂t = k ∇²T + q
 
@@ -60,26 +56,21 @@ or::
 
     ∂T/∂t = 𝛼 ∇² T + q/(ρ c)
 
-where ``T`` is temperature rise, ``𝛼`` is thermal diffusivity, and ``ρ c`` is the
-volumetric heat capacity of the medium.
+for a semi-infinite medium. It is a library of closed-form temperature-rise solutions, not a
+grid-based PDE solver. 
 
-Because this equation is linear, Green's functions act as impulse responses: once the
-response to an idealized source is known, that solution can be scaled, superposed, and
-integrated to model more realistic heating histories. ``grheat`` packages those analytic
-solutions in a Python API for the most common source geometries used in laser-heating and
-heat-transfer calculations.
 
-In practical terms, ``grheat`` gives you direct formulas for the temperature rise caused
-by:
+Green's functions are especially useful for heat-transfer problems because they make the
+structure of the solution explicit:
 
-- point sources in a half-space
-- line sources parallel to the surface
-- planar sources at depth
-- exponentially absorbed volumetric heating from uniform surface illumination
-- exponentially absorbed heating from point illumination on the surface
+- the source geometry is encoded analytically
+- time dependence can often be handled by convolution or finite pulse differences
+- boundary conditions can be enforced exactly with image sources
+- results are fast to evaluate and easy to compare against numerical simulations
 
-This makes it useful when you want fast, exact reference solutions for parameter studies,
-teaching, verification of numerical models, or quick exploratory calculations.
+That is the role of ``grheat``: it provides reusable implementations of these analytic
+solutions so you can work directly with the physics of the heat equation instead of
+re-deriving the formulas each time.
 
 What The Package Implements
 ---------------------------
@@ -100,12 +91,7 @@ Each class provides methods for common temporal source profiles:
 - ``continuous(...)`` for sources that turn on and remain on
 - ``pulsed(...)`` for finite-duration deposition
 
-All methods return temperature rise, not absolute temperature.
-
-Semi-Infinite Geometry and Boundaries
--------------------------------------
-
-The medium occupies the half-space below the surface ``z = 0``. Surface boundary
+The medium occupies the half-space below the surface ``z = 0`` and surface boundary
 conditions are handled analytically with the method of images. The supported boundary
 conditions are:
 
@@ -113,10 +99,7 @@ conditions are:
 - ``adiabatic``: no heat flow across the surface, ``dT/dz = 0``
 - ``zero``: the surface is held at ``T = 0``
 
-These boundary conditions are available on the source classes where they apply.
-
-Model Assumptions
------------------
+All methods return temperature rise, not absolute temperature.
 
 The analytic solutions in ``grheat`` assume:
 
@@ -163,7 +146,11 @@ A point-source example looks like this:
     # Temperature rise from a unit instantaneous point source
     dT = source.instantaneous(0, 0, 0, t)
 
-The class and method docstrings describe the exact normalization for each source type.
+Full documentation, API reference, and example notebooks are available at
+``grheat.readthedocs.io``:
+
+    |docs-badge|
+
 
 Installation
 ------------
@@ -180,6 +167,12 @@ Or with ``conda``:
 
     conda install -c conda-forge grheat
 
+If you want to run the notebooks in the browser with no local installation, use the
+JupyterLite deployment on GitHub Pages:
+
+    |lite-badge|
+
+
 Documentation and Examples
 --------------------------
 
@@ -188,45 +181,39 @@ The full documentation, API reference, and example notebooks are available at
 
     |docs-badge|
 
-The repository also includes notebooks covering the main source classes:
-
-- point-source examples
-- line-source examples
-- plane-source examples
-- absorbing-medium examples
-
 If you want to run the notebooks in the browser with no local installation, use the
 JupyterLite deployment on GitHub Pages:
 
     |lite-badge|
 
-If you want to open the repository directly in Google Colab, use the badge below:
+Citation
+--------
 
-.. image:: https://colab.research.google.com/assets/colab-badge.svg
-  :target: https://colab.research.google.com/github/scottprahl/grheat/blob/main
-  :alt: Colab
+If you use ``grheat`` in academic, instructional, or applied technical work, please cite:
 
-Why Green's Functions?
-----------------------
+Prahl, S. (2026). *grheat: Green's Functions for the Heat Equation* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.533509810
 
-Green's functions are especially useful for heat-transfer problems because they make the
-structure of the solution explicit:
+BibTeX:
 
-- the source geometry is encoded analytically
-- time dependence can often be handled by convolution or finite pulse differences
-- boundary conditions can be enforced exactly with image sources
-- results are fast to evaluate and easy to compare against numerical simulations
+.. code-block:: bibtex
 
-That is the role of ``grheat``: it provides reusable implementations of these analytic
-solutions so you can work directly with the physics of the heat equation instead of
-re-deriving the formulas each time.
+    @software{prahl_grheat_2026,
+      author  = {Scott Prahl},
+      title   = {{grheat}: Green's functions for the heat equation in python},
+      url     = {https://github.com/scottprahl/grheat},
+      doi     = {10.5281/zenodo.533509810},
+      year    = {2026},
+      version = {0.5.0},
+      publisher = {Zenodo}
+    }
+
 
 References
 ----------
 
 The implementations are based on standard heat-conduction results, especially:
 
-- Carslaw, H. S., and Jaeger, J. C., *Conduction of Heat in Solids*
+- Carslaw, H. S., and Jaeger, J. C., *Conduction of Heat in Solids*, (1959).
 - Prahl, Scott A., "Charts to rapidly estimate temperature following laser irradiation,"
   Proc. SPIE 2391 (1995)
 

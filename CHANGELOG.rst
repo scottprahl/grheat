@@ -2,7 +2,7 @@ Changelog
 =========
 
 0.5.0 (2026-03-14)
--------------
+------------------
 * rename absorber-based APIs and docs to ``ExponentialVolumeSource`` and ``ExponentialColumnSource``
 * expand regression coverage, convert the suite to ``pytest``, and keep the example notebooks runnable
 * modernize packaging and automation with ``pyproject.toml``
