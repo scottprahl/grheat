@@ -1,28 +1,29 @@
 Releasing a new version
 
-# make sure all Jupyter notebooks in the docs folder still work
-
 # make sure things are not broken and that files match up
   make rcheck
-  python -m build
   
-# update the version in setup.cfg and docs/conf.py
-  git commit setup.cfg docs/conf.py -m 'update version'
+# update the version in grheat/__init__.py
+  git commit grheat/__init__.py -m 'update version'
 
-# update CHANGELOG.txt  `git shortlog v0.4.1..HEAD`
+# update CHANGELOG.txt  `git shortlog 0.5.0..HEAD`
   git commit CHANGELOG.txt -m 'update recent changes' 
   git push
 
+# update lite implementation
+  make lite
+  make lite-deploy
+
 # create release tag on github
-  git tag v0.4.4
-  git push origin v0.4.4
+  git tag 0.5.0
+  git push origin 0.5.0
 
-# create pure python package and upload to pypi
-  rm -rf dist/*
-  python3 -m build
-  python3 -m twine upload dist/*
-
-# manually update release at
+# manually publish release at
   open https://github.com/scottprahl/grheat
+
+# verify action success
   open https://pypi.org/project/grheat/
   open https://grheat.readthedocs.io
+
+# wait for feedstock update
+  open https://github.com/conda-forge/grheat-feedstock
