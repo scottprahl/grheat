@@ -42,7 +42,7 @@ Example Usage
     T = medium.continuous(z, t)
 """
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
 __copyright__ = "2022-2026, Scott Prahl"

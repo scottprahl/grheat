@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.5.1 (2026-03-14)
+------------------
+* get releases into sync again
+
 0.5.0 (2026-03-14)
 ------------------
 * rename absorber-based APIs and docs to ``ExponentialVolumeSource`` and ``ExponentialColumnSource``

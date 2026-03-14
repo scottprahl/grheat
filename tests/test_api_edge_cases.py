@@ -35,9 +35,7 @@ import grheat
         ),
         (
             lambda: grheat.ExponentialVolumeSource(1000).instantaneous(0, np.array([1, 2, 3], dtype=int)),
-            lambda: grheat.ExponentialVolumeSource(1000).instantaneous(
-                0, np.array([1.0, 2.0, 3.0])
-            ),
+            lambda: grheat.ExponentialVolumeSource(1000).instantaneous(0, np.array([1.0, 2.0, 3.0])),
         ),
         (
             lambda: grheat.ExponentialVolumeSource(1000).continuous(0, np.array([1, 2, 3], dtype=int)),
