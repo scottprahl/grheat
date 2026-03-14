@@ -52,15 +52,15 @@ Green's Functions for the Heat Equation
 semi-infinite medium. It is a library of closed-form temperature-rise solutions, not a
 grid-based PDE solver.
 
-The package is built around the linear heat equation
+Heat equation::
 
-:math:`\rho c \frac{\partial T}{\partial t} = k \nabla^2 T + q`
+   ρ c ∂T/∂t = k ∇²T + q
 
-or
+or::
 
-:math:`\frac{\partial T}{\partial t} = \alpha \nabla^2 T + \frac{q}{\rho c}`
+    ∂T/∂t = 𝛼 ∇² T + q/(ρ c)
 
-where ``T`` is temperature rise, ``alpha`` is thermal diffusivity, and ``rho c`` is the
+where ``T`` is temperature rise, ``𝛼`` is thermal diffusivity, and ``ρ c`` is the
 volumetric heat capacity of the medium.
 
 Because this equation is linear, Green's functions act as impulse responses: once the
