@@ -10,8 +10,8 @@
    :target: https://github.com/conda-forge/grheat-feedstock
    :alt: conda
 
-.. |zenodo-badge| image:: https://zenodo.org/badge/533509810.svg
-   :target: https://zenodo.org/badge/latestdoi/533509810
+.. |zenodo-badge| image:: https://zenodo.org/badge/10030670.svg
+   :target: https://zenodo.org/badge/latestdoi/10030670
    :alt: zenodo
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/grheat?color=68CA66
@@ -191,7 +191,7 @@ Citation
 
 If you use ``grheat`` in academic, instructional, or applied technical work, please cite:
 
-Prahl, S. (2026). *grheat: Green's Functions for the Heat Equation* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.533509810
+Prahl, S. (2026). *grheat: Green's Functions for the Heat Equation* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.10030670
 
 BibTeX:
 
@@ -201,7 +201,7 @@ BibTeX:
       author  = {Scott Prahl},
       title   = {{grheat}: Green's functions for the heat equation in python},
       url     = {https://github.com/scottprahl/grheat},
-      doi     = {10.5281/zenodo.533509810},
+      doi     = {10.5281/zenodo.10030670},
       year    = {2026},
       version = {0.5.0},
       publisher = {Zenodo}
