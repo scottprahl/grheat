@@ -191,7 +191,7 @@ Citation
 
 If you use ``grheat`` in academic, instructional, or applied technical work, please cite:
 
-Prahl, S. (2026). *grheat: a python module for heat transfer Green's functions* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.10030670
+Prahl, S. (2026). *grheat: a python module for heat transfer Green's functions* (Version 0.5.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.10030670
 
 BibTeX:
 
@@ -203,7 +203,7 @@ BibTeX:
       url     = {https://github.com/scottprahl/grheat},
       doi     = {10.5281/zenodo.10030670},
       year    = {2026},
-      version = {0.5.0},
+      version = {0.5.1},
       publisher = {Zenodo}
     }
 
