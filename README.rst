@@ -191,7 +191,7 @@ Citation
 
 If you use ``grheat`` in academic, instructional, or applied technical work, please cite:
 
-Prahl, S. (2026). *grheat: Green's Functions for the Heat Equation* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.533509810
+Prahl, S. (2023). *grheat: Green's Functions for the Heat Equation* (Version 0.5.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.533509810
 
 BibTeX:
 
@@ -202,7 +202,7 @@ BibTeX:
       title   = {{grheat}: Green's functions for the heat equation in python},
       url     = {https://github.com/scottprahl/grheat},
       doi     = {10.5281/zenodo.533509810},
-      year    = {2026},
+      year    = {2023},
       version = {0.5.0},
       publisher = {Zenodo}
     }
